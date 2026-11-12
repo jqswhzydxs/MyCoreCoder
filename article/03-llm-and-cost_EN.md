@@ -2,7 +2,7 @@
 
 The last two pieces covered the loop and the tools, the agent's hands and feet. This piece covers the brain's interface: how the model gets plugged in, how streaming output is handled, how to survive a provider acting up, and a question many tutorials skip but that you'll care about on day one after going live, namely how much this round actually cost.
 
-The file is `corecoder/llm.py`, 349 lines, the largest single file in the engine. It's large because it carries, on your behalf, all the inelegant parts of dealing with a real API.
+The file is `corecoder/llm.py`, 391 lines. It's large because it carries, on your behalf, all the inelegant parts of dealing with a real API.
 
 ## A bet: everyone looks like OpenAI
 
@@ -112,7 +112,7 @@ The logic is classic exponential backoff: failures that are obviously transient,
 
 This retry logic is worth calling out specifically, because "a project this small surely has no room to bother with retries" is a natural misconception, and the truth is the opposite. Retry is not only present, it's thought through quite carefully, even defending with `getattr` against the base `APIError` possibly lacking a `status_code` attribute (different SDK versions have different exception hierarchies, and grabbing the attribute by force would blow up).
 
-What CoreCoder didn't do is Claude Code's heavier graceful degradation: auto-switching to a fallback model on persistent server-side 529s, and a dollar-denominated budget cap. It genuinely didn't do these two, but the reason isn't oversight, it's a tradeoff. A fallback model involves the "which model can stand in for which" policy that's hard to unify across providers, and a dollar budget requires maintaining a price table that keeps changing. CoreCoder did the part it could implement cleanly (backoff retry) and left the part that would drag in a lot of provider-specific logic (fallback, hard budget) for you to add as needed. Knowing "what it did" and "what it deliberately didn't do" is far more useful than a vague "it's crude."
+CoreCoder still does not implement Claude Code's heavier fallback behavior: automatically switching models after persistent server-side 529s, because the "which model can stand in for which" policy is hard to unify across providers. The current fork does enforce dollar budgets when pricing is known; an unknown price records `cost_unavailable` and leaves the other limits active instead of pretending the model is free. Knowing "what it did" and "what it deliberately didn't do" is far more useful than a vague "it's crude."
 
 There's also an easily overlooked coordination detail. `stream_options` is an OpenAI extension that some providers don't recognize and answer with a 400. CoreCoder handles it like this:
 
@@ -185,7 +185,7 @@ Of course this is only an estimate; the price table goes stale, and cache discou
 
 ## Where config comes from
 
-Finally, a thread through `config.py` (55 lines). It reads config from environment variables with a sensible priority:
+Finally, a thread through `config.py` (56 lines). It reads config from environment variables with a sensible priority:
 
 ```python
 api_key = (
@@ -203,7 +203,7 @@ The dedicated variable wins, then it falls back to the generic `OPENAI_API_KEY`,
 - The bet that "most providers are OpenAI-compatible" lets the whole provider layer thin out to a single wrapper over the openai SDK, and switching providers is two environment variables.
 - In streaming output, tool-call arguments arrive in fragments, to be accumulated by index then `json.loads`-ed, and bad data must degrade gracefully.
 - Retry belongs in the provider layer, not stuffed into the main loop. Exponential backoff retries only transient failures and 5xx, never 4xx.
-- CoreCoder did backoff retry and deliberately skipped the fallback model and dollar hard budget, because the latter two drag in a lot of provider-specific logic. Tell "didn't do" apart from "deliberately didn't do."
+- CoreCoder implements backoff retry and known-price dollar limits; fallback models remain deliberately open because provider substitution policy is not uniform. Tell "didn't do" apart from "deliberately didn't do."
 - Cost estimation returns `None` for an unknown model rather than inventing a falsely precise number. Honesty beats looking good.
 
 Next piece, we face the agent's hardest physical constraint: the context window is only so big, and how a long task fits inside it.

@@ -1,0 +1,39 @@
+{
+  "id": "missing_file",
+  "category": "boundary",
+  "description": "A missing file is returned to the model as an ordinary tool error.",
+  "input": "Read missing.txt.",
+  "tools": ["read_file"],
+  "permission": "non_interactive",
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "missing-1",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/missing.txt"}
+        }
+      ]
+    },
+    {"content": "The requested file does not exist."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/missing.txt"},
+      "result_contains": "not found"
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {
+    "missing.txt": {"exists": false}
+  },
+  "expected_final_outcome": {
+    "exact": "The requested file does not exist.",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

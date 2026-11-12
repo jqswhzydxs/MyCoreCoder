@@ -34,7 +34,7 @@ def test_read_only_tools_run_without_consent(tmp_path):
         permission=Permission(),  # nobody to ask, and it doesn't matter
     )
 
-    assert agent.chat("go") == "read it"
+    assert agent.chat("go") == "[未验证] read it"
     assert "hello" in agent.messages[2]["content"]
 
 
@@ -46,7 +46,7 @@ def test_allow_once_asks_again_for_the_next_call(tmp_path):
         permission=Permission(ask=lambda name, args: asked.append(name) or "once"),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert asked == ["write_file", "write_file"]  # every call asks
     assert (tmp_path / "a.txt").exists() and (tmp_path / "b.txt").exists()
 
@@ -59,7 +59,7 @@ def test_always_allow_is_remembered_for_the_session(tmp_path):
         permission=Permission(ask=lambda name, args: asked.append(name) or "always"),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert asked == ["write_file"]  # the second call went straight through
     assert (tmp_path / "a.txt").exists() and (tmp_path / "b.txt").exists()
 
@@ -74,7 +74,7 @@ def test_deny_skips_execution_and_reports_back(tmp_path):
         permission=Permission(ask=lambda name, args: "deny"),
     )
 
-    assert agent.chat("go") == "understood"  # the loop survived the refusal
+    assert agent.chat("go") == "[未验证] understood"  # the loop survived the refusal
     assert not (tmp_path / "a.txt").exists()
     refusal = agent.messages[2]
     assert refusal["role"] == "tool" and refusal["tool_call_id"] == "c1"
@@ -92,7 +92,7 @@ def test_no_callback_means_auto_deny(tmp_path):
         permission=Permission(),
     )
 
-    assert agent.chat("go") == "ok"
+    assert agent.chat("go") == "[未验证] ok"
     assert not (tmp_path / "a.txt").exists()
     assert "non-interactive" in agent.messages[2]["content"]
 
@@ -105,7 +105,7 @@ def test_allow_all_approves_without_any_callback(tmp_path):
         permission=Permission(allow_all=True),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists() and (tmp_path / "b.txt").exists()
 
 
@@ -147,7 +147,7 @@ def test_parallel_calls_each_get_their_own_decision(tmp_path):
         permission=Permission(ask=lambda name, args: "deny" if name == "bash" else "once"),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert not marker.exists()              # the denied bash never ran
     assert (tmp_path / "ok.txt").exists()   # the allowed write did
     results = {m["tool_call_id"]: m["content"] for m in agent.messages if m.get("role") == "tool"}
@@ -174,7 +174,7 @@ def test_sub_agent_inherits_the_permission_layer(tmp_path):
         permission=Permission(ask=ask),
     )
 
-    assert agent.chat("go") == "parent done"
+    assert agent.chat("go") == "[未验证] parent done"
     assert seen == ["agent", "write_file"]  # consent followed into the sub-agent
     assert not target.exists()
 

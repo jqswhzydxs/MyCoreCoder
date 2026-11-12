@@ -10,7 +10,18 @@ from unittest import mock
 import pytest
 from openai import BadRequestError
 
-from corecoder import ALL_TOOLS, LLM, Agent, Config, __version__
+from corecoder import (
+    ALL_TOOLS,
+    LLM,
+    Agent,
+    CompositeVerifier,
+    Config,
+    FileStateVerifier,
+    VerificationResult,
+    VerificationStatus,
+    Verifier,
+    __version__,
+)
 from corecoder import session as session_module
 from corecoder.context import ContextManager, estimate_tokens
 from corecoder.session import list_sessions, load_session, save_session
@@ -102,6 +113,11 @@ def test_public_api_exports():
     assert Agent is not None
     assert LLM is not None
     assert Config is not None
+    assert CompositeVerifier is not None
+    assert FileStateVerifier is not None
+    assert VerificationResult is not None
+    assert VerificationStatus is not None
+    assert Verifier is not None
     assert len(ALL_TOOLS) == 8
 
 
@@ -320,9 +336,8 @@ def test_write_tracks_changed_files(tmp_path):
 
 # --- Agent tool execution ---
 
-def test_parallel_bash_calls_inherit_and_merge_session_cwd(tmp_path):
-    """Pool workers must start from the session cwd, not the launch dir, and a
-    cd inside the batch moves the session cwd afterwards."""
+def test_batched_bash_calls_preserve_session_cwd_in_serial_order(tmp_path):
+    """Bash owns the global shell/cwd resource, so a batch runs in order."""
     from corecoder.tools.bash import get_tracked_cwd, set_tracked_cwd
 
     def norm_dir(s: str) -> str:
@@ -353,11 +368,11 @@ def test_parallel_bash_calls_inherit_and_merge_session_cwd(tmp_path):
         assert norm_dir(str(tmp_path)) in norm_dir(results[0])
         assert "marker.txt" in results[1]
 
-        # a cd in the batch lands on the session afterwards; siblings in the
-        # same batch still start from the pre-batch cwd (parallel, not serial)
+        # A cd in the batch is visible to the next command and remains the
+        # session cwd afterwards because bash is deliberately never parallel.
         results = agent._exec_tools_parallel([_TC(3, f"cd {target}"), _TC(4, "pwd")])
         assert get_tracked_cwd() == str(target)
-        assert norm_dir(str(tmp_path)) in norm_dir(results[1])
+        assert norm_dir(results[1]) == norm_dir(str(target))
     finally:
         set_tracked_cwd(prev)
 
@@ -453,8 +468,10 @@ def test_exec_tool_distinguishes_bad_args_from_internal_error():
         name, id, arguments = "boom", "2", {}
 
     assert "bad arguments" in agent._exec_tool(_BadArgs())
-    assert "Error executing boom" in agent._exec_tool(_Good())
-    assert "bad arguments" not in agent._exec_tool(_Good())
+    safe_error = agent._exec_tool(_Good())
+    assert "failed unexpectedly" in safe_error
+    assert "internal explosion" not in safe_error
+    assert "bad arguments" not in safe_error
 
 
 def test_interrupt_backfills_missing_tool_replies():

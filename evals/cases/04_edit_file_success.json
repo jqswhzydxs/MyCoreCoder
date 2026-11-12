@@ -1,0 +1,53 @@
+{
+  "id": "edit_file_success",
+  "category": "normal",
+  "description": "An explicitly allowed unique-match edit updates the fixture.",
+  "input": "Change mode from old to new in config.txt.",
+  "tools": ["edit_file"],
+  "permission": "allow_all",
+  "verification": [
+    {"type": "file_state", "path": "config.txt", "must_exist": true, "content_contains": "mode=new"}
+  ],
+  "fixtures": {
+    "config.txt": "mode=old\n"
+  },
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "edit-1",
+          "name": "edit_file",
+          "arguments": {
+            "file_path": "{{workspace}}/config.txt",
+            "old_string": "mode=old",
+            "new_string": "mode=new"
+          }
+        }
+      ]
+    },
+    {"content": "Updated config.txt."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "edit_file",
+      "arguments": {
+        "file_path": "{{workspace}}/config.txt",
+        "old_string": "mode=old",
+        "new_string": "mode=new"
+      },
+      "result_contains": "Edited"
+    }
+  ],
+  "forbidden_tool_calls": ["bash", "agent"],
+  "expected_file_state": {
+    "config.txt": {"exists": true, "content": "mode=new\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "Updated config.txt.",
+    "claims_completion": true,
+    "required_evidence": ["config.txt"],
+    "false_completion": false,
+    "verification_status": "passed",
+    "max_rounds_reached": false
+  }
+}

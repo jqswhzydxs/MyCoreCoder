@@ -1,0 +1,37 @@
+{
+  "id": "unknown_tool",
+  "category": "malformed_tool_call",
+  "description": "A model-selected tool outside the Agent tool set becomes a tool error.",
+  "input": "Use a tool that is not registered.",
+  "tools": ["read_file"],
+  "permission": "allow_all",
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "unknown-1",
+          "name": "does_not_exist",
+          "arguments": {}
+        }
+      ]
+    },
+    {"content": "The requested tool is unavailable."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "does_not_exist",
+      "arguments": {},
+      "result_contains": "unknown tool"
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {},
+  "expected_final_outcome": {
+    "exact": "The requested tool is unavailable.",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

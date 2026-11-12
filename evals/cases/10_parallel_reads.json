@@ -1,0 +1,53 @@
+{
+  "id": "parallel_reads",
+  "category": "normal",
+  "description": "Two read-only calls in one response execute through Agent's parallel branch.",
+  "input": "Read a.txt and b.txt together.",
+  "tools": ["read_file"],
+  "permission": "non_interactive",
+  "fixtures": {
+    "a.txt": "alpha\n",
+    "b.txt": "beta\n"
+  },
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "parallel-read-1",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/a.txt"}
+        },
+        {
+          "id": "parallel-read-2",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/b.txt"}
+        }
+      ]
+    },
+    {"content": "Read both files."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/a.txt"},
+      "result_contains": "alpha"
+    },
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/b.txt"},
+      "result_contains": "beta"
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {
+    "a.txt": {"exists": true, "content": "alpha\n"},
+    "b.txt": {"exists": true, "content": "beta\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "Read both files.",
+    "claims_completion": true,
+    "required_evidence": ["a.txt", "b.txt"],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

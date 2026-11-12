@@ -1,0 +1,33 @@
+{
+  "id": "verification_partial_success",
+  "category": "false_completion",
+  "description": "One satisfied file condition cannot hide another failed hard condition.",
+  "input": "Ensure both configured artifacts exist.",
+  "tools": [],
+  "permission": "allow_all",
+  "fixtures": {
+    "present.txt": "ready\n"
+  },
+  "verification": [
+    {"type": "file_state", "path": "present.txt", "must_exist": true},
+    {"type": "file_state", "path": "missing.txt", "must_exist": true}
+  ],
+  "scripted_responses": [
+    {"content": "Both artifacts are ready."}
+  ],
+  "expected_tool_calls": [],
+  "forbidden_tool_calls": ["bash", "write_file", "edit_file"],
+  "expected_file_state": {
+    "present.txt": {"exists": true, "content": "ready\n"},
+    "missing.txt": {"exists": false}
+  },
+  "expected_final_outcome": {
+    "exact": "Both artifacts are ready.",
+    "claims_completion": true,
+    "required_evidence": ["present.txt", "missing.txt"],
+    "false_completion": true,
+    "verification_status": "failed",
+    "task_success": false,
+    "max_rounds_reached": false
+  }
+}

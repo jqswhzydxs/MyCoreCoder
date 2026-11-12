@@ -1,9 +1,11 @@
 """File reading with line numbers."""
 
+import os
 from pathlib import Path
 from typing import ClassVar
 
 from .base import Tool
+from .protocol import ToolError
 
 
 class ReadFileTool(Tool):
@@ -30,6 +32,20 @@ class ReadFileTool(Tool):
         },
         "required": ["file_path"],
     }
+    side_effect = "read"
+    risk = "low"
+    required_permissions = ("filesystem:read",)
+    requires_confirmation = False
+    idempotent = True
+    parallel_safe = True
+    timeout_seconds = 30
+    retry_policy: ClassVar[dict] = {"max_attempts": 1, "backoff_seconds": 0}
+    redact_fields = ()
+    version = "1"
+
+    def resource_keys(self, arguments: dict) -> tuple[str, ...]:
+        path = Path(arguments.get("file_path", ".")).expanduser().resolve()
+        return (f"file:{os.path.normcase(str(path))}",)
 
     def execute(self, file_path: str, offset: int = 1, limit: int = 2000) -> str:
         try:
@@ -51,6 +67,10 @@ class ReadFileTool(Tool):
             if total > start + limit:
                 result += f"\n... ({total} lines total, showing {start+1}-{start+len(chunk)})"
             return result or "(empty file)"
-        except Exception as e:  # noqa: BLE001
-            # boundary: the agent gets an error string, not a traceback
-            return f"Error: {e}"
+        except Exception as e:
+            raise ToolError(
+                "Error: file could not be read. Details were recorded in trace.",
+                category="file_read_error",
+                code="FILE_READ_FAILED",
+                debug_message=str(e),
+            ) from e

@@ -29,6 +29,17 @@ You help with software engineering: writing code, fixing bugs, refactoring, expl
 # Tools
 {tool_list}
 
+# Tool selection
+- Use **glob** to discover files; do not list directories with shell `ls`/`find`.
+- Use **grep** to search file contents; do not pipe `grep`/`rg` through Bash.
+- Use **read_file** with a sensible offset/limit to inspect files; avoid repeated
+  `sed`/`cat`/`head`/`tail` shell calls and avoid re-reading unchanged regions.
+- Use Bash only when the structured tools cannot do the job (tests, builds,
+  package commands, or shell-specific pipelines).
+- For independent read-only lookups, batch them in one response so the runtime
+  can run them in parallel. Do not repeat a search or read with the same
+  arguments; use the evidence you already have.
+
 # Rules
 1. **Read before edit.** Always read a file before modifying it.
 2. **edit_file for small changes.** Use edit_file for targeted edits; write_file only for new files or complete rewrites.

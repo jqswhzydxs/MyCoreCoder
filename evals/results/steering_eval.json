@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-11-11T09:22:17+08:00",
+  "offline_only": true,
+  "model": "scripted fake LLM (no API key)",
+  "cases": [
+    {
+      "id": "token_streaming",
+      "category": "streaming",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 7,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "tool_calls_only_progress",
+      "category": "streaming",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 13,
+      "executions": [
+        "one"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "append_while_model",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 19,
+      "executions": [
+        "frontend",
+        "backend"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "redirect_while_model",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 18,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "redirect_before_write",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 15,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "redirect_after_write",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 16,
+      "executions": [],
+      "writes": [
+        "D:\\\u684c\u9762\\agent\\CoreCoder\\CoreCoder\\.tmp\\corecoder-steering-eval-k_efq_ka\\06-redirect_after_write\\front.txt"
+      ],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "redirect_between_serial_tools",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 19,
+      "executions": [],
+      "writes": [
+        "D:\\\u684c\u9762\\agent\\CoreCoder\\CoreCoder\\.tmp\\corecoder-steering-eval-k_efq_ka\\07-redirect_between_serial_tools\\one.txt"
+      ],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "redirect_parallel_batch",
+      "category": "steering",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 20,
+      "executions": [
+        "a",
+        "b"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "pause_resume",
+      "category": "control",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 18,
+      "executions": [
+        "front"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "pause_cancel",
+      "category": "control",
+      "status": "cancelled",
+      "terminal_seen": true,
+      "event_count": 10,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "bash_stream",
+      "category": "streaming",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 15,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "bash_cancel",
+      "category": "cancellation",
+      "status": "cancelled",
+      "terminal_seen": true,
+      "event_count": 9,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "permission_steering",
+      "category": "permission",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 15,
+      "executions": [
+        "write"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "crash_resume",
+      "category": "recovery",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 7,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "sink_exception",
+      "category": "fault",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 7,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "sensitive_input",
+      "category": "security",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 12,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "backpressure",
+      "category": "backpressure",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 22,
+      "executions": [],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    },
+    {
+      "id": "repeated_read_cache",
+      "category": "cache",
+      "status": "unverified",
+      "terminal_seen": true,
+      "event_count": 18,
+      "executions": [
+        "same"
+      ],
+      "writes": [],
+      "error": null,
+      "timed_out": false
+    }
+  ],
+  "metrics": {
+    "scenario_count": 18,
+    "event_delivery_success_rate": 1.0,
+    "event_order_violation_count": 0,
+    "steering_ack_p50_ms": 0.036,
+    "steering_ack_p95_ms": 0.075,
+    "steering_apply_p50_ms": 0.773,
+    "steering_apply_p95_ms": 201.274,
+    "cancelled_before_side_effect_rate": 1.0,
+    "orphan_tool_message_count": 0,
+    "duplicate_tool_execution_rate": 0.0,
+    "time_to_first_progress_p50_ms": 0.002,
+    "time_to_first_progress_p95_ms": 11.977,
+    "run_completion_rate": 1.0,
+    "deadlock_count": 0,
+    "sensitive_payload_leak_count": 0,
+    "cache_hits": 1
+  },
+  "gates": {
+    "orphan_tool_message_count": {
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    "deadlock_count": {
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    "sensitive_payload_leak_count": {
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    "event_order_violation_count": {
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    }
+  },
+  "all_gates_passed": true
+}

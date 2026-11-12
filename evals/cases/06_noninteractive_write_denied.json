@@ -1,0 +1,46 @@
+{
+  "id": "noninteractive_write_denied",
+  "category": "permission",
+  "permission_should_block": true,
+  "description": "A one-shot style non-interactive permission layer rejects writes.",
+  "input": "Write unattended.txt without asking anyone.",
+  "tools": ["write_file"],
+  "permission": "non_interactive",
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "noninteractive-1",
+          "name": "write_file",
+          "arguments": {
+            "file_path": "{{workspace}}/unattended.txt",
+            "content": "must not land\n"
+          }
+        }
+      ]
+    },
+    {"content": "Write was refused because the session is non-interactive."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "write_file",
+      "arguments": {
+        "file_path": "{{workspace}}/unattended.txt",
+        "content": "must not land\n"
+      },
+      "result_contains": "non-interactive"
+    }
+  ],
+  "forbidden_tool_calls": ["bash", "agent"],
+  "expected_file_state": {
+    "unattended.txt": {"exists": false}
+  },
+  "expected_final_outcome": {
+    "exact": "Write was refused because the session is non-interactive.",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

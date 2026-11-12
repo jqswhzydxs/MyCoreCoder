@@ -1,4 +1,5 @@
-"""Shell routing: POSIX commands need a POSIX shell.
+"""shell.py
+Shell routing: POSIX commands need a POSIX shell.
 
 On macOS/Linux `shell=True` already means /bin/sh. On Windows it means
 cmd.exe, where pwd, ls, cat, sleep and friends do not exist. Every shell
@@ -59,3 +60,30 @@ def run_shell(command: str, check: bool = False, **kwargs) -> subprocess.Complet
     if bash is not None:
         return subprocess.run([bash, "-c", _posixify_drive_paths(command)], shell=False, check=check, **kwargs)
     return subprocess.run(command, shell=True, check=check, **kwargs)
+
+
+def spawn_shell(command: str, **kwargs) -> subprocess.Popen:
+    """Spawn one POSIX command string with the same routing as ``run_shell``.
+
+    The child is placed in its own process group/session so a cancelled tool
+    call can terminate the whole tree, not merely the shell that fronts it.
+    Callers own stdout/stderr pipes and must reap the process.
+    """
+    kwargs.setdefault("stdin", subprocess.DEVNULL)
+    if os.name == "nt":
+        # CREATE_NEW_PROCESS_GROUP is the portable Windows way to keep a
+        # child (and its descendants) distinct from the Agent's console.
+        flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+        if flags:
+            kwargs.setdefault("creationflags", flags)
+    else:
+        kwargs.setdefault("start_new_session", True)
+
+    bash = _git_bash()
+    if bash is not None:
+        return subprocess.Popen(
+            [bash, "-c", _posixify_drive_paths(command)],
+            shell=False,
+            **kwargs,
+        )
+    return subprocess.Popen(command, shell=True, **kwargs)

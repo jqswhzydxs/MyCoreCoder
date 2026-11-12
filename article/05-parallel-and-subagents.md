@@ -6,43 +6,37 @@
 
 模型并不总是一次只要一个工具。你让它「看看这三个文件分别写了啥」，它很可能一口气返回三个 `read_file` 调用。这三个读操作彼此独立，串行跑就是干等，明明可以一起来。
 
-CoreCoder 在主循环里就是这么分流的：
+CoreCoder 先把整批调用交给独立的 `ToolScheduler` 做计划：
 
 ```python
-if len(resp.tool_calls) == 1:
-    tc = resp.tool_calls[0]
-    # ...直接执行...
+schedule = self.tool_scheduler.plan(resp.tool_calls)
+if schedule.parallel:
+    results = self._exec_tool_results_parallel(
+        resp.tool_calls, schedule=schedule
+    )
 else:
-    # parallel execution for multiple tool calls
-    results = self._exec_tools_parallel(resp.tool_calls, on_tool)
+    # 按模型给出的顺序串行执行
+    ...
 ```
 
-单个就直接跑，多个就交给 `_exec_tools_parallel`，一个线程池：
+调度器不按工具名写特例，而是读取每个工具的 `ToolSpec`。只有 `parallel_safe=true`、不需要交互审批、没有尚未解决的数据依赖、也没有不兼容资源冲突的一批调用，才会进入线程池。`write`、`external` 和 `high-risk` 默认串行；只读资源可以共享，所以多个 `read_file`、`grep`、`glob` 仍能真正并发。
 
 ```python
-def _exec_tools_parallel(self, tool_calls, on_tool=None) -> list[str]:
-    for tc in tool_calls:
-        if on_tool:
-            on_tool(tc.name, tc.arguments)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
-        futures = [pool.submit(self._exec_tool, tc) for tc in tool_calls]
-        return [f.result() for f in futures]
+plan = scheduler.plan(tool_calls)
+results = scheduler.execute(tool_calls, invoke, plan=plan)
 ```
 
-最多 8 个线程并发，每个跑一个工具，最后按原顺序收齐结果。三个文件读取本来要等三趟 IO，现在大致只等一趟。对一个会频繁同时读多个文件的 agent，这个并行省下的时间相当可观。
+最多 8 个线程并发，每个跑一个安全调用，最后按原始 tool-call 顺序收齐结果。单个并行调用失败不会吞掉同批其他结果；取消、Ctrl+C 或调度异常也会给所有 pending call 回填合法的 `ToolResult`，避免留下孤儿 tool 消息。三个文件读取本来要等三趟 IO，现在大致只等一趟。
 
 用线程而不是进程或者协程，是因为工具干的基本都是 IO 密集的活：读盘、跑子进程、等网络。这种场景下 Python 的 GIL 不怎么碍事，线程池又是标准库里最省事的并发原语，几行就搞定。选型和项目「能简则简」的基调一致。
 
+每个工具还可以实现 `resource_keys(arguments)`。文件工具返回规范化绝对路径，bash 返回全局 shell/cwd 资源，MCP 返回 server + tool 资源。同一文件的 edit/write 因而必定冲突并串行，而无关文件的只读调用可以并发。调度决定、排队耗时和执行耗时都会写入可选 Trace。
+
 ## 这个简化，相对 Claude Code 差在哪
 
-这里得把简化的边界讲清楚。Claude Code 的并发执行（公开拆解里叫 StreamingToolExecutor）比这激进得多，也精细得多。它有两点是 CoreCoder 没做的。
+这里得把简化的边界讲清楚。Claude Code 的并发执行（公开拆解里叫 StreamingToolExecutor）仍然更激进。它会边生成边执行：模型还在吐后面的内容，前面已经成形的工具调用就可以先跑起来，不必等整段响应结束。CoreCoder 是老老实实等模型把这一轮说完，拿到完整的工具调用列表，才开始计划和执行。少了这个「投机执行」，省的是实现复杂度，丢的是一点延迟。
 
-一是它边生成边执行。模型还在吐后面的内容，前面已经成形的工具调用就可以先跑起来，不必等整段响应结束。CoreCoder 是老老实实等模型把这一轮说完，拿到完整的工具调用列表，才开始执行。少了这个「投机执行」，省的是实现复杂度，丢的是一点点延迟。
-
-二是它会区分工具安不安全并发。公开拆解里 Claude Code 给每个工具标了个 `isConcurrencySafe`，只读的工具（读文件、搜索）可以放心并发，会写的工具（改文件、跑命令）则要小心。CoreCoder 没做这个区分，它把一批工具调用一股脑全丢进线程池，不管它们是读是写。
-
-第二点不只是「少了个优化」，它埋着一个真问题。
+CoreCoder 的策略还刻意偏保守：只要一批调用里有一个不满足并行条件，主循环就按模型顺序串行整批调用，而不是进一步做依赖图分层或把安全子集切成多个并发 wave。这让预算、审批、cwd 和错误回填更容易推理，代价是某些混合批次仍有可优化的等待时间。
 
 ## 并行不是免费的：共享可变状态会咬人
 
@@ -55,9 +49,9 @@ CoreCoder 里 bash 的工作目录跟踪，正是一个绝佳的例子。上一�
 _cwd: str | None = None
 ```
 
-串行执行时，这毫无问题，一次只有一个 bash 在跑，读写这个全局井然有序。可一旦走到并行分支，模型同时返回了两个 bash 调用，它们会在不同线程里同时读写这同一个 `_cwd`。一个调用刚把它改成目录 A，另一个调用可能正巧读到了这个 A，或者反手把它覆盖成 B。两个本该各自独立的命令，因为共享了一份全局状态，结果纠缠在了一起。这就是典型的竞态：平时跑一万次都对，偏在并发、时序不巧的那一次，给你一个莫名其妙、还很难复现的错。
+串行执行时，这毫无问题，一次只有一个 bash 在跑，读写这个全局井然有序。可如果调度层误把两个 bash 放进不同线程，它们就会同时读写同一个 `_cwd`，形成难以复现的竞态。
 
-所以 CoreCoder 没这么存。干净的解法是把这种「每个执行流各自的状态」隔离开，别让它们共享。Python 里现成的工具是 `threading.local()`，它给每个线程一份独立的副本，线程之间互不可见，`bash.py` 里真正用的就是这一版：
+CoreCoder 用两层防线处理它。第一层是调度规则：bash 的 `ToolSpec` 是 external/high-risk/parallel-unsafe，还声明全局 shell/cwd resource，因此永远串行。第二层仍把「每个执行流各自的状态」放进 `threading.local()`，隔离父 agent、子 agent 和调用线程，`bash.py` 里真正用的就是这一版：
 
 ```python
 import threading
@@ -73,7 +67,7 @@ _local.cwd = running
 
 ## 子 agent：给自己开一个分身
 
-`agent` 工具（`corecoder/tools/agent.py`，72 行）解决的是另一个问题。有些子任务很重，比如「把这个陌生代码库摸一遍，告诉我认证是怎么实现的」。这种活如果让主 agent 自己干，它得读一大堆文件、跑一堆搜索，这些中间过程全堆进主对话的窗口，等它摸清楚了，窗口也被探索垃圾塞得差不多了，真正的任务反而没空间了。
+`agent` 工具（`corecoder/tools/agent.py`，89 行）解决的是另一个问题。有些子任务很重，比如「把这个陌生代码库摸一遍，告诉我认证是怎么实现的」。这种活如果让主 agent 自己干，它得读一大堆文件、跑一堆搜索，这些中间过程全堆进主对话的窗口，等它摸清楚了，窗口也被探索垃圾塞得差不多了，真正的任务反而没空间了。
 
 子 agent 的思路是：派一个有独立上下文的分身去干这件重活，它在自己的窗口里折腾，干完只把一个精简结论交回来。主 agent 的窗口始终干净，只多了一句「认证是这么实现的」。
 
@@ -139,4 +133,4 @@ Claude Code 的子 agent 系统（它的 AgentTool 公开拆解里超过一千�
 - 子 agent 的首要价值是上下文隔离，让重活在独立窗口里折腾、只把精简结论交回主对话，其次才是任务分解。
 - 子 agent 不准递归，是用「一刀切」换「绝不失控」。它靠的是实例级工具集这个机制落地。
 
-下一篇，我们把这些零件装进一个真正能用的命令行工具：会话怎么存、断点怎么续、斜杠命令怎么接，以及一个藏在存盘里的安全细节。
+下一篇，我们把这些零件装进一个真正能用的命令行工具：会话怎么存、断点怎么续、斜杠命令怎么接，以及一个藏在存盘里的安全细节。 

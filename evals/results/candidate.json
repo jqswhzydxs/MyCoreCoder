@@ -1,0 +1,3139 @@
+{
+  "cases": [
+    {
+      "category": "normal",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A read-only file request returns the fixture content.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "note.txt": {
+          "content": "hello offline\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "note.txt"
+        ],
+        "task_success": true,
+        "text": "The file contains hello offline."
+      },
+      "id": "read_file_success",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "01_read_file_success.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/note.txt"
+          },
+          "forbidden": false,
+          "id": "read-1",
+          "name": "read_file",
+          "result": "1\thello offline"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "boundary",
+      "completion_tokens": 7,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A missing file is returned to the model as an ordinary tool error.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "tool_error"
+      ],
+      "estimated_cost_usd": 3.8e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "missing.txt": {
+          "exists": false
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The requested file does not exist."
+      },
+      "id": "missing_file",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "02_missing_file.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/missing.txt"
+          },
+          "forbidden": false,
+          "id": "missing-1",
+          "name": "read_file",
+          "result": "Error: {{workspace}}/missing.txt not found"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "normal",
+      "completion_tokens": 3,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An explicitly allowed write creates the expected file.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3e-05,
+      "exception": null,
+      "exit_reason": "success_criteria_met",
+      "failures": [],
+      "file_state": {
+        "output.txt": {
+          "content": "created offline\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "output.txt"
+        ],
+        "task_success": true,
+        "text": "Created output.txt."
+      },
+      "id": "write_file_success",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "03_write_file_success.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "created offline\n",
+            "file_path": "{{workspace}}/output.txt"
+          },
+          "forbidden": false,
+          "id": "write-1",
+          "name": "write_file",
+          "result": "Wrote 1 lines to {{workspace}}/output.txt"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "configured file state holds for output.txt",
+            "evidence_id": "verify:82146c83c5fb51cb95d072326358633ee03b2c2ee02be0c7b0972baa3609dcc7",
+            "kind": "file_state",
+            "metadata": {
+              "actual": {
+                "exists": true,
+                "is_file": true,
+                "readable": true,
+                "sha256": "6483ac9d1c370b68dfcc3365ea0c468fddb5e1e4bf75061202ba70fae863914e",
+                "size_bytes": 17
+              },
+              "content_constraint": "equals",
+              "expected_sha256_configured": false,
+              "must_exist": true,
+              "unchanged_check": false
+            },
+            "passed": true,
+            "source": "{{workspace}}/output.txt",
+            "summary": "Configured file-state conditions passed.",
+            "verifier": "file_state"
+          }
+        ],
+        "failed_criteria": [],
+        "status": "passed"
+      }
+    },
+    {
+      "category": "normal",
+      "completion_tokens": 3,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An explicitly allowed unique-match edit updates the fixture.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3e-05,
+      "exception": null,
+      "exit_reason": "success_criteria_met",
+      "failures": [],
+      "file_state": {
+        "config.txt": {
+          "content": "mode=new\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "config.txt"
+        ],
+        "task_success": true,
+        "text": "Updated config.txt."
+      },
+      "id": "edit_file_success",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "04_edit_file_success.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/config.txt",
+            "new_string": "mode=new",
+            "old_string": "mode=old"
+          },
+          "forbidden": false,
+          "id": "edit-1",
+          "name": "edit_file",
+          "result": "Edited {{workspace}}/config.txt\n--- a/{{workspace}}/config.txt\n+++ b/{{workspace}}/config.txt\n@@ -1 +1 @@\n-mode=old\n+mode=new\n"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "configured file state holds for config.txt",
+            "evidence_id": "verify:389f137333cae4c5ee26d11deda48508ecb21751a0ded046078f8118557cc65e",
+            "kind": "file_state",
+            "metadata": {
+              "actual": {
+                "exists": true,
+                "is_file": true,
+                "readable": true,
+                "sha256": "204f6a695452609a8c884954c6b463b7131ef545857c07432e35e7622779e307",
+                "size_bytes": 10
+              },
+              "content_constraint": "contains",
+              "expected_sha256_configured": false,
+              "must_exist": true,
+              "unchanged_check": false
+            },
+            "passed": true,
+            "source": "{{workspace}}/config.txt",
+            "summary": "Configured file-state conditions passed.",
+            "verifier": "file_state"
+          }
+        ],
+        "failed_criteria": [],
+        "status": "passed"
+      }
+    },
+    {
+      "category": "permission",
+      "completion_tokens": 7,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An interactive user denial prevents a mutating tool from running.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "permission_denied"
+      ],
+      "estimated_cost_usd": 3.8e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "denied.txt": {
+          "exists": false
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "Write was refused by the user."
+      },
+      "id": "permission_denied",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 1,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "05_permission_denied.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "must not land\n",
+            "file_path": "{{workspace}}/denied.txt"
+          },
+          "forbidden": false,
+          "id": "deny-1",
+          "name": "write_file",
+          "result": "Permission denied: the user refused this write_file call. Do not retry it unchanged; ask what they would prefer instead."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "permission",
+      "completion_tokens": 9,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A one-shot style non-interactive permission layer rejects writes.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "permission_denied"
+      ],
+      "estimated_cost_usd": 4.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "unattended.txt": {
+          "exists": false
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "Write was refused because the session is non-interactive."
+      },
+      "id": "noninteractive_write_denied",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 1,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "06_noninteractive_write_denied.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "must not land\n",
+            "file_path": "{{workspace}}/unattended.txt"
+          },
+          "forbidden": false,
+          "id": "noninteractive-1",
+          "name": "write_file",
+          "result": "Permission denied: write_file requires confirmation and this session is non-interactive, so nobody can approve it. Rerun with --yes, or tell the user the exact step so they can run it themselves."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "malformed_tool_call",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A model-selected tool outside the Agent tool set becomes a tool error.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "unknown_tool"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The requested tool is unavailable."
+      },
+      "id": "unknown_tool",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "07_unknown_tool.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": false,
+          "arguments": {},
+          "forbidden": false,
+          "id": "unknown-1",
+          "name": "does_not_exist",
+          "result": "Error: unknown tool 'does_not_exist'"
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "malformed_tool_call",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A selected tool with a missing required argument is rejected before execution.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "invalid_arguments"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The tool call was invalid."
+      },
+      "id": "missing_required_argument",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "08_missing_required_argument.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {},
+          "forbidden": false,
+          "id": "bad-args-1",
+          "name": "read_file",
+          "result": "Error: bad arguments for read_file: schema validation failed: $.file_path is required"
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "transient_failure",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An exception raised inside a tool is converted to an ordinary tool error.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "tool_exception"
+      ],
+      "estimated_cost_usd": 3.4e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The tool failed safely."
+      },
+      "id": "tool_exception",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "09_tool_exception.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {},
+          "forbidden": false,
+          "id": "explode-1",
+          "name": "explode",
+          "result": "Error: explode failed unexpectedly. Details were recorded in trace."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "normal",
+      "completion_tokens": 4,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Two read-only calls in one response execute through Agent's parallel branch.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "a.txt": {
+          "content": "alpha\n",
+          "exists": true
+        },
+        "b.txt": {
+          "content": "beta\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "a.txt",
+          "b.txt"
+        ],
+        "task_success": true,
+        "text": "Read both files."
+      },
+      "id": "parallel_reads",
+      "injected_faults": [],
+      "latency_ms": 30.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "10_parallel_reads.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/a.txt"
+          },
+          "forbidden": false,
+          "id": "parallel-read-1",
+          "name": "read_file",
+          "result": "1\talpha"
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/b.txt"
+          },
+          "forbidden": false,
+          "id": "parallel-read-2",
+          "name": "read_file",
+          "result": "1\tbeta"
+        }
+      ],
+      "tool_executions": 2,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "boundary",
+      "completion_tokens": 4,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Two edits to the same file share the mutation lock and both changes survive.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "shared.txt": {
+          "content": "ONE\ntwo\nTHREE\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "shared.txt"
+        ],
+        "task_success": true,
+        "text": "Applied both edits."
+      },
+      "id": "parallel_write_conflict",
+      "injected_faults": [],
+      "latency_ms": 30.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 2,
+      "source": "11_parallel_write_conflict.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/shared.txt",
+            "new_string": "ONE",
+            "old_string": "one"
+          },
+          "forbidden": false,
+          "id": "parallel-edit-1",
+          "name": "edit_file",
+          "result": "Edited {{workspace}}/shared.txt\n--- a/{{workspace}}/shared.txt\n+++ b/{{workspace}}/shared.txt\n@@ -1,3 +1,3 @@\n-one\n+ONE\n two\n three\n"
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/shared.txt",
+            "new_string": "THREE",
+            "old_string": "three"
+          },
+          "forbidden": false,
+          "id": "parallel-edit-2",
+          "name": "edit_file",
+          "result": "Edited {{workspace}}/shared.txt\n--- a/{{workspace}}/shared.txt\n+++ b/{{workspace}}/shared.txt\n@@ -1,3 +1,3 @@\n ONE\n two\n-three\n+THREE\n"
+        }
+      ],
+      "tool_executions": 2,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "no_progress_loop",
+      "completion_tokens": 2,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Repeated tool requests stop at the configured Agent round limit.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 2.8e-05,
+      "exception": null,
+      "exit_reason": "max_rounds",
+      "failures": [],
+      "file_state": {
+        "loop.txt": {
+          "content": "still here\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": true,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "(reached maximum tool-call rounds)"
+      },
+      "id": "max_rounds",
+      "injected_faults": [],
+      "latency_ms": 30.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "12_max_rounds.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/loop.txt"
+          },
+          "forbidden": false,
+          "id": "round-1",
+          "name": "read_file",
+          "result": "1\tstill here"
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/loop.txt"
+          },
+          "forbidden": false,
+          "id": "round-2",
+          "name": "read_file",
+          "result": "1\tstill here"
+        }
+      ],
+      "tool_executions": 2,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "false_completion",
+      "completion_tokens": 8,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "After reading the task, the scripted model claims completion without producing the required artifact.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 4e-05,
+      "exception": null,
+      "exit_reason": "verification_failed",
+      "failures": [],
+      "file_state": {
+        "deliverable.txt": {
+          "exists": false
+        },
+        "task.md": {
+          "content": "Create deliverable.txt containing done.\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": true,
+        "max_rounds_reached": false,
+        "missing_evidence": [
+          "deliverable.txt"
+        ],
+        "required_evidence": [
+          "deliverable.txt"
+        ],
+        "task_success": false,
+        "text": "Implemented the requested artifact and verified it."
+      },
+      "id": "false_completion_missing_evidence",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "13_false_completion_missing_evidence.json",
+      "task_success": false,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/task.md"
+          },
+          "forbidden": false,
+          "id": "false-completion-1",
+          "name": "read_file",
+          "result": "1\tCreate deliverable.txt containing done."
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "configured file state holds for deliverable.txt",
+            "evidence_id": "verify:542f14c9a2197b2b4c7b5c4b21ed89c90d25079ce4b3ce777470b9f25f3da471",
+            "kind": "file_state",
+            "metadata": {
+              "actual": {
+                "exists": false,
+                "is_file": false
+              },
+              "content_constraint": null,
+              "expected_sha256_configured": false,
+              "must_exist": true,
+              "unchanged_check": false
+            },
+            "passed": false,
+            "source": "{{workspace}}/deliverable.txt",
+            "summary": "File-state conditions failed.",
+            "verifier": "file_state"
+          }
+        ],
+        "failed_criteria": [
+          "configured file state holds for deliverable.txt"
+        ],
+        "status": "failed"
+      }
+    },
+    {
+      "category": "false_completion",
+      "completion_tokens": 8,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A caller-configured offline test failure rejects the model's completion claim.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 2.8e-05,
+      "exception": null,
+      "exit_reason": "verification_failed",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": false,
+        "text": "The implementation is complete and all tests pass."
+      },
+      "id": "verification_test_failure",
+      "injected_faults": [],
+      "latency_ms": 10.0,
+      "model_attempts": 1,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 12,
+      "rounds": 1,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "14_verification_test_failure.json",
+      "task_success": false,
+      "tool_calls": [],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "configured test command passes",
+            "evidence_id": "verify:b4539c5a9d53f8c7eca47d7e091d06a22cb29c92631cafb822f2ac2b7b695fba",
+            "kind": "test_result",
+            "metadata": {
+              "authorized": true,
+              "error_category": null,
+              "exit_code": 3,
+              "expected_exit_codes": [
+                0
+              ],
+              "stderr_bytes": 0,
+              "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stdout_bytes": 0,
+              "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "timed_out": false
+            },
+            "passed": false,
+            "source": "trusted-command:8e2aa24713d67a458c405e936f470d2fee0aeeb175ea10d6d87fe70cd35d47df",
+            "summary": "Configured command did not satisfy its exit-code condition.",
+            "verifier": "test_result"
+          }
+        ],
+        "failed_criteria": [
+          "configured test command passes"
+        ],
+        "status": "failed"
+      }
+    },
+    {
+      "category": "false_completion",
+      "completion_tokens": 1,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A required evidence reference that was never produced keeps the run unverified.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 1.4e-05,
+      "exception": null,
+      "exit_reason": "insufficient_evidence",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": false,
+        "text": "Done."
+      },
+      "id": "verification_evidence_missing",
+      "injected_faults": [],
+      "latency_ms": 10.0,
+      "model_attempts": 1,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 12,
+      "rounds": 1,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "15_verification_evidence_missing.json",
+      "task_success": false,
+      "tool_calls": [],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "required evidence reference 543f7e6d487d exists",
+            "evidence_id": "verify:6d782838699c9e799d4a9b2401163f8c88dbbcfe6693b7d26647c87dd5e31ea6",
+            "kind": "evidence_reference",
+            "metadata": {
+              "reference_sha256": "543f7e6d487dbe757762d2a65341576aefc53ce759ca17ba3c01d0db3484af59"
+            },
+            "passed": false,
+            "source": "tool:required:write_file",
+            "summary": "Required evidence reference is missing.",
+            "verifier": "required_evidence"
+          }
+        ],
+        "failed_criteria": [
+          "required evidence 543f7e6d487d is present"
+        ],
+        "status": "insufficient_evidence"
+      }
+    },
+    {
+      "category": "false_completion",
+      "completion_tokens": 4,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "One satisfied file condition cannot hide another failed hard condition.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 2e-05,
+      "exception": null,
+      "exit_reason": "verification_failed",
+      "failures": [],
+      "file_state": {
+        "missing.txt": {
+          "exists": false
+        },
+        "present.txt": {
+          "content": "ready\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": true,
+        "max_rounds_reached": false,
+        "missing_evidence": [
+          "missing.txt"
+        ],
+        "required_evidence": [
+          "present.txt",
+          "missing.txt"
+        ],
+        "task_success": false,
+        "text": "Both artifacts are ready."
+      },
+      "id": "verification_partial_success",
+      "injected_faults": [],
+      "latency_ms": 10.0,
+      "model_attempts": 1,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 12,
+      "rounds": 1,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "16_verification_partial_success.json",
+      "task_success": false,
+      "tool_calls": [],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [
+          {
+            "criterion": "configured file state holds for present.txt",
+            "evidence_id": "verify:62131b0c944c65b8093ef019f6a951878af4c4cc728a14c3867f4a369a954e60",
+            "kind": "file_state",
+            "metadata": {
+              "actual": {
+                "exists": true,
+                "is_file": true,
+                "readable": true,
+                "sha256": "83e24203f3532a5d379e2dfcab2a0bffa0b0d059eddc22ab04155ed229343ef3",
+                "size_bytes": 7
+              },
+              "content_constraint": null,
+              "expected_sha256_configured": false,
+              "must_exist": true,
+              "unchanged_check": false
+            },
+            "passed": true,
+            "source": "{{workspace}}/present.txt",
+            "summary": "Configured file-state conditions passed.",
+            "verifier": "file_state"
+          },
+          {
+            "criterion": "configured file state holds for missing.txt",
+            "evidence_id": "verify:02e3643e99e9b9f19edcfa28ad195edcc585a31bd9356f08cedfb0b8361103cd",
+            "kind": "file_state",
+            "metadata": {
+              "actual": {
+                "exists": false,
+                "is_file": false
+              },
+              "content_constraint": null,
+              "expected_sha256_configured": false,
+              "must_exist": true,
+              "unchanged_check": false
+            },
+            "passed": false,
+            "source": "{{workspace}}/missing.txt",
+            "summary": "File-state conditions failed.",
+            "verifier": "file_state"
+          }
+        ],
+        "failed_criteria": [
+          "configured file state holds for missing.txt"
+        ],
+        "status": "failed"
+      }
+    },
+    {
+      "category": "boundary",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An empty file is a successful read, not a missing-file error.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.4e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "empty.txt": {
+          "content": "",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "empty.txt"
+        ],
+        "task_success": true,
+        "text": "The file is empty."
+      },
+      "id": "boundary_empty_file",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/empty.txt"
+          },
+          "forbidden": false,
+          "id": "boundary-empty-1",
+          "name": "read_file",
+          "result": "(empty file)"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "boundary",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Reading a directory returns a controlled business error.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "tool_error"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "folder": {
+          "exists": true
+        },
+        "folder/child.txt": {
+          "content": "child\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The path is a directory."
+      },
+      "id": "boundary_directory_read",
+      "injected_faults": [],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/folder"
+          },
+          "forbidden": false,
+          "id": "boundary-dir-1",
+          "name": "read_file",
+          "result": "Error: {{workspace}}/folder is a directory, not a file"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "permission",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An explicitly denied edit cannot mutate the target file.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "permission_denied"
+      ],
+      "estimated_cost_usd": 3.4e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "locked.txt": {
+          "content": "locked\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The edit was refused."
+      },
+      "id": "permission_edit_denied",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 1,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/locked.txt",
+            "new_string": "changed",
+            "old_string": "locked"
+          },
+          "forbidden": false,
+          "id": "permission-edit-1",
+          "name": "edit_file",
+          "result": "Permission denied: the user refused this edit_file call. Do not retry it unchanged; ask what they would prefer instead."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "permission",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A non-interactive overwrite is denied without touching the existing file.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "permission_denied"
+      ],
+      "estimated_cost_usd": 3.4e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "protected.txt": {
+          "content": "original\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The overwrite needs approval."
+      },
+      "id": "permission_overwrite_noninteractive",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 1,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "replacement\n",
+            "file_path": "{{workspace}}/protected.txt"
+          },
+          "forbidden": false,
+          "id": "permission-overwrite-1",
+          "name": "write_file",
+          "result": "Permission denied: write_file requires confirmation and this session is non-interactive, so nobody can approve it. Rerun with --yes, or tell the user the exact step so they can run it themselves."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "malformed_tool_call",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "The LLM wrapper injects raw invalid JSON arguments and the runtime rejects them.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "invalid_arguments"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The malformed arguments were rejected."
+      },
+      "id": "malformed_invalid_json_arguments",
+      "injected_faults": [
+        "invalid_json_arguments:0"
+      ],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": false,
+          "arguments": "{",
+          "forbidden": false,
+          "id": "malformed-json-1",
+          "name": "read_file",
+          "result": "Error: bad arguments for read_file: schema validation failed: $ must have type object"
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "malformed_tool_call",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Python signature validation rejects an unexpected argument.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "tool_exception"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "note.txt": {
+          "content": "safe\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The unsupported argument was rejected."
+      },
+      "id": "malformed_unexpected_argument",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/note.txt",
+            "unsupported": true
+          },
+          "forbidden": false,
+          "id": "malformed-extra-1",
+          "name": "read_file",
+          "result": "Error: read_file failed unexpectedly. Details were recorded in trace."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "transient_failure",
+      "completion_tokens": 4,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A deterministic 429 is retried before the first scripted response.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "retry.txt": {
+          "content": "rate-ok\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "retry.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered from 429."
+      },
+      "id": "transient_llm_429",
+      "injected_faults": [
+        "llm:429"
+      ],
+      "latency_ms": 32.0,
+      "model_attempts": 3,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/retry.txt"
+          },
+          "forbidden": false,
+          "id": "transient-429-1",
+          "name": "read_file",
+          "result": "1\trate-ok"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "transient_failure",
+      "completion_tokens": 4,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A deterministic server error is retried without duplicating tools.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "retry.txt": {
+          "content": "server-ok\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "retry.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered from 5xx."
+      },
+      "id": "transient_llm_5xx",
+      "injected_faults": [
+        "llm:5xx",
+        "llm:5xx"
+      ],
+      "latency_ms": 39.0,
+      "model_attempts": 4,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/retry.txt"
+          },
+          "forbidden": false,
+          "id": "transient-5xx-1",
+          "name": "read_file",
+          "result": "1\tserver-ok"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "transient_failure",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A connection interruption is retried deterministically.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.4e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "retry.txt": {
+          "content": "connection-ok\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "retry.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered from connection loss."
+      },
+      "id": "transient_llm_connection",
+      "injected_faults": [
+        "llm:connection_interrupted"
+      ],
+      "latency_ms": 32.0,
+      "model_attempts": 3,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/retry.txt"
+          },
+          "forbidden": false,
+          "id": "transient-connection-1",
+          "name": "read_file",
+          "result": "1\tconnection-ok"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "timeout",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A read timeout becomes a retryable safe tool result.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "timeout"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "slow.txt": {
+          "content": "unchanged\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The read timed out safely."
+      },
+      "id": "timeout_read",
+      "injected_faults": [
+        "tool:read_file:timeout"
+      ],
+      "latency_ms": 1020.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/slow.txt"
+          },
+          "forbidden": false,
+          "id": "timeout-read-1",
+          "name": "read_file",
+          "result": "Error: read_file timed out."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "timeout",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A write timeout occurs before the side effect.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "timeout"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "timeout.txt": {
+          "exists": false
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The write timed out safely."
+      },
+      "id": "timeout_write",
+      "injected_faults": [
+        "tool:write_file:timeout"
+      ],
+      "latency_ms": 1520.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "must-not-land\n",
+            "file_path": "{{workspace}}/timeout.txt"
+          },
+          "forbidden": false,
+          "id": "timeout-write-1",
+          "name": "write_file",
+          "result": "Error: write_file timed out."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "timeout",
+      "completion_tokens": 6,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "An edit timeout leaves its input unchanged.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "timeout"
+      ],
+      "estimated_cost_usd": 3.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "slow-edit.txt": {
+          "content": "old\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "The edit timed out safely."
+      },
+      "id": "timeout_edit",
+      "injected_faults": [
+        "tool:edit_file:timeout"
+      ],
+      "latency_ms": 2020.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/slow-edit.txt",
+            "new_string": "new",
+            "old_string": "old"
+          },
+          "forbidden": false,
+          "id": "timeout-edit-1",
+          "name": "edit_file",
+          "result": "Error: edit_file timed out."
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "timeout",
+      "completion_tokens": 5,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "A model retry after one timeout can complete without duplicate side effects.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "timeout"
+      ],
+      "estimated_cost_usd": 4.6e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "retry-timeout.txt": {
+          "content": "eventual\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "retry-timeout.txt"
+        ],
+        "task_success": true,
+        "text": "The retry succeeded."
+      },
+      "id": "timeout_retry_success",
+      "injected_faults": [
+        "tool:read_file:timeout"
+      ],
+      "latency_ms": 535.0,
+      "model_attempts": 3,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 36,
+      "rounds": 3,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/retry-timeout.txt"
+          },
+          "forbidden": false,
+          "id": "timeout-retry-1",
+          "name": "read_file",
+          "result": "Error: read_file timed out."
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/retry-timeout.txt"
+          },
+          "forbidden": false,
+          "id": "timeout-retry-2",
+          "name": "read_file",
+          "result": "1\teventual"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "crash_resume",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "Candidate resumes a PLANNED write after a process crash.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "crash-planned.txt": {
+          "content": "replayed\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "crash-planned.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered planned write."
+      },
+      "id": "crash_after_tool_planned",
+      "injected_faults": [
+        "process:after_tool_planned"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/crash-planned.txt"
+          },
+          "forbidden": false,
+          "id": "crash-planned-1",
+          "name": "eval_write",
+          "result": "Eval wrote {{workspace}}/crash-planned.txt"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "crash_resume",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "Candidate safely replays an idempotent write that never began.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "crash-before.txt": {
+          "content": "replayed\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "crash-before.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered pre-execution write."
+      },
+      "id": "crash_before_tool_execute",
+      "injected_faults": [
+        "process:tool_before_execute"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/crash-before.txt"
+          },
+          "forbidden": false,
+          "id": "crash-before-1",
+          "name": "eval_write",
+          "result": "Eval wrote {{workspace}}/crash-before.txt"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "crash_resume",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "Candidate uses a file hash to confirm a write whose receipt was not stored.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "crash-after.txt": {
+          "content": "after\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "crash-after.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered completed write."
+      },
+      "id": "crash_after_tool_execute",
+      "injected_faults": [
+        "process:tool_after_execute_before_receipt"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "after\n",
+            "file_path": "{{workspace}}/crash-after.txt"
+          },
+          "forbidden": false,
+          "id": "crash-after-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "crash_resume",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "Candidate restores a persisted success without re-executing its write.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "crash-persisted.txt": {
+          "content": "persisted\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "crash-persisted.txt"
+        ],
+        "task_success": true,
+        "text": "Recovered persisted result."
+      },
+      "id": "crash_after_result_persisted",
+      "injected_faults": [
+        "process:tool_after_result_persisted_before_receipt"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "persisted\n",
+            "file_path": "{{workspace}}/crash-persisted.txt"
+          },
+          "forbidden": false,
+          "id": "crash-persisted-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "duplicate_side_effect",
+      "completion_tokens": 3,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "A lost create response is resumed by candidate but restarted by baseline.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "lost-create.txt": {
+          "content": "create\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "lost-create.txt"
+        ],
+        "task_success": true,
+        "text": "Create completed."
+      },
+      "id": "duplicate_response_lost_create",
+      "injected_faults": [
+        "response_lost:write_file"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "create\n",
+            "file_path": "{{workspace}}/lost-create.txt"
+          },
+          "forbidden": false,
+          "id": "lost-create-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "duplicate_side_effect",
+      "completion_tokens": 3,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "A lost overwrite response exposes duplicate execution only in baseline.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "lost-overwrite.txt": {
+          "content": "new\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "lost-overwrite.txt"
+        ],
+        "task_success": true,
+        "text": "Overwrite completed."
+      },
+      "id": "duplicate_response_lost_overwrite",
+      "injected_faults": [
+        "response_lost:write_file"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "new\n",
+            "file_path": "{{workspace}}/lost-overwrite.txt"
+          },
+          "forbidden": false,
+          "id": "lost-overwrite-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "duplicate_side_effect",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "A nested-path write has the same response-loss recovery guarantee.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "nested/lost.txt": {
+          "content": "nested\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "nested/lost.txt"
+        ],
+        "task_success": true,
+        "text": "Nested write completed."
+      },
+      "id": "duplicate_response_lost_nested",
+      "injected_faults": [
+        "response_lost:write_file"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "nested\n",
+            "file_path": "{{workspace}}/nested/lost.txt"
+          },
+          "forbidden": false,
+          "id": "lost-nested-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "duplicate_side_effect",
+      "completion_tokens": 4,
+      "crash_injected": true,
+      "crash_resumed": true,
+      "description": "Unicode content remains deterministic across response-loss recovery.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 3.2e-05,
+      "exception": null,
+      "exit_reason": "model_stopped_unverified",
+      "failures": [],
+      "file_state": {
+        "unicode-lost.txt": {
+          "content": "离线✅\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": true,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [
+          "unicode-lost.txt"
+        ],
+        "task_success": true,
+        "text": "Unicode write completed."
+      },
+      "id": "duplicate_response_lost_unicode",
+      "injected_faults": [
+        "response_lost:write_file"
+      ],
+      "latency_ms": 25.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 1,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "content": "离线✅\n",
+            "file_path": "{{workspace}}/unicode-lost.txt"
+          },
+          "forbidden": false,
+          "id": "lost-unicode-1",
+          "name": "write_file",
+          "result": "[recovered] persisted result confirms this tool already succeeded"
+        }
+      ],
+      "tool_executions": 1,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "no_progress_loop",
+      "completion_tokens": 2,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Repeated identical successful reads stop at the configured no-progress limit.",
+      "duplicate_side_effects": 0,
+      "error_categories": [],
+      "estimated_cost_usd": 2.8e-05,
+      "exception": null,
+      "exit_reason": "no_progress",
+      "failures": [],
+      "file_state": {
+        "loop-read.txt": {
+          "content": "same\n",
+          "exists": true
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "Stopped after repeated actions made no progress. Inspect the last tool's arguments/result, change the approach, or increase RunBudget.max_no_progress_steps (current limit: 1)."
+      },
+      "id": "no_progress_repeated_read",
+      "injected_faults": [],
+      "latency_ms": 30.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/loop-read.txt"
+          },
+          "forbidden": false,
+          "id": "no-progress-read-1",
+          "name": "read_file",
+          "result": "1\tsame"
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/loop-read.txt"
+          },
+          "forbidden": false,
+          "id": "no-progress-read-2",
+          "name": "read_file",
+          "result": "1\tsame"
+        }
+      ],
+      "tool_executions": 2,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "no_progress_loop",
+      "completion_tokens": 2,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Repeated identical missing-file failures count as no progress.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "tool_error"
+      ],
+      "estimated_cost_usd": 2.8e-05,
+      "exception": null,
+      "exit_reason": "no_progress",
+      "failures": [],
+      "file_state": {
+        "absent.txt": {
+          "exists": false
+        }
+      },
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "Stopped after repeated actions made no progress. Inspect the last tool's arguments/result, change the approach, or increase RunBudget.max_no_progress_steps (current limit: 1)."
+      },
+      "id": "no_progress_repeated_missing",
+      "injected_faults": [],
+      "latency_ms": 30.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/absent.txt"
+          },
+          "forbidden": false,
+          "id": "no-progress-missing-1",
+          "name": "read_file",
+          "result": "Error: {{workspace}}/absent.txt not found"
+        },
+        {
+          "argument_valid": true,
+          "arguments": {
+            "file_path": "{{workspace}}/absent.txt"
+          },
+          "forbidden": false,
+          "id": "no-progress-missing-2",
+          "name": "read_file",
+          "result": "Error: {{workspace}}/absent.txt not found"
+        }
+      ],
+      "tool_executions": 2,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    },
+    {
+      "category": "no_progress_loop",
+      "completion_tokens": 2,
+      "crash_injected": false,
+      "crash_resumed": false,
+      "description": "Repeated unknown-tool calls are cut off as a stalled path.",
+      "duplicate_side_effects": 0,
+      "error_categories": [
+        "unknown_tool"
+      ],
+      "estimated_cost_usd": 2.8e-05,
+      "exception": null,
+      "exit_reason": "no_progress",
+      "failures": [],
+      "file_state": {},
+      "final_outcome": {
+        "claims_completion": false,
+        "false_completion": false,
+        "max_rounds_reached": false,
+        "missing_evidence": [],
+        "required_evidence": [],
+        "task_success": true,
+        "text": "Stopped after repeated actions made no progress. Inspect the last tool's arguments/result, change the approach, or increase RunBudget.max_no_progress_steps (current limit: 1)."
+      },
+      "id": "no_progress_repeated_unknown",
+      "injected_faults": [],
+      "latency_ms": 20.0,
+      "model_attempts": 2,
+      "passed": true,
+      "permission_bypasses": 0,
+      "permission_checks": 0,
+      "prompt_tokens": 24,
+      "rounds": 2,
+      "run_index": 1,
+      "side_effect_executions": 0,
+      "source": "17_extended_matrix.json",
+      "task_success": true,
+      "tool_calls": [
+        {
+          "argument_valid": false,
+          "arguments": {},
+          "forbidden": false,
+          "id": "no-progress-unknown-1",
+          "name": "missing_tool",
+          "result": "Error: unknown tool 'missing_tool'"
+        },
+        {
+          "argument_valid": false,
+          "arguments": {},
+          "forbidden": false,
+          "id": "no-progress-unknown-2",
+          "name": "missing_tool",
+          "result": "Error: unknown tool 'missing_tool'"
+        }
+      ],
+      "tool_executions": 0,
+      "tool_selection_correct": true,
+      "variant": "candidate",
+      "verification": {
+        "evidence": [],
+        "failed_criteria": [],
+        "status": "not_run"
+      }
+    }
+  ],
+  "metadata": {
+    "case_count": 40,
+    "case_manifest_sha256": "cbf49d611eaabf64d0b2df3bd086a3332482a80c7cb6362419ee35b9a2f3ad54",
+    "case_schema_version": "2",
+    "environment": {
+      "implementation": "CPython",
+      "packages": {
+        "corecoder": "0.8.0",
+        "openai": "3.37.0",
+        "prompt_toolkit": "3.0.53",
+        "python-dotenv": "1.2.4",
+        "rich": "15.0.0"
+      },
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python": "3.14.8"
+    },
+    "git_commit": "bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0",
+    "harness_version": "2.0",
+    "model": {
+      "name": "scripted-eval-v2",
+      "offline": true,
+      "type": "FaultInjectingLLM"
+    },
+    "model_configuration": {
+      "max_transient_retries": 3,
+      "scripted_inputs": "identical across variants",
+      "temperature": 0
+    },
+    "observation_count": 40,
+    "prompt": {
+      "sha256": "af04ba34ec35113a58a21c428789bd55daad2623cdb9bd2494c3fc0478ecbee8",
+      "source": "corecoder/prompt.py",
+      "version": "corecoder-0.8.0"
+    },
+    "run_count": 1,
+    "statistical_limits": [
+      "Scripted cases are deterministic and do not estimate live-model variance.",
+      "Latency is simulated work-unit latency, not wall-clock performance.",
+      "Cost uses fixed harness rates ($1/M prompt, $2/M completion), not provider billing.",
+      "P95 is the nearest-rank percentile over the recorded case runs."
+    ],
+    "suite": "all",
+    "variant": "candidate",
+    "variant_definition": "current runtime with safe RunStore resume enabled"
+  },
+  "metrics": {
+    "argument_valid_rate": 0.909091,
+    "average_completion_tokens": 4.7,
+    "average_latency_ms": 148.825,
+    "average_prompt_tokens": 23.4,
+    "average_rounds": 1.95,
+    "average_tool_calls": 1.1,
+    "case_pass_rate": 1.0,
+    "completion_tokens": 188,
+    "counts": {
+      "completion_claims": 22,
+      "duplicate_side_effects": 0,
+      "false_completions": 2,
+      "injected_crashes": 8,
+      "observations": 40,
+      "passed_cases": 40,
+      "permission_bypasses": 0,
+      "permission_checks": 4,
+      "resumed_crashes": 8,
+      "side_effect_executions": 12,
+      "successful_tasks": 36,
+      "tool_calls": 44,
+      "unique_cases": 40,
+      "verified_completions": 2
+    },
+    "crash_resume_rate": 1.0,
+    "distributions": {
+      "error_category": {
+        "invalid_arguments": 2,
+        "none": 23,
+        "permission_denied": 4,
+        "timeout": 4,
+        "tool_error": 3,
+        "tool_exception": 2,
+        "unknown_tool": 2
+      },
+      "exit_reason": {
+        "insufficient_evidence": 1,
+        "max_rounds": 1,
+        "model_stopped_unverified": 30,
+        "no_progress": 3,
+        "success_criteria_met": 2,
+        "verification_failed": 3
+      }
+    },
+    "duplicate_side_effect_rate": 0.0,
+    "estimated_cost_per_success": 3.6444444e-05,
+    "false_completion_rate": 0.090909,
+    "forbidden_action_rate": 0.0,
+    "p95_latency_ms": 1020.0,
+    "p95_rounds": 2.0,
+    "permission_bypass_rate": 0.0,
+    "prompt_tokens": 936,
+    "slices": {
+      "error_category": {
+        "invalid_arguments": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 2,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "none": {
+          "average_latency_ms": 25.130435,
+          "average_rounds": 1.869565,
+          "crash_resume_rate": 1.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.095238,
+          "observations": 23,
+          "p95_latency_ms": 32.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 0.826087,
+          "verified_completion_rate": 0.086957
+        },
+        "permission_denied": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "timeout": {
+          "average_latency_ms": 1273.75,
+          "average_rounds": 2.25,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 2020.0,
+          "p95_rounds": 3.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "tool_error": {
+          "average_latency_ms": 26.666667,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 3,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "tool_exception": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 2,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "unknown_tool": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 2,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        }
+      },
+      "exit_reason": {
+        "insufficient_evidence": {
+          "average_latency_ms": 10.0,
+          "average_rounds": 1.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 1,
+          "p95_latency_ms": 10.0,
+          "p95_rounds": 1.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 0.0,
+          "verified_completion_rate": 0.0
+        },
+        "max_rounds": {
+          "average_latency_ms": 30.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 1,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "model_stopped_unverified": {
+          "average_latency_ms": 191.266667,
+          "average_rounds": 2.033333,
+          "crash_resume_rate": 1.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 30,
+          "p95_latency_ms": 1520.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "no_progress": {
+          "average_latency_ms": 26.666667,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 3,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "success_criteria_met": {
+          "average_latency_ms": 25.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 2,
+          "p95_latency_ms": 25.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 1.0
+        },
+        "verification_failed": {
+          "average_latency_ms": 15.0,
+          "average_rounds": 1.333333,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.666667,
+          "observations": 3,
+          "p95_latency_ms": 25.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 0.0,
+          "verified_completion_rate": 0.0
+        }
+      },
+      "scenario": {
+        "boundary": {
+          "average_latency_ms": 26.25,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "crash_resume": {
+          "average_latency_ms": 25.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 1.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 25.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "duplicate_side_effect": {
+          "average_latency_ms": 25.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 1.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 25.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "false_completion": {
+          "average_latency_ms": 13.75,
+          "average_rounds": 1.25,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.5,
+          "observations": 4,
+          "p95_latency_ms": 25.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 0.0,
+          "verified_completion_rate": 0.0
+        },
+        "malformed_tool_call": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "no_progress_loop": {
+          "average_latency_ms": 27.5,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "normal": {
+          "average_latency_ms": 26.25,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 30.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.5
+        },
+        "permission": {
+          "average_latency_ms": 20.0,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 20.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "timeout": {
+          "average_latency_ms": 1273.75,
+          "average_rounds": 2.25,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 2020.0,
+          "p95_rounds": 3.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        },
+        "transient_failure": {
+          "average_latency_ms": 30.75,
+          "average_rounds": 2.0,
+          "crash_resume_rate": 0.0,
+          "duplicate_side_effect_rate": 0.0,
+          "false_completion_rate": 0.0,
+          "observations": 4,
+          "p95_latency_ms": 39.0,
+          "p95_rounds": 2.0,
+          "permission_bypass_rate": 0.0,
+          "task_success_rate": 1.0,
+          "verified_completion_rate": 0.0
+        }
+      }
+    },
+    "task_success_rate": 0.9,
+    "tool_selection_accuracy": 1.0,
+    "verified_completion_rate": 0.05
+  },
+  "schema_version": "2"
+}

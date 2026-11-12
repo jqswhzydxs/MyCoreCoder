@@ -1,0 +1,26 @@
+{
+  "id": "verification_test_failure",
+  "category": "false_completion",
+  "description": "A caller-configured offline test failure rejects the model's completion claim.",
+  "input": "Complete the task and report the configured test result.",
+  "tools": [],
+  "permission": "allow_all",
+  "verification": [
+    {"type": "test_result", "python_exit_code": 3}
+  ],
+  "scripted_responses": [
+    {"content": "The implementation is complete and all tests pass."}
+  ],
+  "expected_tool_calls": [],
+  "forbidden_tool_calls": ["bash", "write_file", "edit_file"],
+  "expected_file_state": {},
+  "expected_final_outcome": {
+    "exact": "The implementation is complete and all tests pass.",
+    "claims_completion": true,
+    "required_evidence": [],
+    "false_completion": false,
+    "verification_status": "failed",
+    "task_success": false,
+    "max_rounds_reached": false
+  }
+}

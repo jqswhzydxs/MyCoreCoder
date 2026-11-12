@@ -1,0 +1,41 @@
+{
+  "id": "read_file_success",
+  "category": "normal",
+  "description": "A read-only file request returns the fixture content.",
+  "input": "Read note.txt and report its contents.",
+  "tools": ["read_file"],
+  "permission": "non_interactive",
+  "fixtures": {
+    "note.txt": "hello offline\n"
+  },
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "read-1",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/note.txt"}
+        }
+      ]
+    },
+    {"content": "The file contains hello offline."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/note.txt"},
+      "result_contains": "hello offline"
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {
+    "note.txt": {"exists": true, "content": "hello offline\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "The file contains hello offline.",
+    "claims_completion": true,
+    "required_evidence": ["note.txt"],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

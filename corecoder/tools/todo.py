@@ -52,6 +52,16 @@ class TodoWriteTool(Tool):
         },
         "required": ["tasks"],
     }
+    side_effect = "write"
+    risk = "low"
+    required_permissions = ("session:write",)
+    requires_confirmation = False
+    idempotent = True
+    parallel_safe = False
+    timeout_seconds = 10
+    retry_policy: ClassVar[dict] = {"max_attempts": 1, "backoff_seconds": 0}
+    redact_fields = ()
+    version = "1"
 
     def __init__(self):
         self._tasks: list[dict] = []

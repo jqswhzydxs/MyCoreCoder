@@ -1,4 +1,5 @@
-"""Configuration - env vars and defaults."""
+"""config.py
+Configuration - env vars and defaults."""
 
 import os
 from dataclasses import dataclass

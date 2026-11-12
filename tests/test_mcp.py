@@ -113,7 +113,7 @@ def test_call_round_trip_returns_text_content(mcp_config):
         load_mcp_tools(mcp_config),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     result = agent.messages[2]
     assert result["role"] == "tool" and result["content"] == "echo: hi"
 
@@ -125,7 +125,7 @@ def test_parallel_calls_to_one_server_dont_cross_wires(mcp_config):
         load_mcp_tools(mcp_config),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     results = {m["tool_call_id"]: m["content"] for m in agent.messages if m["role"] == "tool"}
     assert results == {"c1": "echo: one", "c2": "echo: two"}
 
@@ -138,12 +138,12 @@ def test_server_crash_mid_call_fails_without_killing_the_loop(mcp_config):
         load_mcp_tools(mcp_config),
     )
 
-    assert agent.chat("go") == "still alive"
+    assert agent.chat("go") == "[未验证] still alive"
     crash_result = agent.messages[2]
-    assert "Error executing mcp__fake__crash" in crash_result["content"]
-    assert "exited" in crash_result["content"]
+    assert "external MCP tool failed" in crash_result["content"]
+    assert "exited" not in crash_result["content"]
     # the server stays dead: the next call on it fails clean too
-    assert "exited" in agent.messages[4]["content"]
+    assert "external MCP tool failed" in agent.messages[4]["content"]
 
 
 def test_a_slow_server_times_out_the_call(mcp_config):
@@ -212,7 +212,7 @@ def test_hooks_match_mcp_tool_names(mcp_config):
         hooks=Hooks(pre=[{"matcher": "mcp__fake__echo", "command": blocker}], post=[]),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert "mcp frozen" in agent.messages[2]["content"]
 
 

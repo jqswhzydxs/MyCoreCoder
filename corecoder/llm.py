@@ -22,6 +22,7 @@ class ToolCall:
     id: str
     name: str
     arguments: dict
+    depends_on: tuple[str, ...] = ()
 
 
 @dataclass
@@ -118,6 +119,16 @@ def _adapt_rejected_param(params: dict, exc: BadRequestError) -> bool:
     return False
 
 
+def _notify_stream_activity(callback, activity: dict) -> None:
+    """Report content-free stream progress without risking the model call."""
+    if callback is None:
+        return
+    try:
+        callback(dict(activity))
+    except Exception:  # noqa: BLE001 - observation callbacks fail open
+        return
+
+
 class LLM:
     def __init__(
         self,
@@ -150,13 +161,16 @@ class LLM:
         tools: list[dict] | None = None,
         on_token=None,
         on_reasoning=None,
+        on_stream_activity=None,
     ) -> LLMResponse:
         """Send messages, stream back response, handle tool calls.
 
         on_reasoning, when given, receives reasoning_content deltas from
         thinking models (deepseek-reasoner, kimi-k2-thinking, ...). Reasoning
         is display-only: it never enters the history, since providers reject
-        it when sent back.
+        it when sent back. ``on_stream_activity`` receives content-free
+        progress dictionaries for reasoning activity and the first delta of a
+        tool call; raw reasoning and argument fragments are never forwarded.
         """
         params: dict = {
             "model": self.model,
@@ -189,7 +203,12 @@ class LLM:
                         raise
                     params.pop("stream_options")
             try:
-                return self._drain(stream, on_token, on_reasoning)
+                return self._drain(
+                    stream,
+                    on_token,
+                    on_reasoning,
+                    on_stream_activity,
+                )
             except (RateLimitError, APITimeoutError, APIConnectionError) as e:
                 last_err = e
             except APIError as e:
@@ -206,12 +225,20 @@ class LLM:
                 time.sleep(2**attempt)
         raise last_err
 
-    def _drain(self, stream, on_token, on_reasoning) -> LLMResponse:
+    def _drain(
+        self,
+        stream,
+        on_token,
+        on_reasoning,
+        on_stream_activity=None,
+    ) -> LLMResponse:
         """Consume one stream into an LLMResponse."""
         content_parts: list[str] = []
         tc_map: dict[int, dict] = {}  # index -> {id, name, arguments_str}
         prompt_tok = 0
         completion_tok = 0
+        reasoning_activity_reported = False
+        tool_activity_reported: set[int] = set()
 
         for chunk in stream:
             # usage info comes in the final chunk; getattr-style reads stay safe
@@ -233,6 +260,12 @@ class LLM:
             # what aggregators like OpenRouter normalize it to
             reasoning = getattr(delta, "reasoning_content", None) or getattr(
                 delta, "reasoning", None)
+            if reasoning and not reasoning_activity_reported:
+                _notify_stream_activity(
+                    on_stream_activity,
+                    {"activity": "reasoning"},
+                )
+                reasoning_activity_reported = True
             if reasoning and on_reasoning:
                 on_reasoning(reasoning)
 
@@ -246,6 +279,15 @@ class LLM:
             if getattr(delta, "tool_calls", None):
                 for tc_delta in delta.tool_calls:
                     idx = tc_delta.index
+                    if idx not in tool_activity_reported:
+                        _notify_stream_activity(
+                            on_stream_activity,
+                            {
+                                "activity": "tool_call_detected",
+                                "tool_index": idx,
+                            },
+                        )
+                        tool_activity_reported.add(idx)
                     if idx not in tc_map:
                         tc_map[idx] = {"id": "", "name": "", "args": ""}
                     if tc_delta.id:

@@ -1,0 +1,24 @@
+{
+  "schema": "steerable_runtime_v1",
+  "description": "Deterministic offline scenarios for the steerable Agent runtime. The core eval runner ignores this file; evals/run_steering_eval.py executes it.",
+  "scenarios": [
+    {"id": "token_streaming", "category": "streaming", "description": "Text tokens stream before the terminal event."},
+    {"id": "tool_calls_only_progress", "category": "streaming", "description": "A tool-call-only model turn still emits early progress."},
+    {"id": "append_while_model", "category": "steering", "description": "APPEND received during a model call is applied at the next safe point."},
+    {"id": "redirect_while_model", "category": "steering", "description": "REDIRECT during a model call cancels planned tool calls."},
+    {"id": "redirect_before_write", "category": "steering", "description": "REDIRECT before a write starts leaves the file unchanged."},
+    {"id": "redirect_after_write", "category": "steering", "description": "REDIRECT after a write reports the completed side effect."},
+    {"id": "redirect_between_serial_tools", "category": "steering", "description": "REDIRECT between serial calls skips only the unstarted call."},
+    {"id": "redirect_parallel_batch", "category": "steering", "description": "REDIRECT during a parallel batch preserves paired tool replies."},
+    {"id": "pause_resume", "category": "control", "description": "Pause at a safe point and resume without busy polling."},
+    {"id": "pause_cancel", "category": "control", "description": "Cancel while paused stops the run."},
+    {"id": "bash_stream", "category": "streaming", "description": "Bash stdout is visible before process exit."},
+    {"id": "bash_cancel", "category": "cancellation", "description": "Bash responds to cancellation."},
+    {"id": "permission_steering", "category": "permission", "description": "Steering is accepted while a permission request is pending."},
+    {"id": "crash_resume", "category": "recovery", "description": "A persisted running state resumes without duplicate side effects."},
+    {"id": "sink_exception", "category": "fault", "description": "A broken caller sink cannot stop the run."},
+    {"id": "sensitive_input", "category": "security", "description": "Sensitive steering text never reaches events or the control log."},
+    {"id": "backpressure", "category": "backpressure", "description": "A slow event consumer does not deadlock high-frequency output."},
+    {"id": "repeated_read_cache", "category": "cache", "description": "Repeated read-only calls execute once and report cache hits."}
+  ]
+}

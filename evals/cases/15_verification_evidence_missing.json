@@ -1,0 +1,26 @@
+{
+  "id": "verification_evidence_missing",
+  "category": "false_completion",
+  "description": "A required evidence reference that was never produced keeps the run unverified.",
+  "input": "Finish the task and provide the required evidence.",
+  "tools": [],
+  "permission": "allow_all",
+  "verification": [
+    {"type": "required_evidence", "refs": ["tool:required:write_file"]}
+  ],
+  "scripted_responses": [
+    {"content": "Done."}
+  ],
+  "expected_tool_calls": [],
+  "forbidden_tool_calls": ["bash", "write_file", "edit_file"],
+  "expected_file_state": {},
+  "expected_final_outcome": {
+    "exact": "Done.",
+    "claims_completion": true,
+    "required_evidence": [],
+    "false_completion": false,
+    "verification_status": "insufficient_evidence",
+    "task_success": false,
+    "max_rounds_reached": false
+  }
+}

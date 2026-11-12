@@ -38,7 +38,7 @@ def test_pre_hook_blocks_with_reason_and_the_tool_never_runs(tmp_path):
         permission=Permission(ask=lambda n, a: asked.append(n) or "once"),
     )
 
-    assert agent.chat("go") == "done"          # the loop survived the veto
+    assert agent.chat("go") == "[未验证] done"  # the loop survived the veto
     assert not (tmp_path / "a.txt").exists()   # the tool never executed
     result = agent.messages[2]
     assert result["role"] == "tool" and result["tool_call_id"] == "c1"
@@ -49,7 +49,7 @@ def test_pre_hook_blocks_with_reason_and_the_tool_never_runs(tmp_path):
 def test_pre_hook_passing_lets_the_call_through(tmp_path):
     agent = _agent(tmp_path, Hooks(pre=[{"matcher": "", "command": "true"}], post=[]))
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists()
 
 
@@ -57,7 +57,7 @@ def test_post_hook_observes_the_finished_call(tmp_path):
     marker = tmp_path / "seen.jsonl"
     agent = _agent(tmp_path, Hooks(pre=[], post=[{"matcher": "*", "command": f"cat >> {marker}"}]))
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     seen = marker.read_text()
     assert '"tool_name": "write_file"' in seen  # the call JSON arrived on stdin
     assert '"tool_response"' in seen            # post hooks see the result too
@@ -68,7 +68,7 @@ def test_matcher_scopes_a_hook_to_one_tool(tmp_path):
     cmd = "echo blocked >&2; exit 2"
     agent = _agent(tmp_path, Hooks(pre=[{"matcher": "bash", "command": cmd}], post=[]))
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists()
 
 
@@ -92,7 +92,7 @@ def test_broken_hooks_file_is_ignored_with_one_warning(tmp_path, caplog):
 def test_failing_hook_is_skipped_with_a_warning(tmp_path, caplog):
     agent = _agent(tmp_path, Hooks(pre=[{"matcher": "*", "command": "exit 1"}], post=[]))
     with caplog.at_level(logging.WARNING):
-        assert agent.chat("go") == "done"
+        assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists()  # fail open
     assert any("exited 1" in r.getMessage() for r in caplog.records)
 
@@ -101,7 +101,7 @@ def test_slow_hook_times_out_and_is_skipped(tmp_path, caplog, monkeypatch):
     monkeypatch.setattr("corecoder.hooks.TIMEOUT", 0.3)
     agent = _agent(tmp_path, Hooks(pre=[{"matcher": "*", "command": "sleep 5"}], post=[]))
     with caplog.at_level(logging.WARNING):
-        assert agent.chat("go") == "done"
+        assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists()
     assert any("TimeoutExpired" in r.getMessage() for r in caplog.records)
 
@@ -122,7 +122,7 @@ def test_hooks_gate_each_call_of_a_parallel_batch(tmp_path):
         ),
     )
 
-    assert agent.chat("go") == "done"
+    assert agent.chat("go") == "[未验证] done"
     assert (tmp_path / "a.txt").exists() and (tmp_path / "b.txt").exists()
     assert pre_log.read_text().count('"tool_name"') == 2
     assert post_log.read_text().count('"tool_response"') == 2
@@ -141,5 +141,5 @@ def test_sub_agent_inherits_the_hooks(tmp_path):
         hooks=Hooks(pre=[{"matcher": "write_file", "command": "sh -c 'echo no >&2; exit 2'"}], post=[]),
     )
 
-    assert agent.chat("go") == "parent done"
+    assert agent.chat("go") == "[未验证] parent done"
     assert not target.exists()  # the veto followed the work into the sub-agent

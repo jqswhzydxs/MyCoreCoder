@@ -1,0 +1,37 @@
+{
+  "id": "tool_exception",
+  "category": "transient_failure",
+  "description": "An exception raised inside a tool is converted to an ordinary tool error.",
+  "input": "Run the deterministic exploding tool.",
+  "tools": ["explode"],
+  "permission": "allow_all",
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "explode-1",
+          "name": "explode",
+          "arguments": {}
+        }
+      ]
+    },
+    {"content": "The tool failed safely."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "explode",
+      "arguments": {},
+      "result_contains": "Error: explode failed unexpectedly. Details were recorded in trace."
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {},
+  "expected_final_outcome": {
+    "exact": "The tool failed safely.",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

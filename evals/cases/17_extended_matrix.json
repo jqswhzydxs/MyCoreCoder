@@ -1,0 +1,360 @@
+[
+  {
+    "id": "boundary_empty_file", "category": "boundary",
+    "description": "An empty file is a successful read, not a missing-file error.",
+    "input": "Read empty.txt.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"empty.txt": ""},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "boundary-empty-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/empty.txt"}}]},
+      {"content": "The file is empty."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/empty.txt"}, "result_contains": "(empty file)"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"empty.txt": {"exists": true, "content": ""}},
+    "expected_final_outcome": {"exact": "The file is empty.", "claims_completion": true, "required_evidence": ["empty.txt"], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "boundary_directory_read", "category": "boundary",
+    "description": "Reading a directory returns a controlled business error.",
+    "input": "Read the folder path.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"folder/child.txt": "child\n"},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "boundary-dir-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/folder"}}]},
+      {"content": "The path is a directory."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/folder"}, "result_contains": "is a directory"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"folder": {"exists": true}, "folder/child.txt": {"exists": true, "content": "child\n"}},
+    "expected_final_outcome": {"exact": "The path is a directory.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "permission_edit_denied", "category": "permission",
+    "description": "An explicitly denied edit cannot mutate the target file.",
+    "input": "Edit locked.txt.", "tools": ["edit_file"], "permission": "deny", "permission_should_block": true,
+    "fixtures": {"locked.txt": "locked\n"},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "permission-edit-1", "name": "edit_file", "arguments": {"file_path": "{{workspace}}/locked.txt", "old_string": "locked", "new_string": "changed"}}]},
+      {"content": "The edit was refused."}
+    ],
+    "expected_tool_calls": [{"name": "edit_file", "arguments": {"file_path": "{{workspace}}/locked.txt", "old_string": "locked", "new_string": "changed"}, "result_contains": "the user refused"}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"locked.txt": {"exists": true, "content": "locked\n"}},
+    "expected_final_outcome": {"exact": "The edit was refused.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "permission_overwrite_noninteractive", "category": "permission",
+    "description": "A non-interactive overwrite is denied without touching the existing file.",
+    "input": "Overwrite protected.txt.", "tools": ["write_file"], "permission": "non_interactive", "permission_should_block": true,
+    "fixtures": {"protected.txt": "original\n"},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "permission-overwrite-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/protected.txt", "content": "replacement\n"}}]},
+      {"content": "The overwrite needs approval."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/protected.txt", "content": "replacement\n"}, "result_contains": "non-interactive"}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"protected.txt": {"exists": true, "content": "original\n"}},
+    "expected_final_outcome": {"exact": "The overwrite needs approval.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "malformed_invalid_json_arguments", "category": "malformed_tool_call",
+    "description": "The LLM wrapper injects raw invalid JSON arguments and the runtime rejects them.",
+    "input": "Issue a malformed read call.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {},
+    "faults": {"llm": {"type": "invalid_json_arguments", "response_index": 0, "call_index": 0, "raw": "{"}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "malformed-json-1", "name": "read_file", "arguments": {"file_path": "ignored.txt"}}]},
+      {"content": "The malformed arguments were rejected."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": "{", "result_contains": "bad arguments"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {},
+    "expected_final_outcome": {"exact": "The malformed arguments were rejected.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "malformed_unexpected_argument", "category": "malformed_tool_call",
+    "description": "Python signature validation rejects an unexpected argument.",
+    "input": "Read with an unsupported argument.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"note.txt": "safe\n"},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "malformed-extra-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/note.txt", "unsupported": true}}]},
+      {"content": "The unsupported argument was rejected."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/note.txt", "unsupported": true}, "result_contains": "failed unexpectedly"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"note.txt": {"exists": true, "content": "safe\n"}},
+    "expected_final_outcome": {"exact": "The unsupported argument was rejected.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "transient_llm_429", "category": "transient_failure",
+    "description": "A deterministic 429 is retried before the first scripted response.",
+    "input": "Recover from rate limiting.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"retry.txt": "rate-ok\n"}, "faults": {"llm": {"type": "429", "response_index": 0, "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "transient-429-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}}]},
+      {"content": "Recovered from 429."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}, "result_contains": "rate-ok"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"retry.txt": {"exists": true, "content": "rate-ok\n"}},
+    "expected_final_outcome": {"exact": "Recovered from 429.", "claims_completion": true, "required_evidence": ["retry.txt"], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "transient_llm_5xx", "category": "transient_failure",
+    "description": "A deterministic server error is retried without duplicating tools.",
+    "input": "Recover from a server error.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"retry.txt": "server-ok\n"}, "faults": {"llm": {"type": "5xx", "response_index": 0, "times": 2}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "transient-5xx-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}}]},
+      {"content": "Recovered from 5xx."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}, "result_contains": "server-ok"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"retry.txt": {"exists": true, "content": "server-ok\n"}},
+    "expected_final_outcome": {"exact": "Recovered from 5xx.", "claims_completion": true, "required_evidence": ["retry.txt"], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "transient_llm_connection", "category": "transient_failure",
+    "description": "A connection interruption is retried deterministically.",
+    "input": "Recover from a connection interruption.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"retry.txt": "connection-ok\n"}, "faults": {"llm": {"type": "connection_interrupted", "response_index": 0, "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "transient-connection-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}}]},
+      {"content": "Recovered from connection loss."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/retry.txt"}, "result_contains": "connection-ok"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"retry.txt": {"exists": true, "content": "connection-ok\n"}},
+    "expected_final_outcome": {"exact": "Recovered from connection loss.", "claims_completion": true, "required_evidence": ["retry.txt"], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "timeout_read", "category": "timeout",
+    "description": "A read timeout becomes a retryable safe tool result.",
+    "input": "Read a file with an injected timeout.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"slow.txt": "unchanged\n"}, "faults": {"tool": {"name": "read_file", "type": "timeout", "times": 1, "latency_ms": 1000}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "timeout-read-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/slow.txt"}}]},
+      {"content": "The read timed out safely."}
+    ],
+    "expected_tool_calls": [{"name": "read_file", "arguments": {"file_path": "{{workspace}}/slow.txt"}, "result_contains": "timed out"}],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"slow.txt": {"exists": true, "content": "unchanged\n"}},
+    "expected_final_outcome": {"exact": "The read timed out safely.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "timeout_write", "category": "timeout",
+    "description": "A write timeout occurs before the side effect.",
+    "input": "Write with an injected timeout.", "tools": ["write_file"], "permission": "allow_all",
+    "fixtures": {}, "faults": {"tool": {"name": "write_file", "type": "timeout", "times": 1, "latency_ms": 1500}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "timeout-write-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/timeout.txt", "content": "must-not-land\n"}}]},
+      {"content": "The write timed out safely."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/timeout.txt", "content": "must-not-land\n"}, "result_contains": "timed out"}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"timeout.txt": {"exists": false}},
+    "expected_final_outcome": {"exact": "The write timed out safely.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "timeout_edit", "category": "timeout",
+    "description": "An edit timeout leaves its input unchanged.",
+    "input": "Edit with an injected timeout.", "tools": ["edit_file"], "permission": "allow_all",
+    "fixtures": {"slow-edit.txt": "old\n"}, "faults": {"tool": {"name": "edit_file", "type": "timeout", "times": 1, "latency_ms": 2000}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "timeout-edit-1", "name": "edit_file", "arguments": {"file_path": "{{workspace}}/slow-edit.txt", "old_string": "old", "new_string": "new"}}]},
+      {"content": "The edit timed out safely."}
+    ],
+    "expected_tool_calls": [{"name": "edit_file", "arguments": {"file_path": "{{workspace}}/slow-edit.txt", "old_string": "old", "new_string": "new"}, "result_contains": "timed out"}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"slow-edit.txt": {"exists": true, "content": "old\n"}},
+    "expected_final_outcome": {"exact": "The edit timed out safely.", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "timeout_retry_success", "category": "timeout",
+    "description": "A model retry after one timeout can complete without duplicate side effects.",
+    "input": "Retry a timed-out read once.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"retry-timeout.txt": "eventual\n"}, "faults": {"tool": {"name": "read_file", "type": "timeout", "times": 1, "latency_ms": 500}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "timeout-retry-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/retry-timeout.txt"}}]},
+      {"tool_calls": [{"id": "timeout-retry-2", "name": "read_file", "arguments": {"file_path": "{{workspace}}/retry-timeout.txt"}}]},
+      {"content": "The retry succeeded."}
+    ],
+    "expected_tool_calls": [
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/retry-timeout.txt"}, "result_contains": "timed out"},
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/retry-timeout.txt"}, "result_contains": "eventual"}
+    ],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"retry-timeout.txt": {"exists": true, "content": "eventual\n"}},
+    "expected_final_outcome": {"exact": "The retry succeeded.", "claims_completion": true, "required_evidence": ["retry-timeout.txt"], "false_completion": false, "max_rounds_reached": false}
+  },
+  {
+    "id": "crash_after_tool_planned", "category": "crash_resume",
+    "description": "Candidate resumes a PLANNED write after a process crash.",
+    "input": "Create crash-planned.txt.", "tools": ["eval_write"], "permission": "allow_all",
+    "fixtures": {}, "faults": {"process": {"event": "after_tool_planned"}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "crash-planned-1", "name": "eval_write", "arguments": {"file_path": "{{workspace}}/crash-planned.txt"}}]},
+      {"content": "Recovered planned write."}
+    ],
+    "expected_tool_calls": [{"name": "eval_write", "arguments": {"file_path": "{{workspace}}/crash-planned.txt"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"crash-planned.txt": {"exists": true, "content": "replayed\n"}},
+    "expected_final_outcome": {"exact": "Recovered planned write.", "claims_completion": true, "required_evidence": ["crash-planned.txt"], "false_completion": false, "max_rounds_reached": false, "task_success": true},
+    "expected_by_variant": {"baseline": {"expected_file_state": {"crash-planned.txt": {"exists": false}}, "expected_final_outcome": {"exception_category": "InjectedProcessCrash", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": false}}}
+  },
+  {
+    "id": "crash_before_tool_execute", "category": "crash_resume",
+    "description": "Candidate safely replays an idempotent write that never began.",
+    "input": "Create crash-before.txt.", "tools": ["eval_write"], "permission": "allow_all",
+    "fixtures": {}, "faults": {"process": {"event": "tool_before_execute"}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "crash-before-1", "name": "eval_write", "arguments": {"file_path": "{{workspace}}/crash-before.txt"}}]},
+      {"content": "Recovered pre-execution write."}
+    ],
+    "expected_tool_calls": [{"name": "eval_write", "arguments": {"file_path": "{{workspace}}/crash-before.txt"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"crash-before.txt": {"exists": true, "content": "replayed\n"}},
+    "expected_final_outcome": {"exact": "Recovered pre-execution write.", "claims_completion": true, "required_evidence": ["crash-before.txt"], "false_completion": false, "max_rounds_reached": false, "task_success": true},
+    "expected_by_variant": {"baseline": {"expected_file_state": {"crash-before.txt": {"exists": false}}, "expected_final_outcome": {"exception_category": "InjectedProcessCrash", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": false}}}
+  },
+  {
+    "id": "crash_after_tool_execute", "category": "crash_resume",
+    "description": "Candidate uses a file hash to confirm a write whose receipt was not stored.",
+    "input": "Create crash-after.txt.", "tools": ["write_file"], "permission": "allow_all",
+    "fixtures": {}, "faults": {"process": {"event": "tool_after_execute_before_receipt"}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "crash-after-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/crash-after.txt", "content": "after\n"}}]},
+      {"content": "Recovered completed write."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/crash-after.txt", "content": "after\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"crash-after.txt": {"exists": true, "content": "after\n"}},
+    "expected_final_outcome": {"exact": "Recovered completed write.", "claims_completion": true, "required_evidence": ["crash-after.txt"], "false_completion": false, "max_rounds_reached": false, "task_success": true},
+    "expected_by_variant": {"baseline": {"expected_final_outcome": {"exception_category": "InjectedProcessCrash", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": false}}}
+  },
+  {
+    "id": "crash_after_result_persisted", "category": "crash_resume",
+    "description": "Candidate restores a persisted success without re-executing its write.",
+    "input": "Create crash-persisted.txt.", "tools": ["write_file"], "permission": "allow_all",
+    "fixtures": {}, "faults": {"process": {"event": "tool_after_result_persisted_before_receipt"}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "crash-persisted-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/crash-persisted.txt", "content": "persisted\n"}}]},
+      {"content": "Recovered persisted result."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/crash-persisted.txt", "content": "persisted\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"crash-persisted.txt": {"exists": true, "content": "persisted\n"}},
+    "expected_final_outcome": {"exact": "Recovered persisted result.", "claims_completion": true, "required_evidence": ["crash-persisted.txt"], "false_completion": false, "max_rounds_reached": false, "task_success": true},
+    "expected_by_variant": {"baseline": {"expected_final_outcome": {"exception_category": "InjectedProcessCrash", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": false}}}
+  },
+  {
+    "id": "duplicate_response_lost_create", "category": "duplicate_side_effect",
+    "description": "A lost create response is resumed by candidate but restarted by baseline.",
+    "input": "Create lost-create.txt.", "tools": ["write_file"], "permission": "allow_all", "baseline_restart_after_crash": true,
+    "fixtures": {}, "faults": {"tool": {"name": "write_file", "type": "response_lost", "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "lost-create-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-create.txt", "content": "create\n"}}]},
+      {"content": "Create completed."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-create.txt", "content": "create\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"lost-create.txt": {"exists": true, "content": "create\n"}},
+    "expected_final_outcome": {"exact": "Create completed.", "claims_completion": true, "required_evidence": ["lost-create.txt"], "false_completion": false, "max_rounds_reached": false},
+    "expected_by_variant": {"baseline": {"expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-create.txt", "content": "create\n"}, "result_optional": true}, {"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-create.txt", "content": "create\n"}, "result_optional": true}]}}
+  },
+  {
+    "id": "duplicate_response_lost_overwrite", "category": "duplicate_side_effect",
+    "description": "A lost overwrite response exposes duplicate execution only in baseline.",
+    "input": "Overwrite lost-overwrite.txt.", "tools": ["write_file"], "permission": "allow_all", "baseline_restart_after_crash": true,
+    "fixtures": {"lost-overwrite.txt": "old\n"}, "faults": {"tool": {"name": "write_file", "type": "response_lost", "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "lost-overwrite-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-overwrite.txt", "content": "new\n"}}]},
+      {"content": "Overwrite completed."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-overwrite.txt", "content": "new\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"lost-overwrite.txt": {"exists": true, "content": "new\n"}},
+    "expected_final_outcome": {"exact": "Overwrite completed.", "claims_completion": true, "required_evidence": ["lost-overwrite.txt"], "false_completion": false, "max_rounds_reached": false},
+    "expected_by_variant": {"baseline": {"expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-overwrite.txt", "content": "new\n"}, "result_optional": true}, {"name": "write_file", "arguments": {"file_path": "{{workspace}}/lost-overwrite.txt", "content": "new\n"}, "result_optional": true}]}}
+  },
+  {
+    "id": "duplicate_response_lost_nested", "category": "duplicate_side_effect",
+    "description": "A nested-path write has the same response-loss recovery guarantee.",
+    "input": "Create nested/lost.txt.", "tools": ["write_file"], "permission": "allow_all", "baseline_restart_after_crash": true,
+    "fixtures": {}, "faults": {"tool": {"name": "write_file", "type": "response_lost", "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "lost-nested-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/nested/lost.txt", "content": "nested\n"}}]},
+      {"content": "Nested write completed."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/nested/lost.txt", "content": "nested\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"nested/lost.txt": {"exists": true, "content": "nested\n"}},
+    "expected_final_outcome": {"exact": "Nested write completed.", "claims_completion": true, "required_evidence": ["nested/lost.txt"], "false_completion": false, "max_rounds_reached": false},
+    "expected_by_variant": {"baseline": {"expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/nested/lost.txt", "content": "nested\n"}, "result_optional": true}, {"name": "write_file", "arguments": {"file_path": "{{workspace}}/nested/lost.txt", "content": "nested\n"}, "result_optional": true}]}}
+  },
+  {
+    "id": "duplicate_response_lost_unicode", "category": "duplicate_side_effect",
+    "description": "Unicode content remains deterministic across response-loss recovery.",
+    "input": "Create unicode-lost.txt.", "tools": ["write_file"], "permission": "allow_all", "baseline_restart_after_crash": true,
+    "fixtures": {}, "faults": {"tool": {"name": "write_file", "type": "response_lost", "times": 1}},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "lost-unicode-1", "name": "write_file", "arguments": {"file_path": "{{workspace}}/unicode-lost.txt", "content": "离线✅\n"}}]},
+      {"content": "Unicode write completed."}
+    ],
+    "expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/unicode-lost.txt", "content": "离线✅\n"}, "result_optional": true}],
+    "forbidden_tool_calls": ["bash", "agent"],
+    "expected_file_state": {"unicode-lost.txt": {"exists": true, "content": "离线✅\n"}},
+    "expected_final_outcome": {"exact": "Unicode write completed.", "claims_completion": true, "required_evidence": ["unicode-lost.txt"], "false_completion": false, "max_rounds_reached": false},
+    "expected_by_variant": {"baseline": {"expected_tool_calls": [{"name": "write_file", "arguments": {"file_path": "{{workspace}}/unicode-lost.txt", "content": "离线✅\n"}, "result_optional": true}, {"name": "write_file", "arguments": {"file_path": "{{workspace}}/unicode-lost.txt", "content": "离线✅\n"}, "result_optional": true}]}}
+  },
+  {
+    "id": "no_progress_repeated_read", "category": "no_progress_loop",
+    "description": "Repeated identical successful reads stop at the configured no-progress limit.",
+    "input": "Repeat the same read without making progress.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {"loop-read.txt": "same\n"}, "budget": {"max_rounds": 10, "max_no_progress_steps": 1},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "no-progress-read-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/loop-read.txt"}}]},
+      {"tool_calls": [{"id": "no-progress-read-2", "name": "read_file", "arguments": {"file_path": "{{workspace}}/loop-read.txt"}}]}
+    ],
+    "expected_tool_calls": [
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/loop-read.txt"}, "result_contains": "same"},
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/loop-read.txt"}, "result_contains": "same"}
+    ],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"loop-read.txt": {"exists": true, "content": "same\n"}},
+    "expected_final_outcome": {"contains": "no progress", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": true}
+  },
+  {
+    "id": "no_progress_repeated_missing", "category": "no_progress_loop",
+    "description": "Repeated identical missing-file failures count as no progress.",
+    "input": "Repeat the same failed read.", "tools": ["read_file"], "permission": "non_interactive",
+    "fixtures": {}, "budget": {"max_rounds": 10, "max_no_progress_steps": 1},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "no-progress-missing-1", "name": "read_file", "arguments": {"file_path": "{{workspace}}/absent.txt"}}]},
+      {"tool_calls": [{"id": "no-progress-missing-2", "name": "read_file", "arguments": {"file_path": "{{workspace}}/absent.txt"}}]}
+    ],
+    "expected_tool_calls": [
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/absent.txt"}, "result_contains": "not found"},
+      {"name": "read_file", "arguments": {"file_path": "{{workspace}}/absent.txt"}, "result_contains": "not found"}
+    ],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {"absent.txt": {"exists": false}},
+    "expected_final_outcome": {"contains": "no progress", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": true}
+  },
+  {
+    "id": "no_progress_repeated_unknown", "category": "no_progress_loop",
+    "description": "Repeated unknown-tool calls are cut off as a stalled path.",
+    "input": "Repeat an unavailable tool.", "tools": ["read_file"], "permission": "allow_all",
+    "fixtures": {}, "budget": {"max_rounds": 10, "max_no_progress_steps": 1},
+    "scripted_responses": [
+      {"tool_calls": [{"id": "no-progress-unknown-1", "name": "missing_tool", "arguments": {}}]},
+      {"tool_calls": [{"id": "no-progress-unknown-2", "name": "missing_tool", "arguments": {}}]}
+    ],
+    "expected_tool_calls": [
+      {"name": "missing_tool", "arguments": {}, "result_contains": "unknown tool"},
+      {"name": "missing_tool", "arguments": {}, "result_contains": "unknown tool"}
+    ],
+    "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+    "expected_file_state": {},
+    "expected_final_outcome": {"contains": "no progress", "claims_completion": false, "required_evidence": [], "false_completion": false, "max_rounds_reached": false, "task_success": true}
+  }
+]

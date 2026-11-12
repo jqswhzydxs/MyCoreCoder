@@ -1,0 +1,55 @@
+{
+  "id": "max_rounds",
+  "category": "no_progress_loop",
+  "description": "Repeated tool requests stop at the configured Agent round limit.",
+  "input": "Keep reading until the round limit stops the loop.",
+  "tools": ["read_file"],
+  "permission": "non_interactive",
+  "max_rounds": 2,
+  "fixtures": {
+    "loop.txt": "still here\n"
+  },
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "round-1",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/loop.txt"}
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "id": "round-2",
+          "name": "read_file",
+          "arguments": {"file_path": "{{workspace}}/loop.txt"}
+        }
+      ]
+    }
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/loop.txt"},
+      "result_contains": "still here"
+    },
+    {
+      "name": "read_file",
+      "arguments": {"file_path": "{{workspace}}/loop.txt"},
+      "result_contains": "still here"
+    }
+  ],
+  "forbidden_tool_calls": ["write_file", "edit_file", "bash", "agent"],
+  "expected_file_state": {
+    "loop.txt": {"exists": true, "content": "still here\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "(reached maximum tool-call rounds)",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": true
+  }
+}

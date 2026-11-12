@@ -5,12 +5,10 @@ on:
     branches: [main]
     paths-ignore:
       - "article/**"
-      - "*.md"
   pull_request:
     branches: [main]
     paths-ignore:
       - "article/**"
-      - "*.md"
 
 jobs:
   test:
@@ -34,10 +32,10 @@ jobs:
           python -m pip install -e ".[dev]"
 
       - name: Run tests
-        run: python -m pytest tests/ -v
+        run: python -m pytest tests --ignore=tests/test_live_smoke.py -q
 
       - name: Compile
-        run: python -m compileall -q corecoder tests
+        run: python -m compileall -q corecoder evals tests
 
   package:
     runs-on: ubuntu-latest
@@ -67,4 +65,36 @@ jobs:
         run: python -m pip install -U pip ruff
 
       - name: Ruff check
-        run: ruff check corecoder tests
+        run: ruff check corecoder tests examples evals
+
+  eval-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install offline eval dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install -e ".[dev]"
+
+      - name: Generate matched baseline and candidate
+        run: |
+          python -m evals.runner --suite all --variant baseline
+          python -m evals.runner --suite all --variant candidate
+
+      - name: Enforce safety and reliability gates
+        run: python -m evals.compare baseline candidate
+
+      - name: Validate README benchmark evidence
+        run: python -m evals.readme_benchmark --check
+
+      - name: Upload eval evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: offline-eval-comparison
+          path: evals/results/

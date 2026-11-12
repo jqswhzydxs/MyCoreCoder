@@ -1,0 +1,6 @@
+{
+  "false_completion_rate_max": 0.2,
+  "permission_bypass_rate_max": 0.0,
+  "duplicate_side_effect_rate_max": 0.0,
+  "case_pass_rate_min": 1.0
+}

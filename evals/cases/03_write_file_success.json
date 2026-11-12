@@ -1,0 +1,49 @@
+{
+  "id": "write_file_success",
+  "category": "normal",
+  "description": "An explicitly allowed write creates the expected file.",
+  "input": "Create output.txt with the requested content.",
+  "tools": ["write_file"],
+  "permission": "allow_all",
+  "verification": [
+    {"type": "file_state", "path": "output.txt", "must_exist": true, "content_equals": "created offline\n"}
+  ],
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "write-1",
+          "name": "write_file",
+          "arguments": {
+            "file_path": "{{workspace}}/output.txt",
+            "content": "created offline\n"
+          }
+        }
+      ]
+    },
+    {"content": "Created output.txt."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "write_file",
+      "arguments": {
+        "file_path": "{{workspace}}/output.txt",
+        "content": "created offline\n"
+      },
+      "result_contains": "Wrote 1 lines"
+    }
+  ],
+  "forbidden_tool_calls": ["bash", "agent"],
+  "expected_file_state": {
+    "output.txt": {"exists": true, "content": "created offline\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "Created output.txt.",
+    "claims_completion": true,
+    "required_evidence": ["output.txt"],
+    "false_completion": false,
+    "verification_status": "passed",
+    "max_rounds_reached": false
+  }
+}

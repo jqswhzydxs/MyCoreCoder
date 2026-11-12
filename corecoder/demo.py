@@ -1,4 +1,5 @@
-"""Offline scripted demo: watch the full agent loop with no API key.
+"""demo.py
+Offline scripted demo: watch the full agent loop with no API key.
 
 Runs one scripted task through the real Agent loop with a ScriptedLLM, so the
 thought -> tool call -> observation cycle renders exactly as it would against
@@ -35,12 +36,25 @@ class ScriptedLLM:
         self._turns = list(script)
         self.model = model
 
-    def chat(self, messages, tools=None, on_token=None, on_reasoning=None) -> LLMResponse:
+    def chat(
+        self,
+        messages,
+        tools=None,
+        on_token=None,
+        on_reasoning=None,
+        on_stream_activity=None,
+    ) -> LLMResponse:
         if not self._turns:
             raise RuntimeError("ScriptedLLM ran out of turns")
         resp = self._turns.pop(0)
         if on_token and resp.content:
             on_token(resp.content)
+        if on_stream_activity:
+            for index, _call in enumerate(resp.tool_calls):
+                on_stream_activity({
+                    "activity": "tool_call_detected",
+                    "tool_index": index,
+                })
         self.total_completion_tokens += len(resp.content.split())
         return resp
 
@@ -87,9 +101,9 @@ def _script(workdir: Path) -> list[LLMResponse]:
     ]
 
 
-def run_demo() -> int:
+def run_demo(trace_sink=None) -> int:
     workdir = Path(tempfile.mkdtemp(prefix="corecoder-demo-"))
-    agent = Agent(llm=ScriptedLLM(_script(workdir)))
+    agent = Agent(llm=ScriptedLLM(_script(workdir)), trace_sink=trace_sink)
 
     console.print(Panel.fit(f"[bold]{_TASK}[/]", title="corecoder demo (offline)"))
     result = agent.chat(

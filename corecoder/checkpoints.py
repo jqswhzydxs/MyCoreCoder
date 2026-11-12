@@ -1,4 +1,5 @@
-"""Session-scoped undo for file mutations.
+"""checkpoint.py
+Session-scoped undo for file mutations.
 
 edit_file and write_file record a checkpoint before touching a file; /undo
 pops the latest one and restores the previous bytes (or removes the file if
@@ -8,6 +9,7 @@ effects are not tracked, only the two file-writing tools.
 """
 
 import base64
+import hashlib
 import json
 from pathlib import Path
 
@@ -81,6 +83,19 @@ def undo() -> str:
 def pending() -> int:
     _ensure_loaded()
     return len(_stack)
+
+
+def has_preimage(path: Path, sha256: str | None) -> bool:
+    """Whether the undo stack contains this file preimage; does not mutate it."""
+    _ensure_loaded()
+    wanted = str(path.expanduser().resolve())
+    for stored_path, prior in reversed(_stack):
+        if str(Path(stored_path).expanduser().resolve()) != wanted:
+            continue
+        actual = hashlib.sha256(prior).hexdigest() if prior is not None else None
+        if actual == sha256:
+            return True
+    return False
 
 
 def clear() -> None:

@@ -1,289 +1,251 @@
-<div align="center">
+# CoreCoder Reliability Fork (ReliableCoder)
 
-# CoreCoder
+An offline-first reliability engineering extension of upstream CoreCoder that makes agent state, tool governance, verification, recovery, and evaluation explicit and inspectable.
 
-**The nanoGPT of coding agents. A 1.3k-line engine inside 2,816 readable lines of pure Python: understand how a coding agent actually works, then fork your own.**
+[中文](README_CN.md) · [Upstream CoreCoder](https://github.com/he-yufeng/CoreCoder) · [Design notes](docs/design/) · [Checked-in comparison](evals/results/comparison.md)
 
-*learn from it · fork it · ship something better*
+> This repository does not claim CoreCoder as original work. The Python package and CLI remain `corecoder` for compatibility; “ReliableCoder” is the working name of this fork's reliability layer.
 
-[中文](README_CN.md) | English | [Source-reading series · 8 bilingual essays](article/00-index_EN.md)
+## Relationship to upstream CoreCoder
 
-[![PyPI](https://img.shields.io/pypi/v/corecoder)](https://pypi.org/project/corecoder/)
-[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Tests](https://github.com/he-yufeng/CoreCoder/actions/workflows/ci.yml/badge.svg)](https://github.com/he-yufeng/CoreCoder/actions)
-[![engine](https://img.shields.io/badge/engine-1322_LoC-blue)](article/00-index_EN.md)
-[![essays](https://img.shields.io/badge/source--reading-8_bilingual-orange)](article/00-index_EN.md)
+This fork starts from [he-yufeng/CoreCoder](https://github.com/he-yufeng/CoreCoder) **0.8.0**, commit [`bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0`](https://github.com/he-yufeng/CoreCoder/commit/bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0). Upstream authorship remains attributed in `pyproject.toml`, the license, and the history.
 
-</div>
-
-- **Readable end to end.** Read the whole engine in an afternoon, with no magic hidden anywhere you can't follow it.
-- **Hackable.** Set a breakpoint on any line, change it, rerun, all on your own machine. It genuinely works, which makes this a living reference rather than a diagram.
-- **The gaps are the point.** It deliberately keeps only the minimal core; what's missing isn't half-finished, it's where you branch off and make it your own.
-
-## How it compares
-
-| | CoreCoder | Claude Code | aider | nanoGPT |
-|---|---|---|---|---|
-| Lines of code | ~1,322 engine / 2,816 total | hundreds of thousands (closed) | tens of thousands of Python | ~600 (two files) |
-| Time to read it all | one afternoon | can't (closed) | a few days of slogging | one afternoon |
-| Breakpoint, change, rerun? | yes, every line | no | yes, but there's a lot | yes |
-| What it's for | understand one, then fork your own | production coding assistant | terminal pair-programming | minimal GPT for teaching |
-
-The nanoGPT column is there as a reference point: minimal, readable, but it teaches you to train a GPT. CoreCoder is after the same thing, only the subject is an agent that actually edits code. Sitting it next to Claude Code and aider isn't about competing for their users. CoreCoder is the foundation you stand on while you learn from them and get going; it isn't in the same race.
-
-## What this is
-
-I've always felt coding agents get talked about as if they were arcane. Strip a tool like Claude Code or Cursor all the way down and the core is a `while` loop wrapped around a large model, plus seven or eight tools that let it actually do things. The hard part was never the loop; it's everything the loop has to cope with once it meets the real world. CoreCoder is the minimal version that writes that core out honestly.
-
-The engine (loop, model interface, context, tools, sessions) is 1,322 lines once you drop blank lines and comments. Counting the outer CLI, config and packaging too, the whole package is 25 files: 2,816 physical lines, 2,276 net, every one short enough to read in a single sitting. The growth since the original 1,161-line snapshot went into visible features: plan mode, hooks and checkpoints, each documented below.
-
-And it really runs: reads and writes files, executes shell, spawns sub-agents, compacts context in three tiers, and tells you the tokens and dollars a run burned whenever you ask. Anything that would mutate your disk or run a command stops for your consent first. 227 tests, all green. But the point of it running isn't to become your daily driver. It runs so the walkthrough can't lie: a reference that shows how an agent works has to actually work.
-
-The code came out of a public teardown: open analyses have already exposed a lot of the load-bearing architecture inside production agents like Claude Code. I took the most essential layer and rewrote it honestly, in as little code as I could. So reading CoreCoder is roughly like reading a runnable, annotated take on how that kind of agent works, except it's only a minimal reimplementation, sitting right there on your machine for you to take apart and change.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/he-yufeng/CoreCoder/main/assets/demo-plan-hooks.gif" width="760"
-       alt="Plan mode in action: the agent reads fib.py, gets its edit refused while plan mode is on, presents a plan, and only after approval edits, tests, and reports — with Pre/PostToolUse hooks firing around every call.">
-</p>
-
-<p align="center"><sub><i>These thousand lines really do run a full loop end to end: ask it to fix buggy.py and it reads the file, edits the code, runs it once to confirm, then reports back on its own. Watch it, then come back and read the code.</i></sub></p>
-
-This README follows the same arc: the first half helps you **read it** (the code map, the main loop, eight essays), the second half helps you **fork it** and points at a few directions worth pushing further.
-
-## Run it once first (five minutes before you read)
-
-Before you read the source, get it running on your machine once to build some intuition. It's a foundation meant for forking, so the recommended path is to clone it and install editable, reading and changing as you go:
-
-```bash
-git clone https://github.com/he-yufeng/CoreCoder
-cd CoreCoder
-pip install -e .
-```
-
-If you just want to get it running first, `pip install corecoder` works too.
-
-Give it a model and a key and it goes. It speaks the OpenAI-compatible API by default, and switching providers is usually just two environment variables:
-
-| Provider | Example env vars |
+| Scope | Attribution |
 |---|---|
-| OpenAI (default `gpt-5.5`) | `OPENAI_API_KEY=sk-...` |
-| DeepSeek | `OPENAI_API_KEY=sk-... OPENAI_BASE_URL=https://api.deepseek.com CORECODER_MODEL=deepseek-chat` |
-| OmniRoute | `OPENAI_API_KEY=your-key OPENAI_BASE_URL=http://localhost:20128/v1 CORECODER_MODEL=auto` |
-| Local Ollama | `OPENAI_API_KEY=ollama OPENAI_BASE_URL=http://localhost:11434/v1 CORECODER_MODEL=qwen2.5-coder` |
+| Core agent loop, provider abstraction, built-in coding tools, context management, permissions, hooks, MCP, file checkpoints/undo, sessions, CLI, articles, and original tests | Inherited from upstream CoreCoder |
+| Structured run state, tool contract and scheduler, budgets/cancellation, Trace, evidence-based verification, SQLite recovery, deterministic Eval Harness, CI gates, and reliability demo | Added in this fork |
 
-Kimi, Qwen and the like are the same two variables; for providers that don't even offer an OpenAI-compatible endpoint, the optional LiteLLM backend (`pip install "corecoder[litellm]"`) routes to a hundred-plus of them. The third essay goes into this in detail. Thinking models are first-class too: deepseek-reasoner, kimi-k3 and friends stream their chain-of-thought, and CoreCoder shows it dimmed as it works, kept out of the conversation history so providers never see it come back. The key can be `export`ed directly or dropped into a `.env` at the project root, which is loaded on startup. Then:
+The checked-in fork is currently an uncommitted working-tree extension over that upstream commit. Until its owner creates a commit, reports identify the upstream Git commit plus the evaluated case manifest; they must not be described as a separately published release.
 
-Smoke-tested end to end (read the file, edit it, run it, report back) against DeepSeek, Qwen3 and Kimi K2 via a single OpenRouter-compatible endpoint; each completed the full loop. One note for one-shot scripts: `-p` refuses mutating tools unless you pass `--yes`, by design.
+Current source-size audit (kept executable by a test): `engine-4641_LoC`; **37 files**, **12,319 physical lines**, **10,953 net** lines in `corecoder/`.
+
+## Capabilities inherited from upstream
+
+- A compact `Agent.chat()` tool-use loop with OpenAI-compatible providers and optional LiteLLM routing.
+- Built-in file read/write/edit, glob, grep, shell, todo, and sub-agent tools.
+- Layered context compression, streaming, token/cost accounting, retries, sessions, and a terminal UI.
+- Permission prompts, plan mode, pre/post hooks, MCP tool discovery, and file-level `/undo` checkpoints.
+- A bilingual source-reading series in [`article/`](article/) and the original offline test suite.
+
+## Capabilities added by this fork
+
+- `Agent.run()` and a guarded `RunState` state machine, while `Agent.chat()` remains a string-returning compatibility API.
+- `ToolSpec`/`ToolResult`, schema plus signature validation, safe legacy adapters, and a metadata-driven `ToolScheduler` that serializes conflicting side effects.
+- Per-run rounds, tool, token, cost, deadline, cancellation, and no-progress budgets with structured exit reasons.
+- Default-off, redacted JSONL Trace with model/tool/permission/state/verification events and offline replay.
+- Pluggable verifiers that separate model prose from `VERIFIED`; trusted file, command, test, and tool-state evidence determines completion.
+- Transactional SQLite `RunStore`, stable idempotency keys, conservative `UNKNOWN` recovery, and hash reconciliation for file writes.
+- Forty deterministic core Eval cases plus 18 steerable-runtime scenarios, reproducible fault injection, matched baseline/candidate comparison, and non-negotiable safety gates.
+- A read-only tool result cache keyed by tool name, version, canonical arguments, cwd, and workspace revision. Writes, Bash, and external tools invalidate it before execution; the cache never applies to Bash and emits a redacted `cache_hit` event. `Agent.invalidate_tool_cache()` provides an explicit refresh. Repeated no-progress exploration also injects a structured replanning reminder.
+- Per-run wall-clock metrics for first event/model/tool output, model/tool queue/execution time, steering acknowledgement/apply latency, and total duration. Metrics contain timings and counts only, never prompts, commands, paths, or tool payloads.
+- A steerable background runtime: typed event streams, `AgentRunHandle`, APPEND/REDIRECT steering at safe points, pause/resume/cancel, live Bash output, and SQLite control-log recovery.
+- A real offline crash/resume demo and progressive learning material under [`docs/learning/`](docs/learning/).
+
+Design rationale is documented in [`docs/design/`](docs/design/); key decisions are recorded in [`docs/adr/`](docs/adr/).
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[User] --> RS[RunState]
+    RS --> C[Context]
+    C --> M[Model]
+    M --> S[Scheduler]
+    S --> T[Tool Runtime]
+    T --> V[Verifier]
+    V --> CP[Checkpoint / RunStore]
+    CP --> R[Result]
+    T --> C
+    CP -. persists boundaries .-> RS
+```
+
+This is the logical evidence path. Persistence also brackets model calls, tool calls, and verification; it is not deferred until the end. A model response can request work or provide prose, but it cannot directly write `RunState` or mark a run verified.
+
+## Steerable streaming runtime
+
+`Agent.start()` runs the same loop in one worker thread and returns an
+`AgentRunHandle`. The caller can consume typed events, send instructions, and
+pause or cancel without touching mutable agent state. The full protocol and
+recovery rules are in [`docs/steerable-runtime.md`](docs/steerable-runtime.md).
+
+```text
+[00.06] run started
+[00.06] Steer > analyze the backend only; skip the frontend
+[00.06] model thinking
+[00.06] steering received, waiting for safe point
+[00.06] tool stopped read_file
+[00.06] tool stopped read_file
+[00.06] steering applied at safe point
+[00.06] replanning
+[00.07] tool started read_file
+[00.07] verification finished
+[00.07] run finished
+```
+
+The demo is fully offline. It prints this transcript, the skip count, the
+steering acknowledgement/apply latency, and an event-order summary:
 
 ```bash
-corecoder                                             # interactive REPL
-corecoder -p "add error handling to parse_config()"   # one-shot mode, exits when done
+python examples/steerable_agent_demo.py
 ```
 
-## Read it: the code map
+Key semantics:
 
-Laid out flat, the whole project is this big. Skim it before you clone and you'll know where everything is. This is the most concrete difference from Claude Code's hundreds of thousands of lines: you can read it like the table of contents of a book. Start from the main loop in `agent.py`; that's the heart of the whole agent.
+- **APPEND** adds a requirement after the current tool batch and lets the next
+  model turn account for it. **REDIRECT** stops not-yet-started calls, inserts
+  paired `BLOCKED` tool replies, and enters `REPLANNING`. Receipt
+  (`STEERING_RECEIVED`) is not application (`STEERING_APPLIED`).
+- A safe point is a closed model/tool batch or a pause checkpoint. A redirect
+  never starts a call that was already cancelled. An effect that has already
+  started is reported, not rolled back.
+- `pause()` waits on a condition rather than polling; `resume()` releases it;
+  `cancel()` stops new model/tool starts and terminates a running Bash process.
+- `RunStore` records steering ids, modes, receive/apply sequences, timestamps,
+  safe point, skipped-call count, and final status. It never stores instruction
+  text. Applied instructions are not replayed; a received-but-unapplied
+  instruction becomes `NEEDS_ACTION` instead of being silently dropped.
+- A persisted `PAUSED` run stays paused on automatic recovery. Only an explicit
+  `resume_paused=True` continues it.
 
-```
-corecoder/
-├── agent.py        agent loop + parallel tool exec       240 lines   ← start here
-├── llm.py          streaming client + retry + cost        349 lines
-├── context.py      three-tier context compaction          220 lines
-├── session.py      save / resume + path-traversal guard    97 lines
-├── permissions.py  consent for mutating tools              75 lines
-├── hooks.py        Pre/PostToolUse shell hooks             87 lines
-├── shell.py        POSIX shell routing (Git Bash on Windows) 61 lines
-├── mcp.py          MCP stdio client for external tools    237 lines
-├── prompt.py       system prompt                           41 lines
-├── cli.py          REPL + slash commands + one-shot       393 lines
-├── config.py       env-var config                          55 lines
-├── checkpoints.py  /undo snapshot and restore               93 lines
-├── demo.py         offline end-to-end demo                 101 lines
-└── tools/
-    ├── bash.py       shell + dangerous-command gate + cd  203 lines
-    ├── edit.py       unique-match search/replace + diff    99 lines
-    ├── grep.py       content search                        93 lines
-    ├── glob_tool.py  filename matching                     52 lines
-    ├── read.py       file read                             56 lines
-    ├── write.py      file write                            46 lines
-    ├── todo.py       agent-maintained task checklist       79 lines
-    ├── agent.py      sub-agent spawning                    72 lines
-    └── base.py       tool base class                       32 lines
-examples/
-└── plan_hooks_demo.py  offline plan mode + hooks demo (no API key)
-```
+### Steering evaluation
 
-Eight tools: `bash`, `read_file`, `write_file`, `edit_file`, `glob`, `grep`, `todo_write` (a task checklist the agent maintains for itself), and `agent` (which spawns a sub-agent). Everything else is the CLI shell, config, and packaging wrapped around that engine core. If `~/.corecoder/mcp.json` exists, its MCP servers join the eight as extra `mcp__*` tools; the MCP section below covers it.
-
-## A `while` loop is the whole agent
-
-The whole of an agent fits in one sentence: hand the user's words to the model, run whatever tools it asks for, stuff the results back into the context, ask again, and keep going until it stops asking for tools and gives an answer. In code, that's about a dozen lines:
-
-```python
-# corecoder/agent.py · the main loop (trimmed skeleton)
-def chat(self, user_input):
-    self.messages.append(user_input)
-
-    for _ in range(self.max_rounds):                   # bounded, so it can't run away
-        reply = self.llm.chat(self.messages, self.tools)   # ask the model what to do next
-        if not reply.tool_calls:                       # model wants no more tools
-            return reply.text                          #   -> done, hand the answer back
-        results = run_parallel(reply.tool_calls)       # tools requested -> run in parallel
-        self.messages += results                       # feed results back, loop again
-
-    return "(hit the round limit)"
-```
-
-That's the whole thing. The core skeleton is about twenty lines; counting parallel execution and the bookkeeping after a Ctrl+C interrupt, maybe forty. Almost everything else in CoreCoder's thousand-odd lines is there to clean up the mess the loop runs into once it meets the real world. `llm.py` ends up the biggest file in the engine, not because calling a model is hard, but because a streamed response splinters each tool call's arguments into fragments you have to restitch in order, a provider will hand you half a JSON object or a null `usage` field, and 429s, timeouts, dropped connections and 5xx all need backoff-and-retry while the other 4xx should just raise. A stream can also die after it has already started, so the retry wraps the whole request, not just the connect. That unglamorous grunt work, not the loop, is where the real engineering of taking an agent from demo to delivery actually lives; the third essay follows it down to the line.
-
-Three decisions are worth a closer look, because they're the kind of call you can only make after you've understood how others did it, and they're judgments you can lift straight into your own fork.
-
-**`edit_file` does search-and-replace on a unique match, not line numbers.** Line numbers are a trap: the model only has to miscount by one and it quietly edits the wrong place. Anchor on a unique snippet of the original instead. If there's no match, it hands the start of the file back so the model can re-anchor; if there are several matches, it makes the model bring more surrounding context rather than gamble on one. On a successful edit it returns a diff. Recoverable on failure, verifiable on success: the whole loop stays inside the tool.
-
-**Context isn't cut all at once when it's full; it gives ground in three tiers, cheapest first.** At half full (50%) it trims over-long tool outputs in place, a tier that's purely mechanical and costs no model call. If 70% still isn't enough, it has the model summarize the older turns into a single paragraph while keeping the most recent ones verbatim. Only at 90% does it hit the emergency tier and pull everything, summary and recent turns alike, down to its tightest form. Blunt truncation tends to throw away exactly the early decision a long task leans on most; tiering lets it surrender the least important things first instead of lopping off the oldest decisions wholesale from the start.
-
-**You constrain a sub-agent by withholding the tool, not by writing rules and hoping it obeys.** A spawned sub-agent gets an isolated context and its own separate history, with a toolset exactly one item shorter than the parent's: the `agent` tool itself, so it can't recursively spawn more sub-agents. Handing it one fewer tool is cleaner than legislating a rule after the fact. It also reuses the parent's model connection (its spend folded into the same running total), truncates its output once it runs past 5,000 characters down to just the opening, and runs on a shorter round limit than the parent. The same restraint, end to end.
-
-Every one of these *whys* is traced down to the actual lines of code in the series below.
-
-## The source-reading series · 8 bilingual essays
-
-I also wrote a bilingual source-reading series, one intro plus eight parts, each in Chinese with an English mirror. Against CoreCoder's actual code, it walks through how agents like Claude Code work under the hood. One hard rule I set myself: every line count and every snippet is re-read and re-checked from the repo, never written from memory. The first six get you reading, the seventh gets you forking, and the eighth is about extending it without touching the loop; read them in any order.
-
-- **[Intro · Read Claude Code through CoreCoder, then build your own](article/00-index_EN.md)**
-- **[01 · An agent, at its core, is a `while` loop](article/01-the-loop_EN.md)** — the main loop in `agent.py`, interrupts, and the round limit
-- **[02 · The tool system: letting the model act, safely](article/02-tools_EN.md)** — the eight tools in `tools/` and the bash safety gate
-- **[03 · Plug in any LLM, and keep the bill honest](article/03-llm-and-cost_EN.md)** — `llm.py`'s provider wrapper, retries, and cost accounting
-- **[04 · Surviving a long task on a finite window](article/04-context_EN.md)** — `context.py`'s three-tier compaction and orphaned tool messages
-- **[05 · Parallel execution and sub-agents](article/05-parallel-and-subagents_EN.md)** — thread-pool concurrency and sub-agent isolation
-- **[06 · Turning it into a real command-line tool](article/06-session-and-cli_EN.md)** — `session.py` and path-traversal defense
-- **[07 · Fork CoreCoder into your own coding agent](article/07-build-your-own_EN.md)** — from fork to custom tools to swapping models
-- **[08 · Three ways to extend without touching the loop: MCP, hooks, and plan mode](article/08-extensibility_EN.md)** — the v0.6.0 extensibility trio and the contract that makes them safe
-
-## Fork it, build something better
-
-Once you understand it, the natural next step is to fork. Getting started doesn't take much:
-
-- **Swap in a model you actually use.** It's the two env vars from above; `llm.py` (349 lines) is the entry point for all provider adaptation.
-- **Add a tool of your own.** Write a new file against the tool base class in `tools/base.py` (32 lines): run tests, fetch a page, call an LSP, whatever. The end of the second essay walks you through your first one by hand.
-- **Rewrite the system prompt.** `prompt.py` is all of 41 lines; change one line and you'll watch the agent's temperament shift. It's the cheapest "change one thing, see a result" in the whole project.
-- **Import it as a library.** The top level exports `Agent`, `LLM`, and `Config`, ready to embed in your own program:
-
-```python
-from corecoder import Agent, LLM
-
-llm = LLM(model="deepseek-chat", api_key="sk-...", base_url="https://api.deepseek.com")
-print(Agent(llm=llm).chat("find every TODO comment in this project and list them"))
-```
-
-Going deeper, the directions are out in the open too. None of the following is in CoreCoder, by design, not because it's unfinished. Flip it around and each one is an entry point you can carry into a real tool of your own:
-
-- **The dangerous-command blocking in bash is just a regex blacklist.** It guards against slips, not a security sandbox. Facing untrusted input means reaching for seccomp or container isolation. This is the hardest of the four; it goes all the way down to the syscall and isolation layer.
-- **Retry is only exponential backoff.** No fallback model, no hard dollar budget. Follow `llm.py` down and add a fallback model chain plus a stop-on-over-budget gate; the change stays mostly inside that one file.
-- **Sub-agents only run the plainest synchronous execution.** Make it async or a streaming executor and you close the exact gap the fifth essay identifies between this and how production agents stream execution.
-- **No RAG, and the MCP client speaks tools only.** Retrieval-based code location for big repos is still open, and `mcp.py` leaves resources and prompts unimplemented on purpose. Either one is a real way to grow from a minimal core into your own stronger agent.
-
-The README only points; the seventh essay picks up the code details for each. Pick one and start; that's the whole reason the core is kept this small.
-
-## Commands
-
-Inside the REPL, `/help` lists everything; these are the ones you'll reach for:
-
-```
-/model <name>    switch model
-/compact         compact the context by hand
-/tokens          token usage and cost estimate
-/diff            files changed this session
-/undo            revert the most recent file change
-/plan            toggle plan mode (read-only, then a plan to approve)
-/save  /sessions save / list sessions
-/mcp             MCP server status; /mcp reconnect <name> revives a dead one
-quit / exit      exit (Ctrl+C cancels the current round)
-```
-
-Session IDs are sanitized to safe characters before they become filenames, every archive lands under `~/.corecoder/sessions`, and a malicious session name can't traverse out. Undo history persists the same way: checkpoints land in `~/.corecoder/checkpoints.json`, so `/undo` still reaches back after a restart. The cost estimate behind `/tokens` reads a built-in price table, and `~/.corecoder/pricing.json` overrides any entry in it, so a new model or a moved price lands without waiting for a release.
-
-## Permissions
-
-Read-only tools (`read_file`, `glob`, `grep`, `todo_write`) run the moment the model asks. The mutating ones (`edit_file`, `write_file`, `bash`, and spawning a sub-agent) stop for consent first, and the REPL banner shows which mode you're in:
-
-- In the REPL you get one prompt per call: allow once, always allow this tool, or deny. "Always" is remembered per tool and persists in `~/.corecoder/permissions.json` across restarts; a sub-agent inherits the same layer, so consent follows the work wherever it happens.
-- In one-shot mode (`-p`) there is nobody to ask, so a mutating call is refused on the spot and the refusal goes back to the model as an ordinary tool result: the loop never hangs on input that can't arrive. Pass `--yes` to approve everything up front (scripts, CI).
-- The decision itself is pure logic in `permissions.py`, with the terminal only supplying the prompt callback. You can unit-test consent without a TTY, or reuse the layer in your own embedding.
-
-## Plan mode
-
-`/plan` toggles plan mode in the REPL. While it's on, the prompt shows `(plan)` and every mutating call (writes, edits, bash, MCP tools, sub-agents) is refused on the spot: the refusal goes back to the model as an ordinary tool result, telling it to keep investigating read-only and present a numbered plan instead. When the plan looks right, `approve` (or `/plan` again) hands control back and the agent executes. Mechanically it is one flag on the `Agent` plus one refusal branch ahead of the consent gate, which itself stays untouched; there is no plan file and nothing is remembered between sessions.
-
-## Hooks
-
-Drop a `hooks.json` under `~/.corecoder` and your own shell commands run around every tool call, the same idea as Claude Code's hooks:
-
-```json
-{
-  "PreToolUse":  [{"matcher": "bash", "command": "cat >> ~/.corecoder/audit.jsonl"}],
-  "PostToolUse": [{"matcher": "*",    "command": "cat >> ~/.corecoder/trace.jsonl"}]
-}
-```
-
-Each hook gets the call as JSON on stdin (`tool_name`, `tool_input`; post hooks also get `tool_response`). The matcher is an exact tool name; empty or `*` fires on every tool. A pre hook can veto the call with exit code 2, and its stderr travels back to the model as the reason so it can route around the block. Post hooks only observe and can never block. A hook that errors or runs past ten seconds is skipped with a warning: hooks assist the loop, they never get to kill it. The whole mechanism is `hooks.py`, and the REPL banner shows how many hooks loaded.
-
-Two worth stealing (the commands lean on `jq`, the usual suspect):
+The 18 deterministic scenarios use a scripted LLM and the real Agent, tools,
+scheduler, handle, and SQLite store. Run:
 
 ```bash
-# 1. lint gate: after every edit/write, run the project's fast linter on the
-#    touched file. The model sees the output and fixes its own mistakes in
-#    the same turn instead of waiting for CI.
-{
-  "PostToolUse": [{
-    "matcher": "edit_file",
-    "command": "f=$(jq -r .tool_input.file_path); ruff check \"$f\" 2>&1 | head -20"
-  }]
-}
-
-# 2. write protect: refuse edits under paths you never want an agent to
-#    touch. Exit code 2 vetoes the call and the message reaches the model.
-{
-  "PreToolUse": [{
-    "matcher": "edit_file",
-    "command": "case \"$(jq -r .tool_input.file_path)\" in .env*|*/secrets/*|*.pem) echo 'that path is off-limits' >&2; exit 2;; esac"
-  }]
-}
+python evals/run_steering_eval.py
 ```
 
-Both are plain shell; nothing here is CoreCoder-specific syntax beyond the JSON shape and the exit-code-2 veto.
+Latest observed single-machine result (details and caveats in
+[`evals/results/steering_eval.md`](evals/results/steering_eval.md)):
 
-## MCP servers
+| Metric | Observed |
+|---|---:|
+| event_delivery_success_rate | 1.0 |
+| event_order_violation_count | 0 |
+| steering_ack_p50 / p95 | 0.036 ms / 0.075 ms |
+| steering_apply_p50 / p95 | 0.773 ms / 201.274 ms |
+| cancelled_before_side_effect_rate | 1.0 |
+| orphan_tool_message_count | 0 |
+| duplicate_tool_execution_rate | 0.0 |
+| time_to_first_progress_p50 / p95 | 0.002 ms / 11.977 ms |
+| run_completion_rate | 1.0 |
+| deadlock_count | 0 |
+| sensitive_payload_leak_count | 0 |
+| cache_hits | 1 |
 
-Drop a `mcp.json` under `~/.corecoder` and tools from any MCP server join the agent over stdio, the same config shape as Claude Code's:
+Hard gates are `orphan_tool_message_count == 0`, `deadlock_count == 0`,
+`sensitive_payload_leak_count == 0`, and `event_order_violation_count == 0`.
+The apply p95 is dominated by the intentionally slow write used to exercise a
+serial safe point; it is not a latency SLA.
 
-```json
-{
-  "mcpServers": {
-    "filesystem": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]}
-  }
-}
+## Quick start
+
+Python 3.10+ is required. The default walkthrough is fully offline and does not need an API key.
+
+```bash
+git clone <your-fork-url>
+cd CoreCoder
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# POSIX: source .venv/bin/activate
+python -m pip install -e ".[dev]"
+python -m examples.reliablecoder_demo
+python examples/steerable_agent_demo.py
 ```
 
-Each configured server starts as a subprocess at launch, handshakes, and lists its tools; every one is registered as `mcp__<server>__<tool>`, so hook matchers and the consent gate treat it exactly like a built-in. MCP tools stay out of the read-only set, meaning the agent asks before running one. The handshake gets fifteen seconds, a call gets sixty, and a server that dies or never answers fails that one call as an ordinary tool result instead of killing the loop. The REPL's `/mcp` lists every server with its state, and `/mcp reconnect <name>` starts a dead one fresh: new process, new handshake, and the tools the agent already holds work again with no restart. The client speaks the tools slice of the protocol (initialize, tools/list, tools/call) and nothing else, which keeps the whole thing inside `mcp.py` at about 240 lines. With no `mcp.json` there is no MCP and nothing changes. A runnable starter config lives in [`examples/mcp_filesystem.md`](examples/mcp_filesystem.md): the reference filesystem server, scoped to one directory, behind the same consent gate.
+The first script is the 2–3 minute reliability walkthrough; the second is a
+short steering demo that prints its terminal transcript and exits non-zero if
+the redirect, event order, or verification assertion fails.
 
-## Related Projects
+This 2–3 minute walkthrough creates a buggy `calculator.py`, reads and edits it with real tools, simulates a crash after the edit ran but before its receipt was stored, resumes from SQLite without repeating the edit, runs real pytest through a permission-aware Verifier, checks the JSONL Trace, and reaches `VERIFIED`. It exits non-zero if the file, test exit code, event chain, or exactly-once assertion disagrees. The scripted model never claims that tests passed.
 
-If working through CoreCoder was useful, here are a few other tools I've built around agents and LLM systems:
+To replay the retained Trace separately, copy the path printed by the demo:
 
-- **[RepoWiki](https://github.com/he-yufeng/RepoWiki)** — dropped into an unfamiliar codebase? It gives you a guided wiki and a where-to-start reading path, a self-hostable DeepWiki alternative.
-- **[FindJobs-Agent](https://github.com/he-yufeng/FindJobs-Agent)** — stop sifting job boards by hand: it ranks postings against your resume and runs mock interviews.
-- **[ContractGuard](https://github.com/he-yufeng/ContractGuard)** — catch the risky clauses before you sign: it reads contracts and flags the dangerous bits.
-- **[GitSense](https://github.com/he-yufeng/GitSense)** — want to contribute to open source? It finds issues worth your time and gauges whether your PR will get merged.
-- **[CodeABC](https://github.com/he-yufeng/CodeABC)** — understand any codebase even if you don't code, built for non-programmers.
+```bash
+python -m corecoder.trace_replay <demo-workspace>/run.trace.jsonl
+```
 
-## Contributing / License
+The live CLI remains available, but it requires a configured provider and is deliberately outside the offline acceptance path:
 
-Before you send anything, run `pytest tests/ -q` (227 tests), `ruff check`, and `compileall`, and make sure they're green. MIT licensed: fork it, learn from it, ship something better. A mention of this project is appreciated.
+```bash
+corecoder --trace-file .corecoder/run.jsonl
+corecoder --resume-run RUN_ID
+```
 
----
+Library callers should prefer structured results for new integrations:
 
-By [Yufeng He](https://github.com/he-yufeng), formerly at Moonshot AI (Kimi). I earlier wrote a fairly complete [Claude Code source analysis](article/claude-code-source-analysis.md) (written in Chinese); this project is its hands-on counterpart: that one walks you through reading it, this one through rebuilding it.
+```python
+from corecoder import Agent, CompositeVerifier, FileStateVerifier
 
-> CoreCoder was formerly named NanoCoder; it was renamed to avoid confusion with [Nano-Collective/nanocoder](https://github.com/Nano-Collective/nanocoder), and old links redirect here automatically.
+result = Agent(llm=my_llm).run({
+    "goal": "create report.txt",
+    "success_criteria": ["report.txt contains a summary"],
+    "verifier": CompositeVerifier([
+        FileStateVerifier("report.txt", content_contains="summary"),
+    ]),
+})
+print(result.status, result.exit_reason, result.evidence)
+```
+
+## Eval methodology
+
+The harness uses the same 40 JSON cases, case-manifest hash, scripted model configuration, prompt version, code commit, and run count for both variants. `baseline` is a controlled ablation of automatic durable resume; `candidate` enables the current safe RunStore recovery policy. It is **not** a claim that the baseline represents untouched upstream CoreCoder.
+
+```bash
+python -m evals.runner --suite all --variant baseline
+python -m evals.runner --suite all --variant candidate
+python -m evals.compare baseline candidate
+python -m evals.readme_benchmark --check
+```
+
+Cases cover normal, boundary, permission, malformed calls, transient failure, timeout, crash/resume, duplicate side effects, false completion, and no-progress loops. Safety gates (`permission_bypass_rate == 0`, `duplicate_side_effect_rate == 0`, and the configured false-completion ceiling) cannot be traded against latency, tokens, or success rate. Failures name their case and reasons. See [`docs/design/05-evaluation.md`](docs/design/05-evaluation.md).
+
+## Real benchmark
+
+The following block is generated from [`evals/results/baseline.json`](evals/results/baseline.json) and [`evals/results/candidate.json`](evals/results/candidate.json). CI validates it with `python -m evals.readme_benchmark --check`; edit the reports or rerun the harness, never hand-edit the figures.
+
+<!-- eval-benchmark:start -->
+<!-- Generated by: python -m evals.readme_benchmark --write -->
+| Metric | Baseline | Candidate |
+|---|---:|---:|
+| Task success rate | 80% | 90% |
+| Verified completion rate | 5% | 5% |
+| False completion rate | 11.1111% | 9.0909% |
+| Duplicate side-effect rate | 28.5714% | 0% |
+| Permission bypass rate | 0% | 0% |
+| Crash resume rate | 0% | 100% |
+| P95 rounds | 3 | 2 |
+| Completion tokens | 180 | 188 |
+
+Evidence: 40 deterministic offline cases, 1 run per case, model `FaultInjectingLLM/scripted-eval-v2`, commit `bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0`. Safety gates: **PASS**.
+<!-- eval-benchmark:end -->
+
+Full scenario, exit-reason, and error-category slices are in [`evals/results/comparison.md`](evals/results/comparison.md). These are observed values, not proof of universal safety or statistical significance. Raw false completions remain 2 in each variant; the rate denominator changes because candidate safely resumes additional completion claims.
+
+## Reproducibility and project checks
+
+The validated environment and observed dependency versions are recorded in [`docs/baseline.md`](docs/baseline.md). The required offline checks are:
+
+```bash
+pytest tests --ignore=tests/test_live_smoke.py -q
+ruff check corecoder tests examples
+```
+
+Contribution rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md), changes in [`CHANGELOG.md`](CHANGELOG.md), and the current delivery candidate in [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+
+## Known limitations
+
+- No live-provider benchmark was run: default validation is intentionally offline, makes no network calls, and does not read or print API keys.
+- The Eval model is deterministic and scripted; latency is simulated work-unit latency, token counts are harness counts, cost uses fixed test rates, and each checked-in case has one run. No statistical-significance claim is made.
+- The working tree has no new fork commit yet; another machine needs this complete snapshot or a later owner-created commit, not only the upstream hash.
+- Unknown-price models record `cost_unavailable`; other budgets still apply, but a dollar ceiling cannot be enforced without trusted pricing.
+- Python tool timeouts and cancellation are cooperative; hard interruption of arbitrary blocking code still needs process isolation or provider-native cancellation.
+- Command verification passes through permissions but is not a sandbox; commands must come from trusted caller configuration, never model text.
+- A non-idempotent bash/MCP call left `STARTED` by a crash becomes `UNKNOWN` and is not replayed automatically; it requires external status lookup or human confirmation.
+- Verifier objects are caller configuration and are not serialized into SQLite; resumed verification must receive the same trusted Verifier again.
+- A zero safety rate means no observed violation in this 40-case matrix, not proof that violations are impossible.
+
+## License and attribution
+
+MIT, following upstream. See [`LICENSE`](LICENSE). When reusing this fork, preserve both upstream attribution and a clear statement of which reliability changes came from the fork.

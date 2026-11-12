@@ -6,43 +6,37 @@ When piece one covered the main loop, I left a gap at the "execute tools" step: 
 
 The model doesn't always want one tool at a time. Ask it "tell me what each of these three files does" and it'll very likely return three `read_file` calls in one go. Those three reads are independent of each other, and running them serially is dead waiting when they could clearly go together.
 
-CoreCoder branches on exactly this in the main loop:
+CoreCoder first asks an independent `ToolScheduler` to plan the whole batch:
 
 ```python
-if len(resp.tool_calls) == 1:
-    tc = resp.tool_calls[0]
-    # ...execute directly...
+schedule = self.tool_scheduler.plan(resp.tool_calls)
+if schedule.parallel:
+    results = self._exec_tool_results_parallel(
+        resp.tool_calls, schedule=schedule
+    )
 else:
-    # parallel execution for multiple tool calls
-    results = self._exec_tools_parallel(resp.tool_calls, on_tool)
+    # execute deterministically in model order
+    ...
 ```
 
-A single one runs directly; multiple go to `_exec_tools_parallel`, a thread pool:
+The scheduler does not hard-code tool names. It reads each tool's `ToolSpec`. A batch reaches the thread pool only when every call is `parallel_safe=true`, needs no interactive approval, has no unresolved data dependency, and has no incompatible resource conflict. `write`, `external`, and `high-risk` calls default to serial execution; read resources are shareable, so multiple `read_file`, `grep`, and `glob` calls can still run concurrently.
 
 ```python
-def _exec_tools_parallel(self, tool_calls, on_tool=None) -> list[str]:
-    for tc in tool_calls:
-        if on_tool:
-            on_tool(tc.name, tc.arguments)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
-        futures = [pool.submit(self._exec_tool, tc) for tc in tool_calls]
-        return [f.result() for f in futures]
+plan = scheduler.plan(tool_calls)
+results = scheduler.execute(tool_calls, invoke, plan=plan)
 ```
 
-At most 8 threads run concurrently, each running one tool, then the results are collected in the original order. Three file reads that would have waited three rounds of IO now wait roughly one. For an agent that frequently reads several files at once, the time this parallelism saves is considerable.
+At most 8 threads run concurrently, each running one safe call, and results are collected in the original tool-call order. One failed call cannot discard its siblings; cancellation, Ctrl+C, or a scheduler exception also backfills every pending call with a legal `ToolResult`, preventing orphan tool messages. Three file reads that would have waited three rounds of IO now wait roughly one.
 
 Threads rather than processes or coroutines, because tools mostly do IO-bound work: reading disk, running subprocesses, waiting on the network. In this scenario Python's GIL isn't much of an obstacle, and a thread pool is the most effortless concurrency primitive in the standard library, done in a few lines. The choice is consistent with the project's "keep it simple where you can" tone.
 
+Tools may also implement `resource_keys(arguments)`. File tools return normalized absolute paths, bash returns the global shell/cwd resource, and MCP returns a server-plus-tool resource. Edit and write calls against one file therefore always conflict and serialize, while unrelated reads can overlap. The optional Trace records the scheduling decision, queue wait, and execution time.
+
 ## Where this simplification falls short of Claude Code
 
-Here the boundary of the simplification needs drawing clearly. Claude Code's concurrent execution (public teardowns call it StreamingToolExecutor) is far more aggressive and far more refined. It does two things CoreCoder doesn't.
+Here the boundary of the simplification needs drawing clearly. Claude Code's concurrent execution (public teardowns call it StreamingToolExecutor) remains more aggressive. It executes while generating: with the model still emitting later content, an already-formed tool call up front can start without waiting for the whole response. CoreCoder waits for the model to finish the round, receives the complete call list, then plans and executes it. Avoiding speculative execution saves implementation complexity at the cost of some latency.
 
-One is that it executes while generating. With the model still emitting later content, an already-formed tool call up front can start running, without waiting for the whole response to finish. CoreCoder dutifully waits for the model to finish this round and gets the complete tool-call list before it starts executing. Without this "speculative execution," what's saved is implementation complexity, what's lost is a little latency.
-
-Two is that it distinguishes whether a tool is safe to run concurrently. In public teardowns Claude Code tags each tool with an `isConcurrencySafe`: read-only tools (read a file, search) can be run concurrently with confidence, while write tools (edit a file, run a command) need care. CoreCoder doesn't make this distinction; it throws a batch of tool calls into the thread pool all at once, regardless of whether they read or write.
-
-The second point isn't just "a missing optimization," it hides a real problem.
+CoreCoder is deliberately conservative in another way: if any call in a batch fails the parallel conditions, the main loop executes the whole batch in model order. It does not yet layer a dependency graph or split the safe subset into multiple concurrent waves. That keeps budgets, approval, cwd, and error backfilling easy to reason about, while leaving some latency in mixed batches.
 
 ## Parallelism isn't free: shared mutable state will bite
 
@@ -55,9 +49,9 @@ bash's working-directory tracking in CoreCoder is a perfect case in point. As th
 _cwd: str | None = None
 ```
 
-Under serial execution this is no problem at all; only one bash runs at a time, and reading and writing this global is orderly. But once it reaches the parallel branch and the model returns two bash calls at once, they read and write this same `_cwd` from different threads simultaneously. One call just set it to directory A, and the other call may read exactly that A, or turn around and overwrite it to B. Two commands that should each be independent get tangled together because they shared one piece of global state. This is a textbook race: it's correct ten thousand runs in a row, and then in the one run where concurrency and timing line up badly, it hands you a baffling, hard-to-reproduce error.
+Under serial execution this is no problem at all; only one bash runs at a time, and reading and writing this global is orderly. If a scheduler mistakenly put two bash calls on different threads, though, they would read and write the same `_cwd` simultaneously and create a hard-to-reproduce race.
 
-So CoreCoder doesn't store it that way. The clean solution is to isolate this kind of "each execution flow's own state" and not let them share. Python's ready-made tool is `threading.local()`, which gives each thread its own copy invisible to other threads, and it's the version `bash.py` actually uses:
+CoreCoder uses two defenses. First, scheduling metadata marks bash external, high-risk, and not parallel-safe, and gives it a global shell/cwd resource, so it always runs serially. Second, per-execution-flow state still lives in `threading.local()`, isolating parent agents, sub-agents, and calling threads. This is the version `bash.py` actually uses:
 
 ```python
 import threading
@@ -73,7 +67,7 @@ I pull this passage out on its own because it's a particularly good teaching poi
 
 ## Sub-agents: spawning a clone of yourself
 
-The `agent` tool (`corecoder/tools/agent.py`, 72 lines) solves a different problem. Some subtasks are heavy, say "go over this unfamiliar codebase and tell me how authentication is implemented." If the main agent does this itself, it has to read a pile of files and run a bunch of searches, and all that intermediate process piles into the main conversation's window; by the time it's figured things out, the window is nearly stuffed with exploration garbage and the real task has no room left.
+The `agent` tool (`corecoder/tools/agent.py`, 89 lines) solves a different problem. Some subtasks are heavy, say "go over this unfamiliar codebase and tell me how authentication is implemented." If the main agent does this itself, it has to read a pile of files and run a bunch of searches, and all that intermediate process piles into the main conversation's window; by the time it's figured things out, the window is nearly stuffed with exploration garbage and the real task has no room left.
 
 The sub-agent's idea is: dispatch a clone with its own independent context to do this heavy work, let it churn in its own window, and hand back only a distilled conclusion when done. The main agent's window stays clean throughout, with just one extra line, "authentication is implemented this way."
 

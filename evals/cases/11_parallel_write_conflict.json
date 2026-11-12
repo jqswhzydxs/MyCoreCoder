@@ -1,0 +1,67 @@
+{
+  "id": "parallel_write_conflict",
+  "category": "boundary",
+  "description": "Two edits to the same file share the mutation lock and both changes survive.",
+  "input": "Apply both independent edits to shared.txt in one batch.",
+  "tools": ["edit_file"],
+  "permission": "allow_all",
+  "fixtures": {
+    "shared.txt": "one\ntwo\nthree\n"
+  },
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "parallel-edit-1",
+          "name": "edit_file",
+          "arguments": {
+            "file_path": "{{workspace}}/shared.txt",
+            "old_string": "one",
+            "new_string": "ONE"
+          }
+        },
+        {
+          "id": "parallel-edit-2",
+          "name": "edit_file",
+          "arguments": {
+            "file_path": "{{workspace}}/shared.txt",
+            "old_string": "three",
+            "new_string": "THREE"
+          }
+        }
+      ]
+    },
+    {"content": "Applied both edits."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "edit_file",
+      "arguments": {
+        "file_path": "{{workspace}}/shared.txt",
+        "old_string": "one",
+        "new_string": "ONE"
+      },
+      "result_contains": "Edited"
+    },
+    {
+      "name": "edit_file",
+      "arguments": {
+        "file_path": "{{workspace}}/shared.txt",
+        "old_string": "three",
+        "new_string": "THREE"
+      },
+      "result_contains": "Edited"
+    }
+  ],
+  "forbidden_tool_calls": ["bash", "agent"],
+  "expected_file_state": {
+    "shared.txt": {"exists": true, "content": "ONE\ntwo\nTHREE\n"}
+  },
+  "expected_final_outcome": {
+    "exact": "Applied both edits.",
+    "claims_completion": true,
+    "required_evidence": ["shared.txt"],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

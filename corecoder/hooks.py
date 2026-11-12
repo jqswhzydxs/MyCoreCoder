@@ -1,4 +1,5 @@
-"""User shell hooks around tool calls, distilled from Claude Code's hooks.
+"""hooks.py
+User shell hooks around tool calls, distilled from Claude Code's hooks.
 
 Definitions live in ~/.corecoder/hooks.json:
 

@@ -1,0 +1,46 @@
+{
+  "id": "permission_denied",
+  "category": "permission",
+  "permission_should_block": true,
+  "description": "An interactive user denial prevents a mutating tool from running.",
+  "input": "Write denied.txt.",
+  "tools": ["write_file"],
+  "permission": "deny",
+  "fixtures": {},
+  "scripted_responses": [
+    {
+      "tool_calls": [
+        {
+          "id": "deny-1",
+          "name": "write_file",
+          "arguments": {
+            "file_path": "{{workspace}}/denied.txt",
+            "content": "must not land\n"
+          }
+        }
+      ]
+    },
+    {"content": "Write was refused by the user."}
+  ],
+  "expected_tool_calls": [
+    {
+      "name": "write_file",
+      "arguments": {
+        "file_path": "{{workspace}}/denied.txt",
+        "content": "must not land\n"
+      },
+      "result_contains": "the user refused"
+    }
+  ],
+  "forbidden_tool_calls": ["bash", "agent"],
+  "expected_file_state": {
+    "denied.txt": {"exists": false}
+  },
+  "expected_final_outcome": {
+    "exact": "Write was refused by the user.",
+    "claims_completion": false,
+    "required_evidence": [],
+    "false_completion": false,
+    "max_rounds_reached": false
+  }
+}

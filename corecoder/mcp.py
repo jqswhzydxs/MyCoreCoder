@@ -1,4 +1,5 @@
-"""MCP stdio client, distilled to the slice of the protocol an agent uses.
+"""mcp.py
+MCP stdio client, distilled to the slice of the protocol an agent uses.
 
 Servers are configured in ~/.corecoder/mcp.json:
 
@@ -20,9 +21,11 @@ import subprocess
 import threading
 import time
 from pathlib import Path
+from typing import ClassVar
 
 from . import __version__
 from .tools.base import Tool
+from .tools.protocol import ToolError
 
 log = logging.getLogger(__name__)
 
@@ -32,8 +35,17 @@ INIT_TIMEOUT = 15  # seconds for initialize + tools/list at startup
 CALL_TIMEOUT = 60  # seconds for one tools/call
 
 
-class MCPError(RuntimeError):
+class MCPError(ToolError):
     """Transport or protocol failure talking to one server."""
+
+    def __init__(self, message: str):
+        super().__init__(
+            "Error: external MCP tool failed. Details were recorded in trace.",
+            category="mcp_error",
+            code="MCP_CALL_FAILED",
+            retryable=True,
+            debug_message=message,
+        )
 
 
 class MCPClient:
@@ -44,12 +56,20 @@ class MCPClient:
     lock keeps two threads' requests from interleaving on stdin.
     """
 
-    def __init__(self, name: str, command: str, args: list = (), env: dict | None = None):
+    def __init__(
+        self,
+        name: str,
+        command: str,
+        args: list = (),
+        env: dict | None = None,
+        trust_tool_metadata: bool = False,
+    ):
         self.name = name
         self.call_timeout = CALL_TIMEOUT
         self._command = command
         self._args = args
         self._env = env
+        self._trust_tool_metadata = trust_tool_metadata
         self._next_id = 0
         self._dead: MCPError | None = None
         self._responses: dict[int, dict] = {}
@@ -80,7 +100,10 @@ class MCPClient:
             }, INIT_TIMEOUT)
             self._notify("notifications/initialized")
             listed = self._request("tools/list", {}, INIT_TIMEOUT)
-            self.tools = [MCPTool(self, t) for t in listed.get("tools", [])]
+            self.tools = [
+                MCPTool(self, tool, trust_metadata=self._trust_tool_metadata)
+                for tool in listed.get("tools", [])
+            ]
         except BaseException:
             self.close()  # a half-started server must not leak
             raise
@@ -194,15 +217,64 @@ class MCPTool(Tool):
     Permission.READ_ONLY and the consent gate asks first, like any mutating tool.
     """
 
-    def __init__(self, client: MCPClient, spec: dict):
+    side_effect = "external"
+    risk = "high"
+    required_permissions = ("external:unknown-side-effect",)
+    requires_confirmation = True
+    idempotent = False
+    parallel_safe = False
+    # Unknown remote side effects; only explicitly trusted read-only hints
+    # may opt in, in _apply_trusted_metadata.
+    cacheable = False
+    timeout_seconds = CALL_TIMEOUT
+    retry_policy: ClassVar[dict] = {"max_attempts": 1, "backoff_seconds": 0}
+    redact_fields = ()
+    version = "1"
+    manages_own_timeout = True
+
+    def __init__(self, client: MCPClient, spec: dict, *, trust_metadata: bool = False):
         self._client = client
         self._remote_name = spec["name"]
         self.name = f"mcp__{client.name}__{spec['name']}"
         self.description = spec.get("description") or ""
         self.parameters = spec.get("inputSchema") or {"type": "object", "properties": {}}
+        self.output_schema = spec.get("outputSchema") or {"type": "string"}
+        if trust_metadata:
+            self._apply_trusted_metadata(spec)
+
+    def _apply_trusted_metadata(self, remote_spec: dict) -> None:
+        """Use server hints only after the local config explicitly trusts them."""
+        annotations = remote_spec.get("annotations") or {}
+        metadata = (remote_spec.get("_meta") or {}).get("corecoder/toolSpec") or {}
+        if annotations.get("readOnlyHint") is True:
+            self.side_effect = "read"
+            self.risk = "low"
+            self.required_permissions = ("external:read",)
+            self.requires_confirmation = False
+        self.idempotent = bool(annotations.get("idempotentHint", self.idempotent))
+        self.parallel_safe = bool(metadata.get("parallel_safe", self.parallel_safe))
+        timeout = metadata.get("timeout_seconds")
+        if isinstance(timeout, (int, float)) and timeout > 0:
+            self.timeout_seconds = float(timeout)
+        self.redact_fields = tuple(
+            field for field in metadata.get("redact_fields", []) if isinstance(field, str)
+        )
+        version = metadata.get("version")
+        if isinstance(version, str) and version:
+            self.version = version
+        # The remote server is trusted only within the read-only declaration;
+        # an explicit cacheable=false always wins.
+        self.cacheable = bool(
+            self.side_effect == "read"
+            and self.idempotent
+            and metadata.get("cacheable", True) is not False
+        )
 
     def execute(self, **kwargs) -> str:
         return self._client.call_tool(self._remote_name, kwargs)
+
+    def resource_keys(self, arguments: dict) -> tuple[str, ...]:
+        return (f"mcp:{self._client.name}:{self._remote_name}",)
 
 
 _live_clients: list[MCPClient] = []
@@ -222,7 +294,13 @@ def load_mcp_tools(path: Path = CONFIG_FILE) -> list[Tool]:
     tools: list[Tool] = []
     for name, spec in (data.get("mcpServers") or {}).items():
         try:
-            client = MCPClient(name, spec["command"], spec.get("args", []), spec.get("env"))
+            client = MCPClient(
+                name,
+                spec["command"],
+                spec.get("args", []),
+                spec.get("env"),
+                trust_tool_metadata=bool(spec.get("trustToolMetadata", False)),
+            )
         except (MCPError, OSError, KeyError, TypeError) as e:
             log.warning("MCP server %r skipped: %s", name, e)
             continue

@@ -15,9 +15,142 @@ the loop survives and the model can route around it.
 """
 
 import json
+import threading
+import time
+import uuid
+from collections import deque
+from dataclasses import dataclass, field
 from pathlib import Path
 
+from .tools.protocol import ToolSpec
+
 DEFAULT_STORE = Path.home() / ".corecoder" / "permissions.json"
+
+
+@dataclass(slots=True)
+class PermissionRequest:
+    """One private worker-to-UI permission handoff."""
+
+    request_id: str
+    tool_name: str
+    arguments: dict = field(repr=False)
+    created_monotonic: float = field(default_factory=time.monotonic)
+    _resolved: threading.Event = field(default_factory=threading.Event, repr=False)
+    _verdict: str | None = field(default=None, repr=False)
+
+    @property
+    def argument_names(self) -> tuple[str, ...]:
+        return tuple(sorted(str(name) for name in self.arguments))
+
+
+class PermissionRequestBroker:
+    """FIFO permission arbiter with no terminal input of its own.
+
+    Agent workers block on per-request events.  The CLI main thread is the only
+    party that reads y/a/n and resolves those requests.
+    """
+
+    _VERDICTS = frozenset({"once", "always", "deny"})
+
+    def __init__(self, *, timeout: float | None = None) -> None:
+        if timeout is not None and timeout < 0:
+            raise ValueError("permission timeout must be non-negative")
+        self.timeout = timeout
+        self._condition = threading.Condition()
+        self._pending: deque[PermissionRequest] = deque()
+        self._requests: dict[str, PermissionRequest] = {}
+        self._closed = False
+        self._wakeup = None
+
+    def set_wakeup(self, callback) -> None:
+        """Register a best-effort UI invalidation callback."""
+        with self._condition:
+            self._wakeup = callback
+
+    def request(self, tool_name: str, arguments: dict) -> str:
+        request = PermissionRequest(
+            request_id=uuid.uuid4().hex,
+            tool_name=str(tool_name),
+            arguments=dict(arguments),
+        )
+        with self._condition:
+            if self._closed:
+                return "deny"
+            self._pending.append(request)
+            self._requests[request.request_id] = request
+            self._condition.notify_all()
+            wakeup = self._wakeup
+        self._notify(wakeup)
+        if not request._resolved.wait(self.timeout):
+            self.resolve(request.request_id, "deny")
+        return request._verdict or "deny"
+
+    def poll(self, timeout: float | None = None) -> PermissionRequest | None:
+        """Return the oldest unresolved request, optionally waiting for one."""
+        deadline = None if timeout is None else time.monotonic() + max(0.0, timeout)
+        with self._condition:
+            while not self._pending and not self._closed:
+                if deadline is None:
+                    self._condition.wait()
+                    continue
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return None
+                self._condition.wait(remaining)
+            return self._pending[0] if self._pending else None
+
+    def peek(self) -> PermissionRequest | None:
+        return self.poll(timeout=0)
+
+    def resolve(self, request_id: str, verdict: str) -> bool:
+        selected = str(verdict).lower()
+        if selected not in self._VERDICTS:
+            raise ValueError(f"unsupported permission verdict: {verdict}")
+        with self._condition:
+            request = self._requests.pop(str(request_id), None)
+            if request is None or request._resolved.is_set():
+                return False
+            request._verdict = selected
+            request._resolved.set()
+            self._pending = deque(
+                item for item in self._pending if item.request_id != request.request_id
+            )
+            self._condition.notify_all()
+            wakeup = self._wakeup
+        self._notify(wakeup)
+        return True
+
+    def deny_all(self) -> int:
+        with self._condition:
+            request_ids = [request.request_id for request in self._pending]
+        return sum(self.resolve(request_id, "deny") for request_id in request_ids)
+
+    def close(self) -> None:
+        self.deny_all()
+        with self._condition:
+            self._closed = True
+            self._condition.notify_all()
+            wakeup = self._wakeup
+        self._notify(wakeup)
+
+    @property
+    def has_pending(self) -> bool:
+        with self._condition:
+            return bool(self._pending)
+
+    @property
+    def pending_count(self) -> int:
+        with self._condition:
+            return len(self._pending)
+
+    @staticmethod
+    def _notify(callback) -> None:
+        if callback is None:
+            return
+        try:
+            callback()
+        except Exception:  # noqa: BLE001 - UI wakeups must fail open
+            return
 
 
 class Permission:
@@ -26,9 +159,16 @@ class Permission:
 
     READ_ONLY = frozenset({"read_file", "glob", "grep", "todo_write"})
 
-    def __init__(self, ask=None, allow_all: bool = False, persist_path: Path | None = None):
+    def __init__(
+        self,
+        ask=None,
+        allow_all: bool = False,
+        persist_path: Path | None = None,
+        broker: PermissionRequestBroker | None = None,
+    ):
         # ask(tool_name, arguments) -> "once" | "always" | "deny"
         self.ask = ask
+        self.broker = broker
         self.allow_all = allow_all
         self._always: set[str] = set()
         self._persist_path = persist_path
@@ -39,18 +179,36 @@ class Permission:
             except (OSError, ValueError, AttributeError):
                 pass  # a missing or corrupt store just means nothing granted yet
 
-    def check(self, tool_name: str, arguments: dict) -> str | None:
+    def check(
+        self,
+        tool_name: str,
+        arguments: dict,
+        tool_spec: ToolSpec | None = None,
+    ) -> str | None:
         """Decide one call. None lets it through; a string is the refusal
         the model receives as its tool result."""
-        if tool_name in self.READ_ONLY or self.allow_all or tool_name in self._always:
+        spec_allows_without_prompt = (
+            tool_spec is not None and not tool_spec.requires_confirmation
+        )
+        legacy_read_only = tool_spec is None and tool_name in self.READ_ONLY
+        if (
+            spec_allows_without_prompt
+            or legacy_read_only
+            or self.allow_all
+            or tool_name in self._always
+        ):
             return None
-        if self.ask is None:
+        if self.ask is None and self.broker is None:
             return (
-                f"Permission denied: {tool_name} mutates state and this session is "
-                "non-interactive, so nobody can approve it. Rerun with --yes, or "
+                f"Permission denied: {tool_name} requires confirmation and this session "
+                "is non-interactive, so nobody can approve it. Rerun with --yes, or "
                 "tell the user the exact step so they can run it themselves."
             )
-        verdict = self.ask(tool_name, arguments)
+        verdict = (
+            self.broker.request(tool_name, arguments)
+            if self.broker is not None
+            else self.ask(tool_name, arguments)
+        )
         if verdict == "always":
             self._always.add(tool_name)
             self._save()

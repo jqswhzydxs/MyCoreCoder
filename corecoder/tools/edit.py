@@ -7,11 +7,13 @@ and makes edits safe and reviewable.
 """
 
 import difflib
+import os
 from pathlib import Path
 from typing import ClassVar
 
 from ..checkpoints import record as _record_checkpoint
 from .base import Tool
+from .protocol import ToolError
 
 # track files changed this session for /diff
 _changed_files: set[str] = set()
@@ -42,6 +44,20 @@ class EditFileTool(Tool):
         },
         "required": ["file_path", "old_string", "new_string"],
     }
+    side_effect = "write"
+    risk = "high"
+    required_permissions = ("filesystem:write",)
+    requires_confirmation = True
+    idempotent = False
+    parallel_safe = False
+    timeout_seconds = 30
+    retry_policy: ClassVar[dict] = {"max_attempts": 1, "backoff_seconds": 0}
+    redact_fields = ("old_string", "new_string")
+    version = "1"
+
+    def resource_keys(self, arguments: dict) -> tuple[str, ...]:
+        path = Path(arguments.get("file_path", ".")).expanduser().resolve()
+        return (f"file:{os.path.normcase(str(path))}",)
 
     def execute(self, file_path: str, old_string: str, new_string: str) -> str:
         from .base import FILE_MUTATION_LOCK
@@ -78,9 +94,13 @@ class EditFileTool(Tool):
             # generate a unified diff so the user/LLM can see exactly what changed
             diff = _unified_diff(content, new_content, str(p))
             return f"Edited {file_path}\n{diff}"
-        except Exception as e:  # noqa: BLE001
-            # boundary: the agent gets an error string, not a traceback
-            return f"Error: {e}"
+        except Exception as e:
+            raise ToolError(
+                "Error: file could not be edited. Details were recorded in trace.",
+                category="file_edit_error",
+                code="FILE_EDIT_FAILED",
+                debug_message=str(e),
+            ) from e
 
 
 def _unified_diff(old: str, new: str, filename: str, context: int = 3) -> str:

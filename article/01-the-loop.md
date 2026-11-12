@@ -2,21 +2,22 @@
 
 如果只能用一句话解释编码 agent，我会这么说：它是一个循环，反复地问模型「下一步干什么」，照着模型说的去动手，把结果再讲给模型听，直到模型说「不用动手了，我有答案了」。
 
-听起来朴素到有点失望。但这就是真相。Claude Code 把这件事做到了几十万行，可那个最中心的东西，公开拆解里叫 `query.ts`，它的主体是一个一千七百行上下的 `while` 循环。CoreCoder 把同一个循环写在 `corecoder/agent.py`（240 行，连空行带注释）里。两者形状一模一样，区别只是后者你能一眼看完。
+听起来朴素到有点失望。但这就是真相。Claude Code 把这件事做到了几十万行，可那个最中心的东西，公开拆解里叫 `query.ts`，它的主体是一个一千七百行上下的 `while` 循环。CoreCoder 把同一个循环和显式状态迁移写在 `corecoder/agent.py`（2620 行，连空行带注释）与 `corecoder/state.py` 里。模型—工具循环的形状不变，只是状态与退出原因现在也能被直接检查。
 
 这一篇，我们就把这个循环逐段读透。
 
 ## 先看骨架
 
-打开 `agent.py`，核心是 `Agent.chat()` 这个方法。我把它原样贴出来，然后一段段拆：
+打开 `agent.py`，`Agent.chat()` 是兼容入口，核心循环已经显式放进 `Agent.run()`。下面保留结构、略去状态与 Trace 细节：
 
 ```python
-def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
-    """Process one user message. May involve multiple LLM/tool rounds."""
-    self.messages.append({"role": "user", "content": user_input})
-    self.context.maybe_compress(self.messages, self.llm)
+def run(self, task_spec, *, budget=None, cancellation_token=None):
+    state = RunState.create(normalise(task_spec))
+    budget_controller = RunBudgetController(budget, cancellation_token, self.llm)
+    self.messages.append({"role": "user", "content": state.goal})
 
-    for _ in range(self.max_rounds):
+    while True:
+        budget_controller.check("before_model", state, trace_run)
         resp = self.llm.chat(
             messages=self._full_messages(),
             tools=self._tool_schemas(),
@@ -26,7 +27,7 @@ def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
         # no tool calls -> LLM is done, return text
         if not resp.tool_calls:
             self.messages.append(resp.message)
-            return resp.content
+            return AgentResult(state)
 
         # tool calls -> execute
         self.messages.append(resp.message)
@@ -38,15 +39,15 @@ def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
 
 读懂这二十行，你就读懂了一大半。它做的事按顺序是：
 
-把用户这句话追加进对话历史。喊一句压缩（窗口快满时才真动手，细节在[第四篇](04-context.md)）。然后进循环，每一轮都把完整历史和所有工具的 schema 发给模型。模型回来后只有两种可能：要么它返回了一段纯文本、没有工具调用，那就是它觉得活干完了，把这段文本返回给用户，循环结束；要么它返回了若干个工具调用，那就去执行，把每个工具的输出作为一条 `tool` 消息追加回历史，然后进入下一轮，再问模型。
+把用户这句话追加进对话历史。喊一句压缩（窗口快满时才真动手，细节在[第四篇](04-context.md)）。然后进循环，每一轮都把完整历史和所有工具的 schema 发给模型。模型回来后只有两种可能：要么它返回了一段纯文本、没有工具调用，循环就进入 `VERIFYING`，由调用方配置的 Verifier 检查外部证据；要么它返回了若干个工具调用，那就去执行，把每个工具的输出作为一条 `tool` 消息追加回历史，然后进入下一轮，再问模型。
 
 就这样转，直到模型不再要工具为止。
 
-这里有个值得停一下的细节：模型自己决定什么时候停。没有任何外部规则去判断「任务完成了没有」。你给它工具，给它目标，它读了几个文件、跑了个测试，觉得够了，就回你一段话。这种「让模型自己判断收敛」的设计，是所有 agent 的共同假设，也是它有时候会偷懒、有时候会过度操作的根源。理解了这一点，你就理解了为什么 agent 的行为有时候不那么可控：你不是在写 if-else，你是在和一个会自己拿主意的东西协作。
+这里有个值得停一下的细节：模型仍自己决定什么时候停止调用工具，但它无权把任务标成 `VERIFIED`。没有 Verifier 或证据不足时，最终文本只会得到 `UNVERIFIED`；文件状态、测试结果等硬条件失败时则进入 `NEEDS_ACTION` 或 `FAILED`。模型负责提出结论，控制器负责用外部证据决定完成状态，这正是把“说完成了”和“确实完成了”拆开的边界。
 
 ## 为什么是 for，不是 while(true)
 
-Claude Code 的循环写成 `while(true)`，靠内部的预算和错误恢复来退出。CoreCoder 这里写成 `for _ in range(self.max_rounds)`，`max_rounds` 默认 50。
+Claude Code 的循环写成 `while(true)`，靠内部的预算和错误恢复来退出。CoreCoder 当前也使用显式 `while True`，每个模型与工具边界由 `RunBudget` 检查；未显式传预算时仍把旧的 `max_rounds`（默认 50）映射为兼容限额。
 
 这不是风格差异，是一道刹车。设想模型陷入一个它自己跳不出的循环：读文件、发现不对、再读、还是不对、再读。没有上限的话，它会一直烧你的 token，直到你手动 Ctrl+C 或者账单让你心疼。50 轮这个数字是经验值，正常任务远用不到，真撞到上限，循环会返回那句很克制的 `(reached maximum tool-call rounds)`，把控制权交还给你。
 
@@ -140,7 +141,7 @@ def _answer_pending_tool_calls(self, tool_calls):
 
 把 CoreCoder 这 150 行和 Claude Code 的 `query.ts` 摆在一起，你会发现循环的骨架几乎重合：拼消息、带工具调模型、模型要工具就执行、结果回填、再循环、模型给文本就结束。这套结构不是 CoreCoder 抄来的，是这一代编码 agent 的共同范式，谁来写都长这样。
 
-真正的差距在循环之外那一圈防护。Claude Code 的循环里裹着一层厚得多的错误恢复：限流了退避重试、上下文超了自动压缩再重试、服务端 529 了切换备用模型、输出被截断了重试若干次、还有更细的预算控制（既数轮次也数美元）。CoreCoder 把这些拆开放在了别处：重试在 [`llm.py`](03-llm-and-cost.md) 里，压缩在 [`context.py`](04-context.md) 里，预算就是这里的 `max_rounds`。形状相同，厚度不同。本系列接下来几篇，基本就是逐个补上这圈防护，看每一层在 Claude Code 里是什么、在 CoreCoder 里被压成了几十行的什么。
+真正的差距在循环之外那一圈防护。Claude Code 的循环里裹着一层厚得多的错误恢复：限流了退避重试、上下文超了自动压缩再重试、服务端 529 了切换备用模型、输出被截断了重试若干次、还有更细的预算控制。CoreCoder 把这些拆开放在了别处：重试在 [`llm.py`](03-llm-and-cost.md) 里，压缩在 [`context.py`](04-context.md) 里，轮次、工具调用、token、已知价格费用、截止时间和无进展阈值统一在 `budget.py`。形状相同，厚度不同。
 
 ## 收个尾
 

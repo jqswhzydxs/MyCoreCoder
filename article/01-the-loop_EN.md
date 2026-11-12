@@ -2,21 +2,22 @@
 
 If I had only one sentence to explain a coding agent, I'd put it like this: it's a loop that keeps asking the model "what's next," does what the model says, reports the result back to the model, and repeats until the model says "no need to act, I have the answer."
 
-It sounds almost disappointingly plain. But that is the truth of it. Claude Code took this same thing and built it out to hundreds of thousands of lines, yet the most central piece, the part public teardowns call `query.ts`, is at its core a `while` loop of around seventeen hundred lines. CoreCoder writes the same loop in `corecoder/agent.py` (240 lines including blanks and comments). The two have an identical shape; the only difference is you can read the latter in a single glance.
+It sounds almost disappointingly plain. But that is the truth of it. Claude Code took this same thing and built it out to hundreds of thousands of lines, yet the most central piece, the part public teardowns call `query.ts`, is at its core a `while` loop of around seventeen hundred lines. CoreCoder writes the same loop and explicit transitions in `corecoder/agent.py` (2620 lines including blanks and comments) and `corecoder/state.py`. The model-tool loop keeps the same shape, while its state and exit reason are now directly inspectable.
 
 In this piece we read that loop closely, section by section.
 
 ## The skeleton first
 
-Open `agent.py`. The core is the `Agent.chat()` method. I'll paste it verbatim, then take it apart a chunk at a time:
+Open `agent.py`. `Agent.chat()` is now the compatibility entry point and the explicit loop lives in `Agent.run()`. This keeps the structure while omitting state and Trace details:
 
 ```python
-def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
-    """Process one user message. May involve multiple LLM/tool rounds."""
-    self.messages.append({"role": "user", "content": user_input})
-    self.context.maybe_compress(self.messages, self.llm)
+def run(self, task_spec, *, budget=None, cancellation_token=None):
+    state = RunState.create(normalise(task_spec))
+    budget_controller = RunBudgetController(budget, cancellation_token, self.llm)
+    self.messages.append({"role": "user", "content": state.goal})
 
-    for _ in range(self.max_rounds):
+    while True:
+        budget_controller.check("before_model", state, trace_run)
         resp = self.llm.chat(
             messages=self._full_messages(),
             tools=self._tool_schemas(),
@@ -26,7 +27,7 @@ def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
         # no tool calls -> LLM is done, return text
         if not resp.tool_calls:
             self.messages.append(resp.message)
-            return resp.content
+            return AgentResult(state)
 
         # tool calls -> execute
         self.messages.append(resp.message)
@@ -38,15 +39,15 @@ def chat(self, user_input: str, on_token=None, on_tool=None) -> str:
 
 Read these twenty lines and you've read more than half of it. What it does, in order:
 
-Append the user's line to the conversation history. Call for a compression pass (which only acts when the window is nearly full, details in [piece four](04-context_EN.md)). Then enter the loop, and on each round send the full history and every tool's schema to the model. When the model comes back there are only two possibilities. Either it returned a plain block of text with no tool calls, which means it considers the job done, so that text goes back to the user and the loop ends. Or it returned some tool calls, which get executed, with each tool's output appended back to the history as a `tool` message, and then the next round begins, asking the model again.
+Append the user's line to the conversation history. Call for a compression pass (which only acts when the window is nearly full, details in [piece four](04-context_EN.md)). Then enter the loop, and on each round send the full history and every tool's schema to the model. When the model comes back there are only two possibilities. Either it returned a plain block of text with no tool calls, so the run enters `VERIFYING` and caller-configured verifiers inspect external evidence. Or it returned some tool calls, which get executed, with each tool's output appended back to the history as a `tool` message, and then the next round begins, asking the model again.
 
 It turns like that until the model stops asking for tools.
 
-There's a detail here worth pausing on: the model decides when to stop. There is no external rule judging whether the task is complete. You give it tools, give it a goal; it reads a few files, runs a test, decides it's had enough, and replies with a paragraph. This "let the model judge its own convergence" design is the shared assumption of every agent, and it's also why it sometimes slacks off and sometimes over-acts. Once you get this, you get why an agent's behavior isn't always controllable: you aren't writing if-else, you're collaborating with something that makes up its own mind.
+There's a detail here worth pausing on: the model still decides when to stop requesting tools, but it cannot mark the task `VERIFIED`. With no verifier or too little evidence, final text remains `UNVERIFIED`; failed hard conditions such as file state or test results lead to `NEEDS_ACTION` or `FAILED`. The model proposes a conclusion, while the controller decides completion from external evidence. That boundary separates “said it was done” from “demonstrably done.”
 
 ## Why for, not while(true)
 
-Claude Code's loop is written as `while(true)`, relying on internal budget and error recovery to exit. CoreCoder writes it as `for _ in range(self.max_rounds)`, with `max_rounds` defaulting to 50.
+Claude Code's loop is written as `while(true)`, relying on internal budget and error recovery to exit. CoreCoder now also uses an explicit `while True`, with `RunBudget` checked at every model and tool boundary; without an explicit budget, the legacy `max_rounds` value (50 by default) remains the compatibility limit.
 
 This isn't a style difference, it's a brake. Picture the model stuck in a loop it can't get itself out of: read a file, find it wrong, read again, still wrong, read again. With no cap it would keep burning your tokens until you hit Ctrl+C by hand or the bill makes you wince. The number 50 is empirical; normal tasks come nowhere near it, and if you do hit the cap, the loop returns that very restrained line, `(reached maximum tool-call rounds)`, handing control back to you.
 
@@ -140,7 +141,7 @@ This code isn't complicated, but it represents an important kind of engineering 
 
 Put CoreCoder's 150 lines next to Claude Code's `query.ts` and you'll find the loop's skeleton almost overlaps: assemble messages, call the model with tools, execute when the model wants tools, backfill the results, loop again, and finish when the model returns text. This structure isn't something CoreCoder copied; it's the shared paradigm of this generation of coding agents, and anyone writing one ends up here.
 
-The real difference is the ring of protection around the loop. Claude Code's loop is wrapped in a far thicker layer of error recovery: back off and retry on rate limits, auto-compress and retry when context overflows, switch to a fallback model on a server-side 529, retry a few times when output gets truncated, plus finer budget control (counting both rounds and dollars). CoreCoder splits these out elsewhere: retry lives in [`llm.py`](03-llm-and-cost_EN.md), compression in [`context.py`](04-context_EN.md), and the budget is this file's `max_rounds`. Same shape, different thickness. The next several pieces in this series basically fill that protective ring back in, one layer at a time, showing what each layer is inside Claude Code and what it gets compressed into in CoreCoder.
+The real difference is the ring of protection around the loop. Claude Code's loop is wrapped in a far thicker layer of error recovery: back off and retry on rate limits, auto-compress and retry when context overflows, switch to a fallback model on a server-side 529, retry a few times when output gets truncated, plus finer budget control. CoreCoder splits these out elsewhere: retry lives in [`llm.py`](03-llm-and-cost_EN.md), compression in [`context.py`](04-context_EN.md), and round, tool-call, token, known-price cost, deadline, and no-progress limits live together in `budget.py`. Same shape, different thickness.
 
 ## Wrapping up
 

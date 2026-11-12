@@ -11,6 +11,7 @@ The sub-agent runs to completion and returns a text summary.
 from typing import ClassVar
 
 from .base import Tool
+from .protocol import ToolError
 
 
 class AgentTool(Tool):
@@ -31,6 +32,16 @@ class AgentTool(Tool):
         },
         "required": ["task"],
     }
+    side_effect = "external"
+    risk = "high"
+    required_permissions = ("agent:spawn", "external:invoke")
+    requires_confirmation = True
+    idempotent = False
+    parallel_safe = False
+    timeout_seconds = None
+    retry_policy: ClassVar[dict] = {"max_attempts": 1, "backoff_seconds": 0}
+    redact_fields = ("task",)
+    version = "1"
 
     # set by Agent.__init__ after construction
     _parent_agent = None
@@ -51,6 +62,7 @@ class AgentTool(Tool):
             # the sub-agent answers to the same consent layer and hooks as the parent
             permission=parent.permission,
             hooks=parent.hooks,
+            trace_sink=parent.trace_sink,
         )
 
         # a sub-agent failure comes back as text, never propagates into the parent
@@ -65,8 +77,13 @@ class AgentTool(Tool):
             if len(result) > 5000:
                 result = result[:4500] + "\n... (sub-agent output truncated)"
             return f"[Sub-agent completed]\n{result}"
-        except Exception as e:  # noqa: BLE001
-            return f"Sub-agent error: {e}"
+        except Exception as e:
+            raise ToolError(
+                "Error: sub-agent failed. Details were recorded in trace.",
+                category="sub_agent_error",
+                code="SUB_AGENT_FAILED",
+                debug_message=str(e),
+            ) from e
         finally:
             if get_tracked_cwd() != parent_cwd:
                 set_tracked_cwd(parent_cwd)
