@@ -43,6 +43,7 @@ class ExitReason(str, Enum):
     DEADLINE_EXCEEDED = "deadline_exceeded"
     NO_PROGRESS = "no_progress"
     MODEL_ERROR = "model_error"
+    WORKFLOW_BUDGET = "workflow_budget_exceeded"
     TOOL_ERROR = "tool_error"
     INTERNAL_ERROR = "internal_error"
     INTERRUPTED = "interrupted"

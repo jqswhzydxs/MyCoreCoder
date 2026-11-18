@@ -1,0 +1,253 @@
+{
+  "timestamp_utc": "2026-11-17T11:12:31.052552+00:00",
+  "network_blocked": true,
+  "chroma_import_blocked": true,
+  "index": {
+    "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+    "files": 174,
+    "chunks": 2652,
+    "changed_files": 1,
+    "deleted_files": 0,
+    "reused_files": 173,
+    "embedded_texts": 0,
+    "embedding_requests": 0,
+    "skipped": {
+      "excluded": 23
+    },
+    "duration_ms": 2296.9999999995707,
+    "mode": "lexical",
+    "budget": {
+      "requests": 0,
+      "tokens": 0,
+      "pending_requests": 0,
+      "unknown_usage_requests": 0,
+      "cost_usd": 0.0,
+      "cost_unavailable": false
+    }
+  },
+  "status": {
+    "indexed": true,
+    "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+    "files": 174,
+    "chunks": 2652,
+    "embedding_space": null,
+    "splitter_version": "ast-md-lines-v2-b5148bdd2ea01b88"
+  },
+  "query": "RunStore 如何恢复任务",
+  "retrieval_mode": "lexical",
+  "hits": [
+    {
+      "citation": {
+        "chunk_id": "57a1e5a119b7a8e1ba5defe41244c5680b7fed0e0c47c9c3813a2e5384d34c47",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "tests/knowledge/test_lexical_indexing.py",
+        "start_line": 54,
+        "end_line": 59,
+        "raw_hash": "500103e63156e28d8d2099ef0973c5db1fbe2a752c046770c6603a8f0605ec83"
+      },
+      "symbol": "test_cli_cold_local_index_and_search_never_construct_a_model_or_vector_store"
+    },
+    {
+      "citation": {
+        "chunk_id": "307a26e635421937ce64e915c44d276867a01a66c256a55a252e4bfdbed0ea3f",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "tests/knowledge/test_lexical_indexing.py",
+        "start_line": 22,
+        "end_line": 29,
+        "raw_hash": "500103e63156e28d8d2099ef0973c5db1fbe2a752c046770c6603a8f0605ec83"
+      },
+      "symbol": "repository"
+    },
+    {
+      "citation": {
+        "chunk_id": "28730477024332e3e74ab29a8c365826f99d8c85770bde95780f2235730a9feb",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "tests/knowledge/test_lexical_indexing.py",
+        "start_line": 111,
+        "end_line": 125,
+        "raw_hash": "500103e63156e28d8d2099ef0973c5db1fbe2a752c046770c6603a8f0605ec83"
+      },
+      "symbol": "test_local_answer_refreshes_changed_sources_without_embeddings"
+    },
+    {
+      "citation": {
+        "chunk_id": "dcd3147f032e52b509cb7d31420a3740a46def7e5e90eb7d7bfdc225db65a008",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "tests/knowledge/test_lexical_indexing.py",
+        "start_line": 62,
+        "end_line": 88,
+        "raw_hash": "500103e63156e28d8d2099ef0973c5db1fbe2a752c046770c6603a8f0605ec83"
+      },
+      "symbol": "test_local_incremental_index_handles_rename_delete_freshness_and_cleanup"
+    },
+    {
+      "citation": {
+        "chunk_id": "85e1ec9a28beecc919495701185dac48e4ac4ef8976d44ea49959a92f39ac972",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "tests/fixtures/knowledge_repo/corecoder/journal.py",
+        "start_line": 4,
+        "end_line": 6,
+        "raw_hash": "7b8a482986572627fb18273399be98e1b4132ed20178baeb8af558eb0a0c87f8"
+      },
+      "symbol": "RunStore"
+    },
+    {
+      "citation": {
+        "chunk_id": "d255085b59d9d4ff94f8bb3db747260826bcf180e29c7fb533f270fdd12dc98e",
+        "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+        "source_path": "docs/roadmap/llm-engineering-execution-plan.zh-CN.md",
+        "start_line": 849,
+        "end_line": 854,
+        "raw_hash": "f89b47eb57f8294a411938a1aeb84d05f266afadbba8a1c5be35bc5203311be4"
+      },
+      "symbol": ""
+    }
+  ],
+  "model_requests": 0,
+  "existing_vector_cache_entries_preserved": 820,
+  "identifier_queries": [
+    {
+      "query": "RunStore",
+      "hits": [
+        {
+          "citation": {
+            "chunk_id": "f823dcc5f68c6cdc306b85e85482811daebcb76b92104bc6452773d7efba37e6",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "tests/test_run_store.py",
+            "start_line": 114,
+            "end_line": 115,
+            "raw_hash": "371be045a61ff8aaa3d6cda2016cfaa2e2188752ba5f3c1393e01226be10bec2"
+          },
+          "symbol": "_store"
+        },
+        {
+          "citation": {
+            "chunk_id": "5084a942b641207b9a55f18f6cf3d6d4d15f17fa8ba19c7251bbaf6ef67af650",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/run_store.py",
+            "start_line": 213,
+            "end_line": 215,
+            "raw_hash": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd"
+          },
+          "symbol": "RunStore"
+        },
+        {
+          "citation": {
+            "chunk_id": "63a2d07ffb618255ef7566d4c33b5ecbf6acc8c330f675a33faaeab56a43097f",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/run_store.py",
+            "start_line": 216,
+            "end_line": 219,
+            "raw_hash": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd"
+          },
+          "symbol": "RunStore.__init__"
+        },
+        {
+          "citation": {
+            "chunk_id": "df6d7c6ef4819d9c5b6bdbf07c72e272f83e1fc3d7804fb82be3fda0f6141e8b",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/run_store.py",
+            "start_line": 608,
+            "end_line": 609,
+            "raw_hash": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd"
+          },
+          "symbol": "RunStore.steering_controls"
+        },
+        {
+          "citation": {
+            "chunk_id": "197fe8214971c02280b289fd93ae9281284ef81fb4511f7678d56e82b6ee97f4",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/run_store.py",
+            "start_line": 604,
+            "end_line": 606,
+            "raw_hash": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd"
+          },
+          "symbol": "RunStore.pending_steering"
+        },
+        {
+          "citation": {
+            "chunk_id": "152cf2f8a9c02f8b1523e7925d15660de465a7b5be7f723cc655f285e5ae4fd1",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/run_store.py",
+            "start_line": 221,
+            "end_line": 226,
+            "raw_hash": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd"
+          },
+          "symbol": "RunStore._connect"
+        }
+      ]
+    },
+    {
+      "query": "resume_run",
+      "hits": [
+        {
+          "citation": {
+            "chunk_id": "dc12f301a2dbf946cfadda978a79cb9fbda4eede15feaa8fd3b225a5a185c22f",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "tests/test_run_store.py",
+            "start_line": 462,
+            "end_line": 473,
+            "raw_hash": "371be045a61ff8aaa3d6cda2016cfaa2e2188752ba5f3c1393e01226be10bec2"
+          },
+          "symbol": "test_cli_accepts_resume_run_and_custom_store"
+        },
+        {
+          "citation": {
+            "chunk_id": "52a3873957c804f241e380c97d99f90f86daab65ec89a3a9e1d6086bf4338886",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/agent.py",
+            "start_line": 1082,
+            "end_line": 1114,
+            "raw_hash": "d076a67065b5bf407298d1f0a1e38060caf64f61ab905c7f39772f4c8c1f887d"
+          },
+          "symbol": "Agent.resume_run"
+        },
+        {
+          "citation": {
+            "chunk_id": "bcb6f9a3575b82eb4566b0c85d52645c5f9ff01e7465a36c17c46d52176052ff",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "tests/knowledge/test_indexing.py",
+            "start_line": 158,
+            "end_line": 167,
+            "raw_hash": "04a9d9974ce134e3ec322e26d7f83e25ad16b56d0ddaf6116f10fcd7600139be"
+          },
+          "symbol": "test_keyword_identifier_chinese_and_special_query_syntax_are_safe"
+        },
+        {
+          "citation": {
+            "chunk_id": "742499010004749745cb4be581a1345eb86890a56654c44fbcdf068a5ac7d6b5",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "corecoder/agent.py",
+            "start_line": 1149,
+            "end_line": 1155,
+            "raw_hash": "d076a67065b5bf407298d1f0a1e38060caf64f61ab905c7f39772f4c8c1f887d"
+          },
+          "symbol": "Agent.run_once"
+        },
+        {
+          "citation": {
+            "chunk_id": "5266faba022b3d5d11bc2b924222fe777deff3db40e812a18c0b6668d6c0727d",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "tests/fixtures/knowledge_repo/corecoder/journal.py",
+            "start_line": 7,
+            "end_line": 9,
+            "raw_hash": "7b8a482986572627fb18273399be98e1b4132ed20178baeb8af558eb0a0c87f8"
+          },
+          "symbol": "RunStore.resume_run"
+        },
+        {
+          "citation": {
+            "chunk_id": "b5ddf4ed5395fcee5066c96db9918898886c6cd42d2209c3be804ad8a7e29198",
+            "snapshot_id": "8d93b634e60ce24a252536c700db006ea239e4e28ddb4c8c337894030b469c49",
+            "source_path": "tests/knowledge/test_cli.py",
+            "start_line": 30,
+            "end_line": 35,
+            "raw_hash": "726199c29540070c0c56192ad4866aa25bc6432d833b02c926d008ffedd28159"
+          },
+          "symbol": "test_old_one_shot_and_resume_arguments_remain_compatible"
+        }
+      ]
+    }
+  ],
+  "quality_note": "Keyword matching is verified; natural-language semantic relevance is not an acceptance claim."
+}

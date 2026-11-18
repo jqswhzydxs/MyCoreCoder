@@ -1,0 +1,812 @@
+{
+  "mode": "offline_fixture",
+  "python": "3.12.16",
+  "platform": "Windows",
+  "sequence_count": 20,
+  "dataset_sha256": "21912d9b4b8a6f63f68eb8b1a00635e99d9bad2f9fd2528c5ba9719b2c45de15",
+  "source_manifest": {
+    "corecoder/memory/__init__.py": "27a942a02aa544986a26ae8f227a170783144e319a3e762e5f1343bb18f50e8f",
+    "corecoder/memory/cli.py": "00d10c0975548d620042380a812090683ffcdb6d50ba54232b6747de4231daac",
+    "corecoder/memory/models.py": "eb8c4d0d9579b79233c546ddc9f15b89effdf810cc45244997ffe8ea6c873d34",
+    "corecoder/memory/policy.py": "347b3239c4361c1ec84a60f5a8e77d8f9a1b80e587c78db78bf063ec171f656a",
+    "corecoder/memory/service.py": "9ebe3e0f4c54ce85e7127c7c37ce894c4a65a37f64173215bdcdb90888408af1",
+    "corecoder/memory/store.py": "cdcd56e66aad402fe4349d0c3b7da140d214603d4b78529cff2407d92b7fda10",
+    "evals/memory_runner.py": "7bd10aa0934dfd0a54620dd9ff6bf0ea706f1636cf68bc31f9e84b6bf765fe2c",
+    "evals/cases/memory/sequences.json": "21912d9b4b8a6f63f68eb8b1a00635e99d9bad2f9fd2528c5ba9719b2c45de15"
+  },
+  "limitations": "Deterministic lifecycle and prompt-context selection only; live model constraint adherence is not evaluated.",
+  "results": {
+    "off": {
+      "true_positive": 0,
+      "false_positive": 0,
+      "false_negative": 7,
+      "recall_precision": null,
+      "necessary_constraint_recall": 0.0,
+      "exact_match_count": 14,
+      "recall_checks": 21,
+      "deleted_residual": 0,
+      "scope_returns": 0,
+      "cases": [
+        {
+          "id": "session-language",
+          "category": "cross_session",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "session-format",
+          "category": "cross_session",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.format"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "conflict-language",
+          "category": "conflict",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "conflict-format",
+          "category": "conflict",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [
+                "response.format"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "rule-changed",
+          "category": "source_change",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "rule-removed",
+          "category": "source_change",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "ttl-boundary",
+          "category": "ttl",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "ttl-before-boundary",
+          "category": "ttl",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "delete-session",
+          "category": "delete",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "delete-replay",
+          "category": "delete",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "other-project",
+          "category": "isolation",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "scope-forget",
+          "category": "isolation",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_rejection": "memory_missing"
+            },
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "unverified-experience",
+          "category": "unverified",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "forged-experience",
+          "category": "unverified",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "secret-rejected",
+          "category": "sensitive",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 0,
+              "expected_rejection": "sensitive_content"
+            },
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "permission-key",
+          "category": "authority",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 0,
+              "expected_rejection": "policy_rejected"
+            },
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "current-instruction",
+          "category": "priority",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "candidate-review",
+          "category": "candidate",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            },
+            {
+              "step": 3,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        },
+        {
+          "id": "context-budget",
+          "category": "budget",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "operation-conflict",
+          "category": "operation",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 1,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_rejection": "operation_conflict"
+            },
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [],
+              "exact_match": false
+            }
+          ]
+        }
+      ]
+    },
+    "on": {
+      "true_positive": 7,
+      "false_positive": 0,
+      "false_negative": 0,
+      "recall_precision": 1.0,
+      "necessary_constraint_recall": 1.0,
+      "exact_match_count": 21,
+      "recall_checks": 21,
+      "deleted_residual": 0,
+      "scope_returns": 0,
+      "cases": [
+        {
+          "id": "session-language",
+          "category": "cross_session",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [
+                "response.language"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "session-format",
+          "category": "cross_session",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.format"
+              ],
+              "actual_keys": [
+                "response.format"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "conflict-language",
+          "category": "conflict",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [
+                "response.language"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "conflict-format",
+          "category": "conflict",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [
+                "response.format"
+              ],
+              "actual_keys": [
+                "response.format"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "rule-changed",
+          "category": "source_change",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "rule-removed",
+          "category": "source_change",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "ttl-boundary",
+          "category": "ttl",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "ttl-before-boundary",
+          "category": "ttl",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [
+                "response.language"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "delete-session",
+          "category": "delete",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "delete-replay",
+          "category": "delete",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "other-project",
+          "category": "isolation",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "scope-forget",
+          "category": "isolation",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 2,
+              "expected_rejection": "memory_missing"
+            },
+            {
+              "step": 3,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "unverified-experience",
+          "category": "unverified",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "forged-experience",
+          "category": "unverified",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "secret-rejected",
+          "category": "sensitive",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 0,
+              "expected_rejection": "sensitive_content"
+            },
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "permission-key",
+          "category": "authority",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 0,
+              "expected_rejection": "policy_rejected"
+            },
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "current-instruction",
+          "category": "priority",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "candidate-review",
+          "category": "candidate",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            },
+            {
+              "step": 3,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [
+                "response.language"
+              ],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "context-budget",
+          "category": "budget",
+          "true_positive": 0,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_keys": [],
+              "actual_keys": [],
+              "exact_match": true
+            }
+          ]
+        },
+        {
+          "id": "operation-conflict",
+          "category": "operation",
+          "true_positive": 1,
+          "false_positive": 0,
+          "false_negative": 0,
+          "deleted_residual": 0,
+          "scope_returns": 0,
+          "steps": [
+            {
+              "step": 1,
+              "expected_rejection": "operation_conflict"
+            },
+            {
+              "step": 2,
+              "expected_keys": [
+                "response.language"
+              ],
+              "actual_keys": [
+                "response.language"
+              ],
+              "exact_match": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

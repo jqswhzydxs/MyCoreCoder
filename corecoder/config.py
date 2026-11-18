@@ -2,7 +2,7 @@
 Configuration - env vars and defaults."""
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -27,7 +27,7 @@ def _load_dotenv():
 @dataclass
 class Config:
     model: str = "gpt-5.5"
-    api_key: str = ""
+    api_key: str = field(default="", repr=False)
     base_url: str | None = None
     max_tokens: int = 4096
     temperature: float = 0.0
@@ -53,4 +53,27 @@ class Config:
             temperature=float(os.getenv("CORECODER_TEMPERATURE", "0")),
             max_context_tokens=int(os.getenv("CORECODER_MAX_CONTEXT", "128000")),
             provider=os.getenv("CORECODER_PROVIDER", "openai"),
+        )
+
+
+@dataclass(frozen=True)
+class EmbeddingConfig:
+    """Independent embedding configuration, never inferred from chat settings.
+
+    This is a configuration contract for the subsequent indexing milestone;
+    constructing it does not load credentials or contact any provider.
+    """
+
+    provider: str = "openai"
+    model: str = ""
+    base_url: str | None = None
+    api_key_env: str = "CORECODER_EMBEDDING_API_KEY"
+
+    @classmethod
+    def from_env(cls) -> "EmbeddingConfig":
+        return cls(
+            provider=os.getenv("CORECODER_EMBEDDING_PROVIDER", "openai"),
+            model=os.getenv("CORECODER_EMBEDDING_MODEL", ""),
+            base_url=os.getenv("CORECODER_EMBEDDING_BASE_URL") or None,
+            api_key_env=os.getenv("CORECODER_EMBEDDING_API_KEY_ENV", "CORECODER_EMBEDDING_API_KEY"),
         )

@@ -1,0 +1,123 @@
+{
+  "mode": "offline_contract",
+  "python": "3.12.16",
+  "platform": "Windows",
+  "dependencies": {
+    "langgraph": "1.2.20",
+    "langgraph-checkpoint": "4.3.2",
+    "langgraph-checkpoint-sqlite": "3.1.3"
+  },
+  "limitations": "Fixed fault/control contracts with actual StateGraph, SQLite and tool effects. No live model quality or matched runtime/graph performance improvement is claimed.",
+  "passed": 12,
+  "total": 12,
+  "pytest_exit_code": 0,
+  "elapsed_seconds": 11.297000000020489,
+  "dataset_sha256": "0e0a3e693a896dd77947a00b708683c78e2831c242a8ed718e2064e8415df2a8",
+  "source_manifest": {
+    "corecoder/workflows/__init__.py": "c242e057a907c4e4181bc037d4292234520ebf1e9eb20da7470c674da40786a3",
+    "corecoder/workflows/budget_ledger.py": "a7c429022a178507a4f1f043a5193d887948bf6af53a123f31fff2a7873a28a7",
+    "corecoder/workflows/checkpointing.py": "2de0cc2e99d6e582a936eabdcea42c6b5f7e479e6bfa7621cc7ed581699aead4",
+    "corecoder/workflows/claims.py": "250118b6855ed9efe4f320efbad720407ef3797dc8176e5755c9b318eb68554b",
+    "corecoder/workflows/cli.py": "4c0b924a7059a867a24e5ccfda653e1ce8b2b5365a99fcd2039619b38fc82eb2",
+    "corecoder/workflows/durable_budget.py": "a4f41734d4484d354cd3fde0cf55692cd92002037ead5d0562c0c078fe7803ed",
+    "corecoder/workflows/fixtures.py": "6e538357a7929dda61e8a31e9eaa303d6d9319214b2a009f21b81d8640e4cae3",
+    "corecoder/workflows/graph.py": "46d1f52ec4d5894be3747e9caea3715bada7d30d4f721bb63170eae2176fd433",
+    "corecoder/workflows/nodes.py": "c892252735effa5bff46c1e5e82f2966673f14e05e8a9b2ecefde62e788ab29e",
+    "corecoder/workflows/operation_store.py": "84f3c6b50eebc43b0cd6fa9ad3fed69763627aa5151cb52b3298a968f6b68f04",
+    "corecoder/workflows/payload_store.py": "6fce596d7b3763de729afc50507c828dad6cf9bc66c6be5fd315fe8e7f2fc030",
+    "corecoder/workflows/runtime_bridge.py": "a7b256cd6a94e08410b88a2e69a95205be45b42396471307772cb4ce237fc138",
+    "corecoder/workflows/state.py": "c88ecf07ed36a266c6a129466748f6d8181e43799428e7a942ce5ebdb81aefa0",
+    "corecoder/agent.py": "d076a67065b5bf407298d1f0a1e38060caf64f61ab905c7f39772f4c8c1f887d",
+    "corecoder/run_store.py": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd",
+    "corecoder/integrations/agent_llm_bridge.py": "8d904d409c5321cce3104d7facb1504d04438ade2af6aea6db7e01cd31e894b1",
+    "tests/workflows/test_graph.py": "72c3ed438f84c3e0684abd832a81ba816d2155c4c223873d84f1b300b3713cc8",
+    "evals/cases/workflows/recovery.json": "0e0a3e693a896dd77947a00b708683c78e2831c242a8ed718e2064e8415df2a8",
+    "evals/workflow_runner.py": "ba10bbd117b318ed8b727beb02d516d3810f45142b190acf6e065f37f5410738"
+  },
+  "cases": [
+    {
+      "id": "mapping-before-child",
+      "criterion": "mapping persisted before child exists",
+      "pytest_node": "tests/workflows/test_graph.py::test_mapping_and_terminal_checkpoint_crashes_reuse_child[after_mapping]",
+      "passed": true,
+      "elapsed_seconds": 0.987
+    },
+    {
+      "id": "terminal-before-checkpoint",
+      "criterion": "terminal child reused without model/tool replay",
+      "pytest_node": "tests/workflows/test_graph.py::test_mapping_and_terminal_checkpoint_crashes_reuse_child[after_child]",
+      "passed": true,
+      "elapsed_seconds": 0.452
+    },
+    {
+      "id": "write-without-receipt",
+      "criterion": "file hash reconciliation avoids second physical write",
+      "pytest_node": "tests/workflows/test_graph.py::test_file_write_receipt_crash_is_reconciled_without_rewrite",
+      "passed": true,
+      "elapsed_seconds": 0.49
+    },
+    {
+      "id": "paused-recovery",
+      "criterion": "automatic recovery remains paused; explicit resume uses the same child",
+      "pytest_node": "tests/workflows/test_graph.py::test_paused_child_stays_paused_until_explicit_resume",
+      "passed": true,
+      "elapsed_seconds": 0.704
+    },
+    {
+      "id": "unknown-external-effect",
+      "criterion": "unknown non-idempotent effect is not replayed",
+      "pytest_node": "tests/workflows/test_graph.py::test_unknown_external_effect_is_not_automatically_replayed",
+      "passed": true,
+      "elapsed_seconds": 0.57
+    },
+    {
+      "id": "lost-model-usage",
+      "criterion": "unsettled request is charged conservatively across resume",
+      "pytest_node": "tests/workflows/test_graph.py::test_lost_model_usage_is_conservatively_charged_after_resume",
+      "passed": true,
+      "elapsed_seconds": 0.488
+    },
+    {
+      "id": "concurrent-recovery",
+      "criterion": "concurrent resume cannot acquire the same execution claim",
+      "pytest_node": "tests/workflows/test_graph.py::test_concurrent_resume_cannot_create_a_second_child",
+      "passed": true,
+      "elapsed_seconds": 0.403
+    },
+    {
+      "id": "missing-verifier",
+      "criterion": "missing trusted policy does not trigger substitute verification",
+      "pytest_node": "tests/workflows/test_graph.py::test_missing_trusted_verifier_does_not_turn_a_saved_result_into_new_verification",
+      "passed": true,
+      "elapsed_seconds": 0.356
+    },
+    {
+      "id": "memory-write-replay",
+      "criterion": "deleted preference does not revive after graph write acknowledgement is lost",
+      "pytest_node": "tests/workflows/test_graph.py::test_remember_replay_after_graph_failure_cannot_resurrect_deleted_body",
+      "passed": true,
+      "elapsed_seconds": 0.232
+    },
+    {
+      "id": "shared-budget",
+      "criterion": "child budget exhaustion survives resume",
+      "pytest_node": "tests/workflows/test_graph.py::test_budget_exhaustion_in_child_and_resume_do_not_reset_total",
+      "passed": true,
+      "elapsed_seconds": 0.333
+    },
+    {
+      "id": "cancel-before-plan",
+      "criterion": "cancellation prevents starting the planner or child",
+      "pytest_node": "tests/workflows/test_graph.py::test_cancel_between_stages_prevents_planner_and_child",
+      "passed": true,
+      "elapsed_seconds": 0.628
+    },
+    {
+      "id": "input-project-config-payload",
+      "criterion": "different input/project/config or missing payload requires action",
+      "pytest_node": "tests/workflows/test_graph.py::test_different_turn_payload_project_or_config_refuses_resume",
+      "passed": true,
+      "elapsed_seconds": 0.34
+    }
+  ]
+}

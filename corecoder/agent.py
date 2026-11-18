@@ -107,6 +107,7 @@ class Agent:
             raise TypeError("tool_cache must be a ToolCache, False, or None")
         self.last_metrics: dict = {}
         self.last_run_id: str | None = None
+        self._identity_message_hashes: dict[str, str] = {}
         self._pending_exploration_reminder: dict | None = None
         self._tool_by_name = {t.name: t for t in self.tools}
         self._tool_adapters = {
@@ -1111,6 +1112,47 @@ class Agent:
             _resume_run_id=run_id,
             _resume_paused=resume_paused,
         )
+
+    def run_once(self, task_spec, *, run_id: str, configuration_hash: str,
+                 resume_paused: bool = False, **kwargs) -> AgentResult:
+        """Start or recover one stable, caller-owned run identity.
+
+        The trusted host must hash its verification policy, tool configuration
+        and input version into configuration_hash. Equal IDs with different
+        task/configuration are rejected. Automatic recovery preserves PAUSED;
+        terminal results are read from RunStore without executing tools.
+        Existing run()/chat() contracts remain available.
+        """
+        import json
+
+        from .run_store import RunNotFoundError
+
+        if self.run_store is None:
+            raise RunStoreError("run_once requires a durable RunStore")
+        if len(configuration_hash) != 64 or any(character not in "0123456789abcdef" for character in configuration_hash):
+            raise ValueError("configuration_hash must be a trusted SHA-256 digest")
+        if any(name.startswith("_") for name in kwargs):
+            raise ValueError("run_once does not accept private runtime arguments")
+        goal, criteria, verifier = self._normalise_task_spec(task_spec)
+        schemas = [{"schema": adapter.spec.function_schema(), "runtime": adapter.spec.runtime_metadata()}
+                   for _, adapter in sorted(self._tool_adapters.items())]
+        history_hash = self._identity_message_hashes.setdefault(run_id, hashlib.sha256(
+            json.dumps(self.messages, ensure_ascii=False, sort_keys=True).encode()).hexdigest())
+        payload = {"version": 1, "goal": goal.strip(), "criteria": criteria, "configuration_hash": configuration_hash,
+                   "tools": schemas, "run_budget": kwargs["budget"].to_dict() if kwargs.get("budget") else None,
+                   "model": getattr(self.llm, "model", None), "initial_history_hash": history_hash}
+        input_hash = hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        with self.run_store.claim_identity(run_id, input_hash):
+            try:
+                stored = self.run_store.load_run(run_id)
+            except RunNotFoundError:
+                return self.run(task_spec, _run_id=run_id, **kwargs)
+            state = RunState.from_dict(stored.state)
+            self.last_run_id = run_id
+            if state.status in {RunStatus.VERIFIED, RunStatus.UNVERIFIED, RunStatus.NEEDS_ACTION,
+                                RunStatus.FAILED, RunStatus.CANCELLED}:
+                return AgentResult(state)
+            return self.resume_run(run_id, verifier=verifier, resume_paused=resume_paused, **kwargs)
 
     def _steering_checkpoint(
         self,

@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-16",
+  "python": "3.14.8",
+  "tests": {
+    "command": "python -m pytest tests --ignore=tests/test_live_smoke.py -q -p no:cacheprovider",
+    "passed": 436,
+    "failed": 0,
+    "duration_seconds": 56.96,
+    "process_permissions": "normal Windows process termination permissions"
+  },
+  "ruff": "passed",
+  "readme_benchmark": "passed",
+  "pip_check": "passed",
+  "prompt_contracts": {
+    "v1": {
+      "passed": 14,
+      "total": 14
+    },
+    "v2": {
+      "passed": 14,
+      "total": 14
+    }
+  },
+  "mode": "deterministic_offline_baseline",
+  "live_api_calls": 0
+}

@@ -4,6 +4,24 @@ This changelog covers changes made by the reliability fork. Upstream CoreCoder h
 
 ## Unreleased — Reliability preview
 
+### Repository knowledge and durable workflows (2026-11-17)
+
+- Add authorized Python/Markdown loading, AST/heading line-preserving splitting, independent budgeted Embedding, immutable manifests, explicit Chroma vectors, FTS5 and hybrid retrieval.
+- Add cold `knowledge index --mode lexical` with no Embedding/key/model calls or Chroma; share the configured default mode with search, refresh lexical evidence locally and preserve separate vector caches when switching modes.
+- Add evidence-checked answers, source freshness/refusal behavior, local knowledge/ask CLI and a frozen 40-question development/holdout corpus.
+- Add scoped SQLite memory, trusted provenance, candidate approval, expiry/conflicts and deletion tombstones; integrate recall without granting permissions.
+- Add actual LangGraph stages, JSON checkpoints with controlled payload references, stable Agent run identities, durable budgets and conservative child recovery.
+- Add root-bound read-only MCP tools using official SDK 2.3.0, a dedicated closable client loop, explicit SDK configuration and actual stdio/fault tests alongside legacy compatibility.
+- Add offline demonstrations, matched runtime/graph recovery, opt-in bounded quality experiments and separate human-review gates. Real semantic quality and human support targets remain pending; this is not a published release.
+
+### Model and Prompt integration (2026-11-13)
+
+- Repair missing package README and release documentation; ignore local `.corecoder/` runtime data.
+- Add optional LangChain Prompt chains with packaged v1/v2 templates, SHA-256 provenance, bounded Pydantic proposals, evidence membership validation, and at most one schema repair.
+- Add single-attempt `LLM.chat_once()` and ModelGateway with explicit error categories, shared request/token/deadline/cost accounting, bounded retries, complete tool-message pairing, and unknown usage/cost reporting.
+- Keep existing `LLM.chat()` and Agent contracts compatible; hide API keys in Config representations and separate Embedding configuration from Chat configuration.
+- Add deterministic Prompt comparisons, an offline gateway demo, and focused integration tests. Subsequent repository/memory/graph/MCP implementation is recorded separately above.
+
 ### Added by this fork
 
 - Explicit `RunState`, structured `AgentResult`, and backward-compatible `Agent.run()`/`Agent.chat()` boundary.

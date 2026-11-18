@@ -1,0 +1,15 @@
+{
+  "timestamp_utc": "2026-11-17T02:57:41.220735+00:00",
+  "command": [
+    ".tmp/base-py310/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/knowledge/test_cli.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 4.782000000006519,
+  "output": ".....s                                                                   [100%]\n5 passed, 1 skipped in 0.44s\n"
+}

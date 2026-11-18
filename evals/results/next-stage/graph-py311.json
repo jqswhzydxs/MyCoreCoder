@@ -1,0 +1,20 @@
+{
+  "timestamp_utc": "2026-11-16T17:58:28.405014+00:00",
+  "command": [
+    ".tmp/graph-py311/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/workflows",
+    "tests/knowledge",
+    "tests/integrations",
+    "tests/memory",
+    "-x",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=.tmp/pytest-graph311-20261117"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 62.23399999999674,
+  "output": ".......................................................s................ [ 48%]\n........................................................................ [ 96%]\n......                                                                   [100%]\n149 passed, 1 skipped in 45.14s\n"
+}

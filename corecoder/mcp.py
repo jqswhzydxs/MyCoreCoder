@@ -21,7 +21,7 @@ import subprocess
 import threading
 import time
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from . import __version__
 from .tools.base import Tool
@@ -277,7 +277,7 @@ class MCPTool(Tool):
         return (f"mcp:{self._client.name}:{self._remote_name}",)
 
 
-_live_clients: list[MCPClient] = []
+_live_clients: list[Any] = []  # Both explicit legacy and SDK clients share this lifecycle.
 
 
 def load_mcp_tools(path: Path = CONFIG_FILE) -> list[Tool]:
@@ -291,8 +291,31 @@ def load_mcp_tools(path: Path = CONFIG_FILE) -> list[Tool]:
     except (json.JSONDecodeError, OSError) as e:
         log.warning("ignoring %s: %s", path, e)
         return []
+    if not isinstance(data, dict) or not isinstance(data.get("mcpServers", {}), dict):
+        log.warning("ignoring invalid MCP configuration structure")
+        return []
     tools: list[Tool] = []
     for name, spec in (data.get("mcpServers") or {}).items():
+        if not isinstance(spec, dict):
+            log.warning("MCP server configuration skipped: invalid structure")
+            continue
+        if spec.get("client") == "sdk":
+            from .integrations.mcp_sdk_bridge import MCPToolBridge, SDKBridgeError, SDKServerConfig
+
+            try:
+                client = MCPToolBridge(SDKServerConfig(name, spec["command"], tuple(spec.get("args", [])),
+                    env=spec.get("env") or {}, cwd=spec.get("cwd"), mode=spec.get("protocolMode", "auto"),
+                    startup_timeout=float(spec.get("startupTimeout", 30)), call_timeout=float(spec.get("callTimeout", 30)),
+                    trusted_read_only=tuple(spec.get("trustedReadOnlyTools", []))))
+            except (SDKBridgeError, ImportError, OSError, KeyError, TypeError, ValueError):
+                log.warning("MCP SDK server %r skipped: configuration, dependency or transport unavailable", name)
+                continue
+            _live_clients.append(client)
+            tools.extend(client.tools)
+            continue
+        if spec.get("client", "legacy") != "legacy":
+            log.warning("MCP server %r skipped: unknown client adapter", name)
+            continue
         try:
             client = MCPClient(
                 name,
@@ -312,4 +335,7 @@ def load_mcp_tools(path: Path = CONFIG_FILE) -> list[Tool]:
 @atexit.register
 def _shutdown():
     for client in _live_clients:
-        client.close()
+        try:
+            client.close()
+        except Exception:  # noqa: BLE001 - finish closing every configured client without raw diagnostics
+            log.warning("MCP client cleanup did not complete")

@@ -1,0 +1,15 @@
+{
+  "timestamp_utc": "2026-11-17T02:26:28.998133+00:00",
+  "command": [
+    ".tmp/mcp-py312/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests",
+    "--ignore=tests/test_live_smoke.py",
+    "-q",
+    "--basetemp=.tmp/pytest-final-mcp312"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 129.40600000001723,
+  "output": "..............................................................s......... [ 12%]\n........................................................................ [ 25%]\n........................................................................ [ 38%]\n........................................................................ [ 50%]\n........................................................................ [ 63%]\n........................................................................ [ 76%]\n........................................................................ [ 89%]\n..............................................................           [100%]\n============================== warnings summary ===============================\n.tmp\\mcp-py312\\Lib\\site-packages\\_pytest\\cacheprovider.py:469\n  D:\\����\\agent\\CoreCoder\\CoreCoder\\.tmp\\mcp-py312\\Lib\\site-packages\\_pytest\\cacheprovider.py:469: PytestCacheWarning: could not create cache path D:\\����\\agent\\CoreCoder\\CoreCoder\\.pytest_cache\\v\\cache\\nodeids: [WinError 5] �ܾ����ʡ�: 'D:\\\\����\\\\agent\\\\CoreCoder\\\\CoreCoder\\\\.pytest_cache\\\\v\\\\cache'\n    config.cache.set(\"cache/nodeids\", sorted(self.cached_nodeids))\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n565 passed, 1 skipped, 1 warning in 125.00s (0:02:04)\n"
+}

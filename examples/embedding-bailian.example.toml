@@ -1,0 +1,11 @@
+# Example only: never loaded automatically. Keep model and URL blank until
+# the service is enabled; merge into the project's corecoder.toml afterwards.
+[embedding]
+provider = "openai" # The protocol adapter, not the billing provider.
+model = "" # Recommended starting model: text-embedding-v4
+base_url = "" # Copy the compatible-mode/v1 base URL for your workspace/region.
+api_key_env = "CORECODER_EMBEDDING_API_KEY" # Environment variable name only.
+dimensions = 1024
+batch_size = 10
+max_text_bytes = 8192 # Conservative byte cap; no silent truncation.
+max_batch_bytes = 81920

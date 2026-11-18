@@ -162,7 +162,8 @@ class ContextManager:
 
         if llm:
             try:
-                resp = llm.chat(
+                summarize = getattr(llm, "summarize", None) or llm.chat
+                resp = summarize(
                     messages=[
                         {
                             "role": "system",
@@ -178,9 +179,12 @@ class ContextManager:
                     ],
                 )
                 return resp.content
-            except Exception:  # noqa: BLE001, S110
+            except Exception as exc:
+                from .budget import RunStopped
+
+                if isinstance(exc, RunStopped):
+                    raise
                 # summarization is best-effort; fall back to extraction below
-                pass
 
         # fallback: extract key lines
         return self._extract_key_info(messages)

@@ -1,0 +1,21 @@
+{
+  "timestamp_utc": "2026-11-17T11:07:00.333028+00:00",
+  "command": [
+    ".tmp/mcp-py312/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/knowledge",
+    "tests/integrations",
+    "tests/workflows",
+    "tests/test_core.py",
+    "tests/test_project_docs.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    ".tmp/pytest-lexical-regression-py312"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 91.98820419999993,
+  "output": "..........................s............................................. [ 37%]\n........................................................................ [ 74%]\n.................................................                        [100%]\n192 passed, 1 skipped in 82.17s (0:01:22)\n"
+}

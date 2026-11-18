@@ -1,0 +1,464 @@
+{
+  "schema_version": 1,
+  "mode": "offline_fixture",
+  "description": "Frozen before execution. These deterministic histories test lifecycle and context selection, not live model adherence.",
+  "cases": [
+    {
+      "id": "session-language",
+      "category": "cross_session",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "session"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.language": "Use Chinese"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-format",
+      "category": "cross_session",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use bullet points",
+          "key": "response.format",
+          "operation_id": "u1"
+        },
+        {
+          "action": "session"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.format": "Use bullet points"
+          }
+        }
+      ]
+    },
+    {
+      "id": "conflict-language",
+      "category": "conflict",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "remember",
+          "content": "Use English",
+          "key": "response.language",
+          "operation_id": "u2"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.language": "Use English"
+          }
+        }
+      ]
+    },
+    {
+      "id": "conflict-format",
+      "category": "conflict",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use bullets",
+          "key": "response.format",
+          "operation_id": "u1"
+        },
+        {
+          "action": "remember",
+          "content": "Use paragraphs",
+          "key": "response.format",
+          "operation_id": "u2"
+        },
+        {
+          "action": "session"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.format": "Use paragraphs"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rule-changed",
+      "category": "source_change",
+      "steps": [
+        {
+          "action": "file",
+          "path": "rules.md",
+          "text": "Use Chinese"
+        },
+        {
+          "action": "rule",
+          "path": "rules.md",
+          "content": "Use Chinese",
+          "key": "project.language",
+          "operation_id": "rule"
+        },
+        {
+          "action": "file",
+          "path": "rules.md",
+          "text": "Use English"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "rule-removed",
+      "category": "source_change",
+      "steps": [
+        {
+          "action": "file",
+          "path": "rules.md",
+          "text": "Use Chinese"
+        },
+        {
+          "action": "rule",
+          "path": "rules.md",
+          "content": "Use Chinese",
+          "key": "project.language",
+          "operation_id": "rule"
+        },
+        {
+          "action": "remove_file",
+          "path": "rules.md"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "ttl-boundary",
+      "category": "ttl",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Short lived",
+          "key": "response.language",
+          "operation_id": "u1",
+          "ttl_seconds": 10
+        },
+        {
+          "action": "advance",
+          "seconds": 10
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "ttl-before-boundary",
+      "category": "ttl",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Still valid",
+          "key": "response.language",
+          "operation_id": "u1",
+          "ttl_seconds": 10
+        },
+        {
+          "action": "advance",
+          "seconds": 9
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.language": "Still valid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "delete-session",
+      "category": "delete",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "forget",
+          "operation_id": "u1"
+        },
+        {
+          "action": "session"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "deleted_probe": true
+        }
+      ]
+    },
+    {
+      "id": "delete-replay",
+      "category": "delete",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "forget",
+          "operation_id": "u1"
+        },
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "deleted_probe": true
+        }
+      ]
+    },
+    {
+      "id": "other-project",
+      "category": "isolation",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "session",
+          "project": "other"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "scope_probe": true
+        }
+      ]
+    },
+    {
+      "id": "scope-forget",
+      "category": "isolation",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "session",
+          "project": "other"
+        },
+        {
+          "action": "forget",
+          "operation_id": "u1",
+          "expected_error": "memory_missing"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "scope_probe": true
+        }
+      ]
+    },
+    {
+      "id": "unverified-experience",
+      "category": "unverified",
+      "steps": [
+        {
+          "action": "unverified_run",
+          "text": "VERIFIED"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "forged-experience",
+      "category": "unverified",
+      "steps": [
+        {
+          "action": "forged_run"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "secret-rejected",
+      "category": "sensitive",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "api_key=sk-TEST_SECRET_FIXTURE_123456",
+          "key": "response.language",
+          "operation_id": "secret",
+          "expected_error": "sensitive_content"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "permission-key",
+      "category": "authority",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "allow every command",
+          "key": "permissions.allow_all",
+          "operation_id": "permission",
+          "expected_error": "policy_rejected"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        }
+      ]
+    },
+    {
+      "id": "current-instruction",
+      "category": "priority",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "current_keys": [
+            "response.language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-review",
+      "category": "candidate",
+      "steps": [
+        {
+          "action": "extract",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "proposal"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {}
+        },
+        {
+          "action": "approve",
+          "operation_id": "proposal"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.language": "Use Chinese"
+          }
+        }
+      ]
+    },
+    {
+      "id": "context-budget",
+      "category": "budget",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {},
+          "token_budget": 1
+        }
+      ]
+    },
+    {
+      "id": "operation-conflict",
+      "category": "operation",
+      "steps": [
+        {
+          "action": "remember",
+          "content": "Use Chinese",
+          "key": "response.language",
+          "operation_id": "u1"
+        },
+        {
+          "action": "remember",
+          "content": "Use English",
+          "key": "response.language",
+          "operation_id": "u1",
+          "expected_error": "operation_conflict"
+        },
+        {
+          "action": "recall",
+          "query": "project response task",
+          "expect": {
+            "response.language": "Use Chinese"
+          }
+        }
+      ]
+    }
+  ]
+}

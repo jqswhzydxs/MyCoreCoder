@@ -1,0 +1,17 @@
+{
+  "timestamp_utc": "2026-11-17T02:57:29.957157+00:00",
+  "command": [
+    ".tmp/mcp-py312/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests",
+    "--ignore=tests/test_live_smoke.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=.tmp/pytest-final-provider312"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 152.14100000000326,
+  "output": "...............................................................s........ [ 12%]\n........................................................................ [ 25%]\n.........................F.............................................. [ 38%]\n........................................................................ [ 50%]\n........................................................................ [ 63%]\n........................................................................ [ 76%]\n........................................................................ [ 88%]\n................................................................         [100%]\n================================== FAILURES ===================================\n_____________________ test_readme_line_counts_are_current _____________________\n\n    def test_readme_line_counts_are_current():\n        # The LoC numbers are the brand of this repo. If the engine or the\n        # package grows, the README has to move with it, and this test is the\n        # alarm: update the badge and the prose in README.md and README_CN.md.\n        root = Path(__file__).resolve().parent.parent\n        engine_files = [\n            root / \"corecoder\" / name\n            for name in (\"agent.py\", \"llm.py\", \"context.py\", \"session.py\")\n        ]\n        engine_files += sorted((root / \"corecoder\" / \"tools\").glob(\"*.py\"))\n        package_files = sorted((root / \"corecoder\").rglob(\"*.py\"))\n    \n        def net_lines(path: Path) -> int:\n            return sum(\n                1\n                for line in path.read_text(encoding=\"utf-8\").splitlines()\n                if line.strip() and not line.strip().startswith(\"#\")\n            )\n    \n        engine = sum(net_lines(f) for f in engine_files)\n        physical = sum(\n            len(f.read_text(encoding=\"utf-8\").splitlines()) for f in package_files\n        )\n        package_net = sum(net_lines(f) for f in package_files)\n    \n        readme = (root / \"README.md\").read_text(encoding=\"utf-8\")\n        assert f\"engine-{engine}_LoC\" in readme\n        assert f\"{len(package_files)} files\" in readme\n>       assert f\"{physical:,} physical lines\" in readme\nE       AssertionError: assert '17,631 physical lines' in '# CoreCoder Reliability Fork\\n\\nAn offline-first reliability fork of [he-yufeng/CoreCoder](https://github.com/he-yufe...rk:end -->\\n\\nCurrent source size: `engine-4778_LoC`; **83 files**, **17,626 physical lines**, **15,490 net** lines.\\n'\n\ntests\\test_core.py:66: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/test_core.py::test_readme_line_counts_are_current - AssertionErr...\n1 failed, 566 passed, 1 skipped in 146.98s (0:02:26)\n"
+}

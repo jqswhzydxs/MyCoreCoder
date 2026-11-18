@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-17",
+  "environment": "primary Python 3.14",
+  "passed": 470,
+  "skipped": 3,
+  "failed": 0,
+  "duration_seconds": 50.73,
+  "skips": [
+    "Chroma indexing module: dependency installation pending",
+    "Chroma answering module: dependency installation pending",
+    "file symlink creation unavailable for the current Windows account"
+  ],
+  "windows_junction_escape_test": "passed",
+  "ruff": "passed",
+  "readme_counts_and_benchmark": "passed",
+  "not_claimed": "full extension integration verification"
+}

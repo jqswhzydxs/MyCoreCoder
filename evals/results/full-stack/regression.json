@@ -1,0 +1,27 @@
+{
+  "mode": "offline_regression",
+  "python": "3.12.16",
+  "platform": "Windows",
+  "status": "passed",
+  "counts": {
+    "tests": 580,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 579
+  },
+  "elapsed_seconds": 128.156,
+  "command": "python -m pytest tests --ignore=tests/test_live_smoke.py -q -p no:cacheprovider --basetemp=.tmp/pytest-full-stack-normal-20261118 --junitxml=evals/results/full-stack/regression.xml",
+  "environment": "Normal Windows process termination permissions",
+  "junit_sha256": "38714dfd0f7f0b10ca57911754edad7719f38802756358c22d891f23f9f0eaa6",
+  "changed_test_hashes": {
+    "tests/test_core.py": "9a0d7a529c83c39907f122e438b691c383a2d5214204e4670e1d9dd8da77482f",
+    "tests/integrations/test_full_stack_acceptance.py": "0612508adadbb0fb4e7689671804801433e790690a7664462da6c895e0c117a0"
+  },
+  "skipped": [
+    {
+      "name": "test_linked_source_cannot_escape_scope",
+      "reason": "the current Windows account cannot create file symlinks"
+    }
+  ]
+}

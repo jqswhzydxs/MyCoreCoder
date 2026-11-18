@@ -1,0 +1,14 @@
+{
+  "timestamp_utc": "2026-11-17T02:30:29.159326+00:00",
+  "command": [
+    ".tmp/mcp-py311/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/integrations/test_knowledge_mcp.py",
+    "tests/knowledge/test_quality_review.py",
+    "-q"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 44.29699999996228,
+  "output": "..........                                                               [100%]\n10 passed in 39.63s\n"
+}

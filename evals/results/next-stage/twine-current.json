@@ -1,0 +1,14 @@
+{
+  "timestamp_utc": "2026-11-17T03:14:40.100133+00:00",
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "twine",
+    "check",
+    ".tmp/final-dist/corecoder-0.8.0.tar.gz",
+    ".tmp/final-dist/corecoder-0.8.0-py3-none-any.whl"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.9225598000339232,
+  "output": "Checking .tmp/final-dist/corecoder-0.8.0-py3-none-any.whl: PASSED\nChecking .tmp/final-dist/corecoder-0.8.0.tar.gz: PASSED\n"
+}

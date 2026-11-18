@@ -37,10 +37,11 @@ console = Console()
 err_console = Console(stderr=True)
 
 
-def _parse_args():
+def _parse_args(argv=None):
     p = argparse.ArgumentParser(
         prog="corecoder",
         description="Minimal AI coding agent. Works with any OpenAI-compatible LLM.",
+        epilog="Local commands: corecoder knowledge --help; corecoder ask --help; corecoder memory --help",
     )
     p.add_argument("-m", "--model", help="Model name (default: $CORECODER_MODEL or gpt-5.5)")
     p.add_argument("--base-url", help="API base URL (default: $OPENAI_BASE_URL)")
@@ -62,11 +63,36 @@ def _parse_args():
         help=f"SQLite run store (default: {DEFAULT_RUN_STORE})",
     )
     p.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
-    return p.parse_args()
+    return p.parse_args(argv)
 
 
-def main():
-    args = _parse_args()
+def main(argv=None):
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if arguments and arguments[0] == "knowledge":
+        from .knowledge.cli import main as knowledge_main
+
+        raise SystemExit(knowledge_main(arguments[1:]))
+    if arguments and arguments[0] == "ask":
+        from .knowledge.cli import ask_main
+
+        raise SystemExit(ask_main(arguments[1:]))
+    if arguments and arguments[0] == "memory":
+        from .memory.cli import main as memory_main
+
+        raise SystemExit(memory_main(arguments[1:]))
+    if arguments and arguments[0] in {"run", "workflow"}:
+        from .workflows.cli import main as workflow_main
+
+        raise SystemExit(workflow_main(arguments[1:], route=arguments[0]))
+    if arguments and arguments[0] == "mcp":
+        if len(arguments) > 1 and arguments[1] == "serve-knowledge":
+            from .mcp_servers.knowledge import main as mcp_main
+
+            raise SystemExit(mcp_main(arguments[2:]))
+        parser = argparse.ArgumentParser(prog="corecoder mcp", description="Local MCP commands: serve-knowledge")
+        parser.add_argument("command", choices=["serve-knowledge"])
+        parser.parse_args(arguments[1:])
+    args = _parse_args(arguments)
     trace_sink = JsonlTraceSink(args.trace_file) if args.trace_file else None
 
     if args.demo:
@@ -717,6 +743,7 @@ def _show_live_status(
 def _mcp(arg: str):
     """The /mcp command: server states, or `reconnect <name>` to revive one."""
     from . import mcp
+    from .integrations.mcp_sdk_bridge import SDKBridgeError
     parts = arg.split()
     if not parts:
         if not mcp._live_clients:
@@ -737,7 +764,7 @@ def _mcp(arg: str):
             return
         try:
             client.reconnect()
-        except (mcp.MCPError, OSError) as e:
+        except (mcp.MCPError, SDKBridgeError, OSError) as e:
             console.print(f"[red]Reconnect failed:[/red] {e}")
         else:
             console.print(f"[green]Reconnected:[/green] [cyan]{client.name}[/cyan], {len(client.tools)} tools")

@@ -1,0 +1,14 @@
+{
+  "timestamp_utc": "2026-11-17T03:12:54.630237+00:00",
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "build",
+    "--no-isolation",
+    "--outdir",
+    ".tmp/final-dist"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 15.484650600003079,
+  "output": "* Getting build dependencies for sdist...\n* Building sdist...\n* Building wheel from sdist\n* Getting build dependencies for wheel...\n* Building wheel...\nSuccessfully built corecoder-0.8.0.tar.gz and corecoder-0.8.0-py3-none-any.whl\n"
+}

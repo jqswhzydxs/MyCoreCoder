@@ -1,13 +1,13 @@
 # CoreCoder Offline Agent Eval: candidate
 
-- Git commit: `bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0`
+- Git commit: `50e5e7df168d708b45ed0eb43d7fffaa9edff5d0`
 - Variant: `candidate` — current runtime with safe RunStore resume enabled
 - Suite/runs: `all` / 1
 - Cases/observations: 40 / 40
 - Case manifest: `cbf49d611eaabf64d0b2df3bd086a3332482a80c7cb6362419ee35b9a2f3ad54`
 - Harness: `2.0` / case schema `2`
 - Model: `FaultInjectingLLM` (`scripted-eval-v2`, offline)
-- Prompt/version: `corecoder-0.8.0` (`af04ba34ec35113a58a21c428789bd55daad2623cdb9bd2494c3fc0478ecbee8`)
+- Prompt/version: `corecoder-0.8.0` (`2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37`)
 - Environment: CPython 3.14.8 on `Windows-11-10.0.26100-SP0`
 
 ## Metrics
@@ -22,7 +22,7 @@
 | `crash_resume_rate` | 1.0 | Injected crashes safely resumed / injected crashes |
 | `average_rounds` | 1.95 | Mean model rounds per observation |
 | `p95_rounds` | 2.0 | Nearest-rank P95 model rounds |
-| `average_latency_ms` | 148.825 | Mean deterministic simulated latency |
+| `average_latency_ms` | 148.575 | Mean deterministic simulated latency |
 | `p95_latency_ms` | 1020.0 | Nearest-rank P95 deterministic simulated latency |
 | `prompt_tokens` | 936 | Total scripted prompt tokens |
 | `completion_tokens` | 188 | Total scripted completion tokens |
@@ -37,7 +37,7 @@
 | `duplicate_side_effect` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 1.0 | 2.0 / 2.0 | 25.0 / 25.0 |
 | `false_completion` | 4 | 0.0 | 0.0 | 0.5 | 0.0 | 0.0 | 0.0 | 1.25 / 2.0 | 13.75 / 25.0 |
 | `malformed_tool_call` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 / 2.0 | 20.0 / 20.0 |
-| `no_progress_loop` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 / 2.0 | 27.5 / 30.0 |
+| `no_progress_loop` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 / 2.0 | 25.0 / 30.0 |
 | `normal` | 4 | 1.0 | 0.5 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 / 2.0 | 26.25 / 30.0 |
 | `permission` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 / 2.0 | 20.0 / 20.0 |
 | `timeout` | 4 | 1.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.25 / 3.0 | 1273.75 / 2020.0 |
@@ -81,7 +81,7 @@
 | `tool_exception` | `transient_failure` | PASS | `model_stopped_unverified` | `not_run` | 2 | 20.0 | 0 |
 | `parallel_reads` | `normal` | PASS | `model_stopped_unverified` | `not_run` | 2 | 30.0 | 0 |
 | `parallel_write_conflict` | `boundary` | PASS | `model_stopped_unverified` | `not_run` | 2 | 30.0 | 0 |
-| `max_rounds` | `no_progress_loop` | PASS | `max_rounds` | `not_run` | 2 | 30.0 | 0 |
+| `max_rounds` | `no_progress_loop` | PASS | `max_rounds` | `not_run` | 2 | 25.0 | 0 |
 | `false_completion_missing_evidence` | `false_completion` | PASS | `verification_failed` | `failed` | 2 | 25.0 | 0 |
 | `verification_test_failure` | `false_completion` | PASS | `verification_failed` | `failed` | 1 | 10.0 | 0 |
 | `verification_evidence_missing` | `false_completion` | PASS | `insufficient_evidence` | `insufficient_evidence` | 1 | 10.0 | 0 |
@@ -107,7 +107,7 @@
 | `duplicate_response_lost_overwrite` | `duplicate_side_effect` | PASS | `model_stopped_unverified` | `not_run` | 2 | 25.0 | 0 |
 | `duplicate_response_lost_nested` | `duplicate_side_effect` | PASS | `model_stopped_unverified` | `not_run` | 2 | 25.0 | 0 |
 | `duplicate_response_lost_unicode` | `duplicate_side_effect` | PASS | `model_stopped_unverified` | `not_run` | 2 | 25.0 | 0 |
-| `no_progress_repeated_read` | `no_progress_loop` | PASS | `no_progress` | `not_run` | 2 | 30.0 | 0 |
+| `no_progress_repeated_read` | `no_progress_loop` | PASS | `no_progress` | `not_run` | 2 | 25.0 | 0 |
 | `no_progress_repeated_missing` | `no_progress_loop` | PASS | `no_progress` | `not_run` | 2 | 30.0 | 0 |
 | `no_progress_repeated_unknown` | `no_progress_loop` | PASS | `no_progress` | `not_run` | 2 | 20.0 | 0 |
 

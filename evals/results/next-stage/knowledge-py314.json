@@ -1,0 +1,19 @@
+{
+  "timestamp_utc": "2026-11-16T17:18:44.145903+00:00",
+  "command": [
+    ".tmp/knowledge-py314/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/knowledge",
+    "tests/integrations",
+    "tests/memory",
+    "-x",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=.tmp/pytest-knowledge314-20261117"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 37.58009239996318,
+  "output": ".........................s.............................................. [ 60%]\n................................................                         [100%]\n119 passed, 1 skipped in 23.07s\n"
+}

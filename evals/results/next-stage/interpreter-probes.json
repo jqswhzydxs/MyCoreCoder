@@ -1,0 +1,22 @@
+{
+  "cpython-3.11-windows-x86_64-none": {
+    "python": "3.11.18",
+    "sqlite": "3.53.1",
+    "fts5": true
+  },
+  "cpython-3.11.18-windows-x86_64-none": {
+    "python": "3.11.18",
+    "sqlite": "3.53.1",
+    "fts5": true
+  },
+  "cpython-3.12-windows-x86_64-none": {
+    "python": "3.12.16",
+    "sqlite": "3.53.1",
+    "fts5": true
+  },
+  "cpython-3.12.16-windows-x86_64-none": {
+    "python": "3.12.16",
+    "sqlite": "3.53.1",
+    "fts5": true
+  }
+}

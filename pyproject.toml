@@ -32,13 +32,24 @@ dependencies = [
     "rich>=13.0",
     "prompt_toolkit>=3.0",
     "python-dotenv>=1.0",
+    "tomli>=2.0; python_version<'3.11'",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["corecoder"]
+# An ASCII .pth import hook avoids locale-decoding non-ASCII checkout paths
+# on Windows Python 3.10/3.11; normal wheel installs are unaffected.
+dev-mode-exact = true
 
 [project.optional-dependencies]
 litellm = ["litellm>=1.60.0,<2.0.0"]
+knowledge = [
+    "langchain-core==1.8.0", "pydantic==2.14.1",
+    "langchain-text-splitters==1.1.3", "langchain-chroma==1.1.0",
+    "chromadb==1.5.9", "pathspec==1.1.1",
+]
+graph = ["langgraph==1.2.20", "langgraph-checkpoint-sqlite==3.1.3"]
+mcp = ["mcp==2.3.0"]
 dev = ["pytest>=7.0", "ruff>=0.9.0"]
 
 [project.scripts]

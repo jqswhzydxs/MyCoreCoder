@@ -1,0 +1,10 @@
+{
+  "timestamp_utc": "2026-11-17T03:15:09.591636+00:00",
+  "command": [
+    ".tmp/mcp-py312/Scripts/python.exe",
+    ".tmp/sdk_environment_smoke.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 16.43800000002375,
+  "output": "{\"mode\": \"offline_fixture\", \"hybrid_environment_forwarding\": true, \"server_query_requests\": 1, \"real_model_requests\": 0}\n"
+}

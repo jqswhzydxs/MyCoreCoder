@@ -16,3 +16,7 @@ venv/
 .pytest_cache/
 .idea/
 .tmp/
+.corecoder/
+/corecoder.toml
+.env.*
+!.env.example

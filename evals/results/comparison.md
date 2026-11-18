@@ -1,8 +1,8 @@
 # CoreCoder Baseline vs Candidate Eval
 
-- Git commit: `bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0`
+- Git commit: `50e5e7df168d708b45ed0eb43d7fffaa9edff5d0`
 - Model: `FaultInjectingLLM` / `scripted-eval-v2` (offline)
-- Prompt/version: `corecoder-0.8.0` / `af04ba34ec35113a58a21c428789bd55daad2623cdb9bd2494c3fc0478ecbee8`
+- Prompt/version: `corecoder-0.8.0` / `2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37`
 - Suite: `all`; cases: 40; runs per case: 1
 - Matched input manifest: `cbf49d611eaabf64d0b2df3bd086a3332482a80c7cb6362419ee35b9a2f3ad54`
 - Baseline: controlled ablation: durable journal without automatic resume
@@ -33,7 +33,7 @@ Both variants use identical cases, scripts, model configuration, prompt, code co
 | `crash_resume_rate` | 0.0 | 1.0 | 1.0 | numerically improved | optimization |
 | `average_rounds` | 1.95 | 1.95 | 0.0 | unchanged | optimization |
 | `p95_rounds` | 3.0 | 2.0 | -1.0 | numerically improved | optimization |
-| `average_latency_ms` | 149.075 | 148.825 | -0.25 | numerically improved | optimization |
+| `average_latency_ms` | 148.825 | 148.575 | -0.25 | numerically improved | optimization |
 | `p95_latency_ms` | 1020.0 | 1020.0 | 0.0 | unchanged | optimization |
 | `prompt_tokens` | 936 | 936 | 0 | unchanged | optimization |
 | `completion_tokens` | 180 | 188 | 8 | numerically regressed | optimization |

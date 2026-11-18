@@ -298,6 +298,11 @@ class RunStore:
     def _create_schema(connection: sqlite3.Connection) -> None:
         connection.executescript(
             """
+            CREATE TABLE IF NOT EXISTS run_identities (
+                run_id TEXT PRIMARY KEY,
+                input_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS runs (
                 run_id TEXT PRIMARY KEY,
                 schema_version INTEGER NOT NULL,
@@ -400,6 +405,31 @@ class RunStore:
                 ON steering_controls(run_id, status, received_sequence);
             """
         )
+
+    @contextmanager
+    def claim_identity(self, run_id: str, input_hash: str):
+        """Persist intent before starting, then exclude concurrent local owners.
+
+        This additive table is compatible with existing schema-1 databases.
+        Historical runs without a public input identity cannot be adopted.
+        """
+        from .workflows.claims import exclusive_file_claim
+
+        if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", run_id) or not re.fullmatch(r"[a-f0-9]{64}", input_hash):
+            raise ValueError("invalid stable run identity or input hash")
+        lock_name = hashlib.sha256(run_id.encode()).hexdigest() + ".lock"
+        with exclusive_file_claim(self.path.parent / (self.path.name + ".claims") / lock_name):
+            with self._transaction() as connection:
+                connection.execute("BEGIN IMMEDIATE")
+                row = connection.execute("SELECT input_hash FROM run_identities WHERE run_id=?", (run_id,)).fetchone()
+                if row:
+                    if row[0] != input_hash:
+                        raise RunStoreError("stable run identity was used with different task or trusted configuration")
+                else:
+                    if connection.execute("SELECT 1 FROM runs WHERE run_id=?", (run_id,)).fetchone():
+                        raise RunStoreError("historical run has no stable input identity; use explicit resume_run")
+                    connection.execute("INSERT INTO run_identities VALUES (?,?,?)", (run_id, input_hash, _utc_now()))
+            yield
 
     def save_boundary(
         self,

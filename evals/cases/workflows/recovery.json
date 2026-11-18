@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "mode": "offline_contract",
+  "cases": [
+    {
+      "id": "mapping-before-child",
+      "criterion": "mapping persisted before child exists",
+      "pytest_node": "tests/workflows/test_graph.py::test_mapping_and_terminal_checkpoint_crashes_reuse_child[after_mapping]"
+    },
+    {
+      "id": "terminal-before-checkpoint",
+      "criterion": "terminal child reused without model/tool replay",
+      "pytest_node": "tests/workflows/test_graph.py::test_mapping_and_terminal_checkpoint_crashes_reuse_child[after_child]"
+    },
+    {
+      "id": "write-without-receipt",
+      "criterion": "file hash reconciliation avoids second physical write",
+      "pytest_node": "tests/workflows/test_graph.py::test_file_write_receipt_crash_is_reconciled_without_rewrite"
+    },
+    {
+      "id": "paused-recovery",
+      "criterion": "automatic recovery remains paused; explicit resume uses the same child",
+      "pytest_node": "tests/workflows/test_graph.py::test_paused_child_stays_paused_until_explicit_resume"
+    },
+    {
+      "id": "unknown-external-effect",
+      "criterion": "unknown non-idempotent effect is not replayed",
+      "pytest_node": "tests/workflows/test_graph.py::test_unknown_external_effect_is_not_automatically_replayed"
+    },
+    {
+      "id": "lost-model-usage",
+      "criterion": "unsettled request is charged conservatively across resume",
+      "pytest_node": "tests/workflows/test_graph.py::test_lost_model_usage_is_conservatively_charged_after_resume"
+    },
+    {
+      "id": "concurrent-recovery",
+      "criterion": "concurrent resume cannot acquire the same execution claim",
+      "pytest_node": "tests/workflows/test_graph.py::test_concurrent_resume_cannot_create_a_second_child"
+    },
+    {
+      "id": "missing-verifier",
+      "criterion": "missing trusted policy does not trigger substitute verification",
+      "pytest_node": "tests/workflows/test_graph.py::test_missing_trusted_verifier_does_not_turn_a_saved_result_into_new_verification"
+    },
+    {
+      "id": "memory-write-replay",
+      "criterion": "deleted preference does not revive after graph write acknowledgement is lost",
+      "pytest_node": "tests/workflows/test_graph.py::test_remember_replay_after_graph_failure_cannot_resurrect_deleted_body"
+    },
+    {
+      "id": "shared-budget",
+      "criterion": "child budget exhaustion survives resume",
+      "pytest_node": "tests/workflows/test_graph.py::test_budget_exhaustion_in_child_and_resume_do_not_reset_total"
+    },
+    {
+      "id": "cancel-before-plan",
+      "criterion": "cancellation prevents starting the planner or child",
+      "pytest_node": "tests/workflows/test_graph.py::test_cancel_between_stages_prevents_planner_and_child"
+    },
+    {
+      "id": "input-project-config-payload",
+      "criterion": "different input/project/config or missing payload requires action",
+      "pytest_node": "tests/workflows/test_graph.py::test_different_turn_payload_project_or_config_refuses_resume"
+    }
+  ]
+}

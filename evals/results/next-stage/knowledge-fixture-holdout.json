@@ -1,0 +1,1662 @@
+{
+  "mode": "offline_fixture",
+  "semantic_quality_verified": false,
+  "limitations": "Hashed vectors and extractive fixture answers verify plumbing and boundary behavior only; no live model quality, human support rate or cost improvement is claimed.",
+  "python": "3.12.16",
+  "platform": "Windows",
+  "split": "holdout",
+  "case_count": 16,
+  "dataset_sha256": "1360dca0daba7ffe56d5413eba34979e4eae13621a00396d3e1d41649a721ad6",
+  "dependencies": {
+    "langchain-core": "1.8.0",
+    "langchain-chroma": "1.1.0",
+    "chromadb": "1.5.9",
+    "langchain-text-splitters": "1.1.3",
+    "pathspec": "1.1.1"
+  },
+  "source_manifest": {
+    "corecoder/__init__.py": "879aba5211ad0872d7aa872d58d571ddb30874871dbb5d4414778ffc3aec8dc7",
+    "corecoder/__main__.py": "a35ec83f1245c788b60879927505285b32bb82c2a940a4aa77fc41352546c713",
+    "corecoder/agent.py": "64739487687dd6a6383315d9f40c571826395bcc6456ca5b5b33466136d4aa31",
+    "corecoder/budget.py": "04809c59ec5d1efe4be59d1bbc2ef55b204f365358f0c888e3815be0309c6c9b",
+    "corecoder/checkpoints.py": "78248a2cf4a593b458cdc579cb63fa5263854f5fa45559ea0d2da65c9beb76b6",
+    "corecoder/cli.py": "5664550f8bd73f83211d2363f19889889204c726968b0134473326ce6bb9fd66",
+    "corecoder/config.py": "18de19b4d9ed90999ee06a8544ca5d806b33b4ec939fc03e299159f30a108398",
+    "corecoder/context.py": "a82091cfee806fd10b82c9611b2f547bf3bd5266b093480e1be1f78f48dfce06",
+    "corecoder/demo.py": "52649630ed2e90e64dee2601918d9bf0918a2c02ef5e354ce0a35f0857b65075",
+    "corecoder/events.py": "52a633feba540e7a32e54c3400d143d2098f4bb8426a2f1ccae0877be28ed4c6",
+    "corecoder/hooks.py": "b670ad4737bc1f56bade854ef2ba0fc771d82ca373a36f7de6521c60f8a36b8e",
+    "corecoder/integrations/__init__.py": "ee2f09a9cbe9b092dcaf386933266db6e6675b1bf5d3765c5d02d472fc0281b6",
+    "corecoder/integrations/langchain_bridge.py": "8d4db7975ccf7aa11400ac24c966e299727eb470084fe6922ffcf35d3dfec715",
+    "corecoder/integrations/model_gateway.py": "b21b5a065b88783a4a3a12bbdaf02d169d0e0bf6130712b23f8f1fc3407f12ac",
+    "corecoder/knowledge/__init__.py": "d2f73eaa4750549e979009e90ab250055dab25d5bbc6ef4655d6f7d7c512ecec",
+    "corecoder/knowledge/answering.py": "d58ac9c33d668998fe2e6ce99b12d61a75165009b6c35e4792cb68f47be41411",
+    "corecoder/knowledge/citations.py": "9b7c11918d1a07a9b6b41b679334e01343fca286d4af24d65fb3e1973d53867b",
+    "corecoder/knowledge/cli.py": "197226cb4fd168f7406d307940a3db91c4a13ec8162721eb52223b21954d31ae",
+    "corecoder/knowledge/embedding_gateway.py": "809824753c9a3a3289228dcbd8cb9ed3f96798584772d59af7f4cb85ce064110",
+    "corecoder/knowledge/embeddings.py": "8a340e4e23567979b28f18add19f6fc3200f2632c3966377c6954444c9394839",
+    "corecoder/knowledge/indexer.py": "feadff5b2cb2b90163322160ae3dc0cf77fd1b86b011faa886cf3734316a1eaf",
+    "corecoder/knowledge/lexical_store.py": "0c876f4b9fba0dc89ae8b3b9ad2c0ad1964196a868931be4e0347278aae0f572",
+    "corecoder/knowledge/loaders.py": "08dd1ead0ce32a7b611e8ef5a006ede5c90f7b6da6989687592d979c8b79fb1c",
+    "corecoder/knowledge/manifest_store.py": "3f8aca2ccc8a6491382c1c25d2cf9fa5e650a2e781692d8fcf770d34525f64e2",
+    "corecoder/knowledge/models.py": "2e56bc2f4fab5c086038da3f97b7bf0cdd6e6ecc3cff60beb1d43b0923ccd71e",
+    "corecoder/knowledge/retriever.py": "14944b033e2d029af09fc2d7a8e8d3081bd4743254e30204421b489f01d28800",
+    "corecoder/knowledge/scope.py": "ca4a0d7e004c6f87f3d96708aa7e4d6658f12891ed045230f601ce6499f202b4",
+    "corecoder/knowledge/service.py": "a871c0e053b831f4804fba401cc7c0284ad0e4f472e28133d19d087cd81dbe59",
+    "corecoder/knowledge/settings.py": "7a25387667ef6b7d49f9795e71fac9a6605427f2d5ae9b3c3e249ebb18862f72",
+    "corecoder/knowledge/splitters.py": "2a5608e30890ba16358454a2497d36efce4e09214eb3ec481f20cdeff17280fa",
+    "corecoder/knowledge/vector_store.py": "e0bd0a36f6d40bcd89e2e27bf0268560f5a04954b2bd8f9c5c8e44e0d40ebb4d",
+    "corecoder/llm.py": "84b6b004419320cc08f65357b43d224f93f9ba6b8fcc1ec1c350376223a91310",
+    "corecoder/mcp.py": "32faee84a5bbe0959259da871e8db988fdaa0dd0537abd24a22bf55402ddf56c",
+    "corecoder/metrics.py": "94ecd3980329035b84be1946c3769fcb599dde5184a08d29fdcf96bd65b4afe2",
+    "corecoder/permissions.py": "ca260754ce1bc2789975b620709994c5d5d4c521f0c4703d537b1ac0876f9873",
+    "corecoder/prompt.py": "2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37",
+    "corecoder/prompts/__init__.py": "2030a0654c944bfa8f6bb7fd1a09cf494d3e9baf343499a1867d62f0423c63e7",
+    "corecoder/prompts/registry.py": "c1c4525772a8a15d8af78aa39ee11c247276641b58d505cf7aec678e366a43e2",
+    "corecoder/prompts/schemas.py": "f855ca539847f0b6ddc36994305a4ca7afa5926d861a3b56ff084694cbab7b58",
+    "corecoder/run_store.py": "b98527d3f6c0ede2b55f0182c850ea4dff328eccd311f34c22200cbd557fe3d9",
+    "corecoder/runtime.py": "b2647ad8f03513791cf0efce0c34cbb05a3e0aa32ecf7d3209785433e2d6551a",
+    "corecoder/scheduler.py": "ee7a9dd655e9170d2d19e7cb98823df3b50a582f38774d0b04005312bd0a6c09",
+    "corecoder/session.py": "980ffd8e185eb474e2ec6964c0c00eeb09807a5f19b4b6219fd6bd90c0e03ef1",
+    "corecoder/shell.py": "88f67d7d1200595ad30f1e7d1b89d12579d121690edc18be0d19d90cbcb8797a",
+    "corecoder/state.py": "961971ec0464a033fcb20f23dc4654aef0cd89c66000b3ab94a722d203fb8aba",
+    "corecoder/tool_cache.py": "e44cd52de8a5ad479ff5ff7a177eecec30c41b8a67eeac0259e191cc3765459a",
+    "corecoder/tools/__init__.py": "5d334dfd426f197572331a23f39820b463757e0544f1847301dae716666be8f3",
+    "corecoder/tools/agent.py": "efd3a2b43a152458e50d9da59113822448a241257f60b4ad3dbe7505919abd92",
+    "corecoder/tools/base.py": "851991f583391be54c7c1704055dbdc9a195004e234a16b55c780b6cc0c7b3d0",
+    "corecoder/tools/bash.py": "d74b5692ac2e8c3c08ef11f1ebfe876638d8574541f0b2c1a86ca0016c43b95b",
+    "corecoder/tools/edit.py": "8bf43ee34c9d40db30bdba5795ca584f65e3c39b0d7de474046a0039ecd03c06",
+    "corecoder/tools/glob_tool.py": "1bbd81a50314613082c1b3b87a99c5e77bb4e755779766889fb864cebba9c872",
+    "corecoder/tools/grep.py": "91baba40313f97c15e68f7c2dfec8268b9065bfa193b0a69bfa183d0b94231aa",
+    "corecoder/tools/protocol.py": "298f13d4b8d92f00b19f9a49f9721d0af07bcd9fb46b22651e8d0639ade90190",
+    "corecoder/tools/read.py": "511b2a1b3396a6d55a7076c8c01dc3d353642372e075c17aca72acedc486af81",
+    "corecoder/tools/todo.py": "97f4c1ed00aaad7b4ff1ae73423b81f0ad3e9f995feb9ae8868fbf01fe983798",
+    "corecoder/tools/write.py": "41758e42214e437859b2cede8455921dcdc1e303e8af7a2feeffe9d87cfffca2",
+    "corecoder/trace.py": "456205860008cb02cc5a58b12a0b54ff3a94cea5253df132fdb51cc7889dbdf2",
+    "corecoder/trace_replay.py": "005b76cce9f3dc72de054494f1e9e3f61080fe2bb81c040f0a77cf4332239057",
+    "corecoder/verification.py": "abb62de322461a91b7fe3242a9b0ccedc317e19d07635d837b8efad52e35fb0f",
+    "corecoder/workflows/__init__.py": "c242e057a907c4e4181bc037d4292234520ebf1e9eb20da7470c674da40786a3",
+    "corecoder/workflows/budget_ledger.py": "a7c429022a178507a4f1f043a5193d887948bf6af53a123f31fff2a7873a28a7",
+    "corecoder/prompts/memory_extract.v1.txt": "5f2d98b67af4285bc01ea1741d16a8e7008c6561d8447a90b60ba559b99f039d",
+    "corecoder/prompts/memory_extract.v2.txt": "445129d9390a2b3bc891b0a88a00f297bc923cf555108def539649731b66eac6",
+    "corecoder/prompts/query_rewrite.v1.txt": "8ac909c6ebc6c018ede829070bdb130b75a91ddf502aab82ded9d7909070dfbc",
+    "corecoder/prompts/query_rewrite.v2.txt": "92a86461951521a9ea2c3d46f9a255d3588bdece806bc4009170781224463c57",
+    "corecoder/prompts/repo_answer.v1.txt": "e7a6afc3f721d43ef5d0ab0a4825ba01b8bee2983760b5ee75f9314d701f3cab",
+    "corecoder/prompts/repo_answer.v2.txt": "db2d0d462d86b88b1802db4011725d304b0f2daecb2cd5bf4df028f4bd459844",
+    "corecoder/prompts/task_plan.v1.txt": "5430332c7c8b5d13c9e6c317998011e82eda86a7cfe27baf0e42a5f71d483286",
+    "corecoder/prompts/task_plan.v2.txt": "bcc7d67d4dd579e0e021924fa15e9ab73d5265eb861e862e3c308009e543d811",
+    "evals/knowledge_runner.py": "8e9bb6c1650a5287cb1d9271de4a1690589fbd1f7ea13f884b84524848f47b76",
+    "evals/cases/knowledge/repository.json": "1360dca0daba7ffe56d5413eba34979e4eae13621a00396d3e1d41649a721ad6",
+    "pyproject.toml": "5162064405a2bdcca274a25411a8bc1734dba93dbee7eb6656ed09e497a6c1fb"
+  },
+  "corpus_manifest": [
+    {
+      "source_path": "README.md",
+      "raw_hash": "88d3486081019befe1a31556b602454aff1718b0ca5949e29760985e139d8f5b",
+      "normalized_hash": "2b5e9c7b9dafa73cee8c72864d3b42e72c54d1ec7329621d03f84bf721265a9f",
+      "language": "markdown",
+      "source_kind": "documentation",
+      "size_bytes": 3729
+    },
+    {
+      "source_path": "README_CN.md",
+      "raw_hash": "0c12b3d0a407d19cfa88e1acf63d9c4489de2cab2ffce8bd17c821a70be2904f",
+      "normalized_hash": "f7d7bb7153b5837e31ae7cc59592a1718db4e074320a3afa363482e3a1d14779",
+      "language": "markdown",
+      "source_kind": "documentation",
+      "size_bytes": 14543
+    },
+    {
+      "source_path": "corecoder/__init__.py",
+      "raw_hash": "879aba5211ad0872d7aa872d58d571ddb30874871dbb5d4414778ffc3aec8dc7",
+      "normalized_hash": "94023e4c48ef967eb13467e49b56a5c7f7ddef84a045c84a695e5c4367b6e85a",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3156
+    },
+    {
+      "source_path": "corecoder/__main__.py",
+      "raw_hash": "a35ec83f1245c788b60879927505285b32bb82c2a940a4aa77fc41352546c713",
+      "normalized_hash": "3a18e2ba29bf3edf3f8dd2d5ca9d05b62e351a773b4061b451eb95565259601c",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 42
+    },
+    {
+      "source_path": "corecoder/agent.py",
+      "raw_hash": "64739487687dd6a6383315d9f40c571826395bcc6456ca5b5b33466136d4aa31",
+      "normalized_hash": "29248c4b03776f7edb0edfb9be6d2cae7527b5c7c0e4e6799d21388c0d528ac7",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 104245
+    },
+    {
+      "source_path": "corecoder/budget.py",
+      "raw_hash": "04809c59ec5d1efe4be59d1bbc2ef55b204f365358f0c888e3815be0309c6c9b",
+      "normalized_hash": "04809c59ec5d1efe4be59d1bbc2ef55b204f365358f0c888e3815be0309c6c9b",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 17737
+    },
+    {
+      "source_path": "corecoder/checkpoints.py",
+      "raw_hash": "78248a2cf4a593b458cdc579cb63fa5263854f5fa45559ea0d2da65c9beb76b6",
+      "normalized_hash": "8f77fcc9ee863104f300c0d29964fc2e82f648e143e8a00145a04d4b21c0759b",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3559
+    },
+    {
+      "source_path": "corecoder/cli.py",
+      "raw_hash": "5664550f8bd73f83211d2363f19889889204c726968b0134473326ce6bb9fd66",
+      "normalized_hash": "bb566c94cccba2b39d50a926132d975a289bb5dd4a117793576bede01fc88944",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 34475
+    },
+    {
+      "source_path": "corecoder/config.py",
+      "raw_hash": "18de19b4d9ed90999ee06a8544ca5d806b33b4ec939fc03e299159f30a108398",
+      "normalized_hash": "9e62e781ee894507fcdcc320db927ea2b94eb6ae62068cde8ff9e3c2b8944e64",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2673
+    },
+    {
+      "source_path": "corecoder/context.py",
+      "raw_hash": "a82091cfee806fd10b82c9611b2f547bf3bd5266b093480e1be1f78f48dfce06",
+      "normalized_hash": "22cb3e9cab7565666f269a431eb7415b0fffabcbb02755098c966a12e8bf0554",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 8483
+    },
+    {
+      "source_path": "corecoder/demo.py",
+      "raw_hash": "52649630ed2e90e64dee2601918d9bf0918a2c02ef5e354ce0a35f0857b65075",
+      "normalized_hash": "7e700bcb6f06eed7f0e78703dc702690ee2fca55bd75eab16bce7f4d82eb3fa0",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3988
+    },
+    {
+      "source_path": "corecoder/events.py",
+      "raw_hash": "52a633feba540e7a32e54c3400d143d2098f4bb8426a2f1ccae0877be28ed4c6",
+      "normalized_hash": "52a633feba540e7a32e54c3400d143d2098f4bb8426a2f1ccae0877be28ed4c6",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 11210
+    },
+    {
+      "source_path": "corecoder/hooks.py",
+      "raw_hash": "b670ad4737bc1f56bade854ef2ba0fc771d82ca373a36f7de6521c60f8a36b8e",
+      "normalized_hash": "9585974369739f3d784c72b85eb997792b0c851e6e5be81d3808235e2488fb5a",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3444
+    },
+    {
+      "source_path": "corecoder/integrations/__init__.py",
+      "raw_hash": "ee2f09a9cbe9b092dcaf386933266db6e6675b1bf5d3765c5d02d472fc0281b6",
+      "normalized_hash": "ee2f09a9cbe9b092dcaf386933266db6e6675b1bf5d3765c5d02d472fc0281b6",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 78
+    },
+    {
+      "source_path": "corecoder/integrations/langchain_bridge.py",
+      "raw_hash": "8d4db7975ccf7aa11400ac24c966e299727eb470084fe6922ffcf35d3dfec715",
+      "normalized_hash": "8d4db7975ccf7aa11400ac24c966e299727eb470084fe6922ffcf35d3dfec715",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 5056
+    },
+    {
+      "source_path": "corecoder/integrations/model_gateway.py",
+      "raw_hash": "b21b5a065b88783a4a3a12bbdaf02d169d0e0bf6130712b23f8f1fc3407f12ac",
+      "normalized_hash": "b21b5a065b88783a4a3a12bbdaf02d169d0e0bf6130712b23f8f1fc3407f12ac",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 9998
+    },
+    {
+      "source_path": "corecoder/knowledge/__init__.py",
+      "raw_hash": "d2f73eaa4750549e979009e90ab250055dab25d5bbc6ef4655d6f7d7c512ecec",
+      "normalized_hash": "d2f73eaa4750549e979009e90ab250055dab25d5bbc6ef4655d6f7d7c512ecec",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 76
+    },
+    {
+      "source_path": "corecoder/knowledge/answering.py",
+      "raw_hash": "d58ac9c33d668998fe2e6ce99b12d61a75165009b6c35e4792cb68f47be41411",
+      "normalized_hash": "d58ac9c33d668998fe2e6ce99b12d61a75165009b6c35e4792cb68f47be41411",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 6530
+    },
+    {
+      "source_path": "corecoder/knowledge/citations.py",
+      "raw_hash": "9b7c11918d1a07a9b6b41b679334e01343fca286d4af24d65fb3e1973d53867b",
+      "normalized_hash": "9b7c11918d1a07a9b6b41b679334e01343fca286d4af24d65fb3e1973d53867b",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3768
+    },
+    {
+      "source_path": "corecoder/knowledge/cli.py",
+      "raw_hash": "197226cb4fd168f7406d307940a3db91c4a13ec8162721eb52223b21954d31ae",
+      "normalized_hash": "197226cb4fd168f7406d307940a3db91c4a13ec8162721eb52223b21954d31ae",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 11006
+    },
+    {
+      "source_path": "corecoder/knowledge/embedding_gateway.py",
+      "raw_hash": "809824753c9a3a3289228dcbd8cb9ed3f96798584772d59af7f4cb85ce064110",
+      "normalized_hash": "809824753c9a3a3289228dcbd8cb9ed3f96798584772d59af7f4cb85ce064110",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 6772
+    },
+    {
+      "source_path": "corecoder/knowledge/embeddings.py",
+      "raw_hash": "8a340e4e23567979b28f18add19f6fc3200f2632c3966377c6954444c9394839",
+      "normalized_hash": "8a340e4e23567979b28f18add19f6fc3200f2632c3966377c6954444c9394839",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 4697
+    },
+    {
+      "source_path": "corecoder/knowledge/indexer.py",
+      "raw_hash": "feadff5b2cb2b90163322160ae3dc0cf77fd1b86b011faa886cf3734316a1eaf",
+      "normalized_hash": "feadff5b2cb2b90163322160ae3dc0cf77fd1b86b011faa886cf3734316a1eaf",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 5550
+    },
+    {
+      "source_path": "corecoder/knowledge/lexical_store.py",
+      "raw_hash": "0c876f4b9fba0dc89ae8b3b9ad2c0ad1964196a868931be4e0347278aae0f572",
+      "normalized_hash": "0c876f4b9fba0dc89ae8b3b9ad2c0ad1964196a868931be4e0347278aae0f572",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2373
+    },
+    {
+      "source_path": "corecoder/knowledge/loaders.py",
+      "raw_hash": "08dd1ead0ce32a7b611e8ef5a006ede5c90f7b6da6989687592d979c8b79fb1c",
+      "normalized_hash": "08dd1ead0ce32a7b611e8ef5a006ede5c90f7b6da6989687592d979c8b79fb1c",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 8281
+    },
+    {
+      "source_path": "corecoder/knowledge/manifest_store.py",
+      "raw_hash": "3f8aca2ccc8a6491382c1c25d2cf9fa5e650a2e781692d8fcf770d34525f64e2",
+      "normalized_hash": "3f8aca2ccc8a6491382c1c25d2cf9fa5e650a2e781692d8fcf770d34525f64e2",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 21204
+    },
+    {
+      "source_path": "corecoder/knowledge/models.py",
+      "raw_hash": "2e56bc2f4fab5c086038da3f97b7bf0cdd6e6ecc3cff60beb1d43b0923ccd71e",
+      "normalized_hash": "2e56bc2f4fab5c086038da3f97b7bf0cdd6e6ecc3cff60beb1d43b0923ccd71e",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 9998
+    },
+    {
+      "source_path": "corecoder/knowledge/retriever.py",
+      "raw_hash": "14944b033e2d029af09fc2d7a8e8d3081bd4743254e30204421b489f01d28800",
+      "normalized_hash": "14944b033e2d029af09fc2d7a8e8d3081bd4743254e30204421b489f01d28800",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2041
+    },
+    {
+      "source_path": "corecoder/knowledge/scope.py",
+      "raw_hash": "ca4a0d7e004c6f87f3d96708aa7e4d6658f12891ed045230f601ce6499f202b4",
+      "normalized_hash": "ca4a0d7e004c6f87f3d96708aa7e4d6658f12891ed045230f601ce6499f202b4",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2217
+    },
+    {
+      "source_path": "corecoder/knowledge/service.py",
+      "raw_hash": "a871c0e053b831f4804fba401cc7c0284ad0e4f472e28133d19d087cd81dbe59",
+      "normalized_hash": "a871c0e053b831f4804fba401cc7c0284ad0e4f472e28133d19d087cd81dbe59",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 8952
+    },
+    {
+      "source_path": "corecoder/knowledge/settings.py",
+      "raw_hash": "7a25387667ef6b7d49f9795e71fac9a6605427f2d5ae9b3c3e249ebb18862f72",
+      "normalized_hash": "7a25387667ef6b7d49f9795e71fac9a6605427f2d5ae9b3c3e249ebb18862f72",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 7146
+    },
+    {
+      "source_path": "corecoder/knowledge/splitters.py",
+      "raw_hash": "2a5608e30890ba16358454a2497d36efce4e09214eb3ec481f20cdeff17280fa",
+      "normalized_hash": "2a5608e30890ba16358454a2497d36efce4e09214eb3ec481f20cdeff17280fa",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 5574
+    },
+    {
+      "source_path": "corecoder/knowledge/vector_store.py",
+      "raw_hash": "e0bd0a36f6d40bcd89e2e27bf0268560f5a04954b2bd8f9c5c8e44e0d40ebb4d",
+      "normalized_hash": "e0bd0a36f6d40bcd89e2e27bf0268560f5a04954b2bd8f9c5c8e44e0d40ebb4d",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 5230
+    },
+    {
+      "source_path": "corecoder/llm.py",
+      "raw_hash": "84b6b004419320cc08f65357b43d224f93f9ba6b8fcc1ec1c350376223a91310",
+      "normalized_hash": "470b7299dc936261b11b32b6a42a87cd9205cb083253a18d3cefbeb5b0f7c7b9",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 19846
+    },
+    {
+      "source_path": "corecoder/mcp.py",
+      "raw_hash": "32faee84a5bbe0959259da871e8db988fdaa0dd0537abd24a22bf55402ddf56c",
+      "normalized_hash": "bbbfff78f7e30c02cc382037b5e5e9cfc3115c4557f0f2eac3f0926c32192d12",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 12471
+    },
+    {
+      "source_path": "corecoder/metrics.py",
+      "raw_hash": "94ecd3980329035b84be1946c3769fcb599dde5184a08d29fdcf96bd65b4afe2",
+      "normalized_hash": "94ecd3980329035b84be1946c3769fcb599dde5184a08d29fdcf96bd65b4afe2",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 7859
+    },
+    {
+      "source_path": "corecoder/permissions.py",
+      "raw_hash": "ca260754ce1bc2789975b620709994c5d5d4c521f0c4703d537b1ac0876f9873",
+      "normalized_hash": "177574cbfacdd4aff82ccd028a70cb4fa3d3551ecf5f878454d7fa8132849003",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 8797
+    },
+    {
+      "source_path": "corecoder/prompt.py",
+      "raw_hash": "2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37",
+      "normalized_hash": "bc5b62f451519d88367933cb6da9f5d912748dd3c6ac66b58d659b21dace9ac5",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2458
+    },
+    {
+      "source_path": "corecoder/prompts/__init__.py",
+      "raw_hash": "2030a0654c944bfa8f6bb7fd1a09cf494d3e9baf343499a1867d62f0423c63e7",
+      "normalized_hash": "2030a0654c944bfa8f6bb7fd1a09cf494d3e9baf343499a1867d62f0423c63e7",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 74
+    },
+    {
+      "source_path": "corecoder/prompts/registry.py",
+      "raw_hash": "c1c4525772a8a15d8af78aa39ee11c247276641b58d505cf7aec678e366a43e2",
+      "normalized_hash": "c1c4525772a8a15d8af78aa39ee11c247276641b58d505cf7aec678e366a43e2",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 1513
+    },
+    {
+      "source_path": "corecoder/prompts/schemas.py",
+      "raw_hash": "f855ca539847f0b6ddc36994305a4ca7afa5926d861a3b56ff084694cbab7b58",
+      "normalized_hash": "f855ca539847f0b6ddc36994305a4ca7afa5926d861a3b56ff084694cbab7b58",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3400
+    },
+    {
+      "source_path": "corecoder/run_store.py",
+      "raw_hash": "b98527d3f6c0ede2b55f0182c850ea4dff328eccd311f34c22200cbd557fe3d9",
+      "normalized_hash": "b98527d3f6c0ede2b55f0182c850ea4dff328eccd311f34c22200cbd557fe3d9",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 42082
+    },
+    {
+      "source_path": "corecoder/runtime.py",
+      "raw_hash": "b2647ad8f03513791cf0efce0c34cbb05a3e0aa32ecf7d3209785433e2d6551a",
+      "normalized_hash": "b2647ad8f03513791cf0efce0c34cbb05a3e0aa32ecf7d3209785433e2d6551a",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 29451
+    },
+    {
+      "source_path": "corecoder/scheduler.py",
+      "raw_hash": "ee7a9dd655e9170d2d19e7cb98823df3b50a582f38774d0b04005312bd0a6c09",
+      "normalized_hash": "ee7a9dd655e9170d2d19e7cb98823df3b50a582f38774d0b04005312bd0a6c09",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 18021
+    },
+    {
+      "source_path": "corecoder/session.py",
+      "raw_hash": "980ffd8e185eb474e2ec6964c0c00eeb09807a5f19b4b6219fd6bd90c0e03ef1",
+      "normalized_hash": "4b1ee32cb79a76b9cf0a1aa2c2cc90f6bdf7e909f382f3a74763d045bc0a5007",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3250
+    },
+    {
+      "source_path": "corecoder/shell.py",
+      "raw_hash": "88f67d7d1200595ad30f1e7d1b89d12579d121690edc18be0d19d90cbcb8797a",
+      "normalized_hash": "33d3c02f313aac213bfc4d60b0d5e18baafdfa5a0c69d1b077fa410deb30805d",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3488
+    },
+    {
+      "source_path": "corecoder/state.py",
+      "raw_hash": "961971ec0464a033fcb20f23dc4654aef0cd89c66000b3ab94a722d203fb8aba",
+      "normalized_hash": "961971ec0464a033fcb20f23dc4654aef0cd89c66000b3ab94a722d203fb8aba",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 18120
+    },
+    {
+      "source_path": "corecoder/tool_cache.py",
+      "raw_hash": "e44cd52de8a5ad479ff5ff7a177eecec30c41b8a67eeac0259e191cc3765459a",
+      "normalized_hash": "e44cd52de8a5ad479ff5ff7a177eecec30c41b8a67eeac0259e191cc3765459a",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 6600
+    },
+    {
+      "source_path": "corecoder/tools/__init__.py",
+      "raw_hash": "5d334dfd426f197572331a23f39820b463757e0544f1847301dae716666be8f3",
+      "normalized_hash": "f37bb2163b16cb139f1fbf1c941dfbbc7e6fc8126a9b3b82c149efe0a0f89df2",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 761
+    },
+    {
+      "source_path": "corecoder/tools/agent.py",
+      "raw_hash": "efd3a2b43a152458e50d9da59113822448a241257f60b4ad3dbe7505919abd92",
+      "normalized_hash": "4b5cec36899942abde34b3ae14a85ad5dcce00a2ce4405bf61808df7611c4f5c",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3329
+    },
+    {
+      "source_path": "corecoder/tools/base.py",
+      "raw_hash": "851991f583391be54c7c1704055dbdc9a195004e234a16b55c780b6cc0c7b3d0",
+      "normalized_hash": "2a59cd7d4d106d6926b13b0d94a7ac9afc82c5e799d8f40da04088a1784f2eb0",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3029
+    },
+    {
+      "source_path": "corecoder/tools/bash.py",
+      "raw_hash": "d74b5692ac2e8c3c08ef11f1ebfe876638d8574541f0b2c1a86ca0016c43b95b",
+      "normalized_hash": "033b54f6ca0c91ab7de2a5f3587471266b10c967a414ce0f035ea4d849a93349",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 21316
+    },
+    {
+      "source_path": "corecoder/tools/edit.py",
+      "raw_hash": "8bf43ee34c9d40db30bdba5795ca584f65e3c39b0d7de474046a0039ecd03c06",
+      "normalized_hash": "87ad7f1cc4b23784832c0d3fe7bd5d903e69e9f08638bd7fb259451d39ccf3ee",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 4552
+    },
+    {
+      "source_path": "corecoder/tools/glob_tool.py",
+      "raw_hash": "1bbd81a50314613082c1b3b87a99c5e77bb4e755779766889fb864cebba9c872",
+      "normalized_hash": "9f1a282b37a6738188fe24776065d6fc148f1c0e1a9d37edefb5e553f24c0efc",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2400
+    },
+    {
+      "source_path": "corecoder/tools/grep.py",
+      "raw_hash": "91baba40313f97c15e68f7c2dfec8268b9065bfa193b0a69bfa183d0b94231aa",
+      "normalized_hash": "deecd3877d07506511b25706024e5c982a3726bac1e0b731a064d9f1e76439cf",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3837
+    },
+    {
+      "source_path": "corecoder/tools/protocol.py",
+      "raw_hash": "298f13d4b8d92f00b19f9a49f9721d0af07bcd9fb46b22651e8d0639ade90190",
+      "normalized_hash": "298f13d4b8d92f00b19f9a49f9721d0af07bcd9fb46b22651e8d0639ade90190",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 16735
+    },
+    {
+      "source_path": "corecoder/tools/read.py",
+      "raw_hash": "511b2a1b3396a6d55a7076c8c01dc3d353642372e075c17aca72acedc486af81",
+      "normalized_hash": "093d093993b094d66d671d7e1f39de750a05232d20b0510ced9e090c144b56c9",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2621
+    },
+    {
+      "source_path": "corecoder/tools/todo.py",
+      "raw_hash": "97f4c1ed00aaad7b4ff1ae73423b81f0ad3e9f995feb9ae8868fbf01fe983798",
+      "normalized_hash": "9152757ff2ae0bf590c63dfd5ca8a5a2802b4e5b3a771aec36abbdb30455e8c3",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 3759
+    },
+    {
+      "source_path": "corecoder/tools/write.py",
+      "raw_hash": "41758e42214e437859b2cede8455921dcdc1e303e8af7a2feeffe9d87cfffca2",
+      "normalized_hash": "adab8aff0ebd0df060bed8a60a91100aac5463880d5906e582c6a60926c278c8",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 2323
+    },
+    {
+      "source_path": "corecoder/trace.py",
+      "raw_hash": "456205860008cb02cc5a58b12a0b54ff3a94cea5253df132fdb51cc7889dbdf2",
+      "normalized_hash": "456205860008cb02cc5a58b12a0b54ff3a94cea5253df132fdb51cc7889dbdf2",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 8694
+    },
+    {
+      "source_path": "corecoder/trace_replay.py",
+      "raw_hash": "005b76cce9f3dc72de054494f1e9e3f61080fe2bb81c040f0a77cf4332239057",
+      "normalized_hash": "005b76cce9f3dc72de054494f1e9e3f61080fe2bb81c040f0a77cf4332239057",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 4768
+    },
+    {
+      "source_path": "corecoder/verification.py",
+      "raw_hash": "abb62de322461a91b7fe3242a9b0ccedc317e19d07635d837b8efad52e35fb0f",
+      "normalized_hash": "abb62de322461a91b7fe3242a9b0ccedc317e19d07635d837b8efad52e35fb0f",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 20553
+    },
+    {
+      "source_path": "corecoder/workflows/__init__.py",
+      "raw_hash": "c242e057a907c4e4181bc037d4292234520ebf1e9eb20da7470c674da40786a3",
+      "normalized_hash": "c242e057a907c4e4181bc037d4292234520ebf1e9eb20da7470c674da40786a3",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 66
+    },
+    {
+      "source_path": "corecoder/workflows/budget_ledger.py",
+      "raw_hash": "a7c429022a178507a4f1f043a5193d887948bf6af53a123f31fff2a7873a28a7",
+      "normalized_hash": "a7c429022a178507a4f1f043a5193d887948bf6af53a123f31fff2a7873a28a7",
+      "language": "python",
+      "source_kind": "source_code",
+      "size_bytes": 6241
+    },
+    {
+      "source_path": "docs/adr/0001-explicit-loop-over-langgraph.md",
+      "raw_hash": "a54ac7d499aa9edbd7a78e1f054fbaba0d25f12e13bb2291ae29be3a00782f1c",
+      "normalized_hash": "a54ac7d499aa9edbd7a78e1f054fbaba0d25f12e13bb2291ae29be3a00782f1c",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 1542
+    },
+    {
+      "source_path": "docs/adr/0002-sqlite-run-store.md",
+      "raw_hash": "2e67f611556efc4d8a1dac46fe14faa86cba95d97c94fa1699d3368ec9b5ba0a",
+      "normalized_hash": "2e67f611556efc4d8a1dac46fe14faa86cba95d97c94fa1699d3368ec9b5ba0a",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 1355
+    },
+    {
+      "source_path": "docs/adr/0003-external-evidence-final-judge.md",
+      "raw_hash": "6606d47c6248c5c8a01d6c58c700dc23f17ab9f6aed713bb067a086ffa35ebc9",
+      "normalized_hash": "6606d47c6248c5c8a01d6c58c700dc23f17ab9f6aed713bb067a086ffa35ebc9",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 1394
+    },
+    {
+      "source_path": "docs/adr/0004-optional-knowledge-workflow.md",
+      "raw_hash": "ef1d46e01a9f928299027b947eb5c3d391a6e64b7d137a08c41d66a50bf262a9",
+      "normalized_hash": "ef1d46e01a9f928299027b947eb5c3d391a6e64b7d137a08c41d66a50bf262a9",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 3214
+    },
+    {
+      "source_path": "docs/adr/README.md",
+      "raw_hash": "792439739c91fa0cbc4d3ff7acbb3097e1cbb25036bb4a9256ccdf69d2ababfa",
+      "normalized_hash": "792439739c91fa0cbc4d3ff7acbb3097e1cbb25036bb4a9256ccdf69d2ababfa",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 424
+    },
+    {
+      "source_path": "docs/architecture/steerable-streaming-runtime.md",
+      "raw_hash": "eba55b94daf42c768b3c930525e311237820a954053699eebfa158b72d9345ed",
+      "normalized_hash": "eba55b94daf42c768b3c930525e311237820a954053699eebfa158b72d9345ed",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 37299
+    },
+    {
+      "source_path": "docs/baseline.md",
+      "raw_hash": "514ec1d43bcb9183ca1de74a5a9105e596cb6a16ce93dc79a14346e3438465e5",
+      "normalized_hash": "514ec1d43bcb9183ca1de74a5a9105e596cb6a16ce93dc79a14346e3438465e5",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 8300
+    },
+    {
+      "source_path": "docs/design/01-state-machine.md",
+      "raw_hash": "88fa2e14a80ff8987a1f09ef4a9456fcc78e19746e692265ed6912d0c638892f",
+      "normalized_hash": "88fa2e14a80ff8987a1f09ef4a9456fcc78e19746e692265ed6912d0c638892f",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2950
+    },
+    {
+      "source_path": "docs/design/02-tool-contract.md",
+      "raw_hash": "ac2768ec287a2272d377e0255ba93992771ed58092515fbd3c5034f8aab1dffe",
+      "normalized_hash": "ac2768ec287a2272d377e0255ba93992771ed58092515fbd3c5034f8aab1dffe",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2627
+    },
+    {
+      "source_path": "docs/design/03-verification.md",
+      "raw_hash": "ebd29d9da24da34f575ee92be7f92623f7f07be5bd2d64b918f11763d6522b23",
+      "normalized_hash": "ebd29d9da24da34f575ee92be7f92623f7f07be5bd2d64b918f11763d6522b23",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2377
+    },
+    {
+      "source_path": "docs/design/04-checkpoint-resume.md",
+      "raw_hash": "94f9bb298b8e141308257b074bb35947cc09c9f597255d76107ab856ee00ecb3",
+      "normalized_hash": "94f9bb298b8e141308257b074bb35947cc09c9f597255d76107ab856ee00ecb3",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2675
+    },
+    {
+      "source_path": "docs/design/05-evaluation.md",
+      "raw_hash": "7294a6e76db50ffd90e03942cbef472f9ce5ab9d007301275e9562d895c01bc4",
+      "normalized_hash": "7294a6e76db50ffd90e03942cbef472f9ce5ab9d007301275e9562d895c01bc4",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2790
+    },
+    {
+      "source_path": "docs/design/06-repository-knowledge.md",
+      "raw_hash": "c6530c840a277f0d88283ac372fcbbe1f6c2843dc4b4e4d7749ead7d7db10c60",
+      "normalized_hash": "c6530c840a277f0d88283ac372fcbbe1f6c2843dc4b4e4d7749ead7d7db10c60",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 4868
+    },
+    {
+      "source_path": "docs/design/07-memory-workflow-contracts.md",
+      "raw_hash": "42beb550c73f54c7d34cebef11bfd445b67dfb465ec8e32803c0388314e5a3a9",
+      "normalized_hash": "42beb550c73f54c7d34cebef11bfd445b67dfb465ec8e32803c0388314e5a3a9",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2665
+    },
+    {
+      "source_path": "docs/design/README.md",
+      "raw_hash": "5ca535d6e9a2dc781126e80924c48fb859b77f848ab54255834fdcfef71699ca",
+      "normalized_hash": "5ca535d6e9a2dc781126e80924c48fb859b77f848ab54255834fdcfef71699ca",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 549
+    },
+    {
+      "source_path": "docs/learning/01-agent-loop.md",
+      "raw_hash": "85363f837e7c83e36e3f946009c1b32bfd014f7054e489d4cb52424cd834a656",
+      "normalized_hash": "85363f837e7c83e36e3f946009c1b32bfd014f7054e489d4cb52424cd834a656",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 10226
+    },
+    {
+      "source_path": "docs/learning/README.md",
+      "raw_hash": "2bb7cdf3e90f7aaf75d3904c31e315935f8b0ff849faac3cd4819bcfd805ef01",
+      "normalized_hash": "2bb7cdf3e90f7aaf75d3904c31e315935f8b0ff849faac3cd4819bcfd805ef01",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 11844
+    },
+    {
+      "source_path": "docs/learning/VALIDATION.md",
+      "raw_hash": "6ba3b1d848280054d557ae3a080cba608a7a4161795dec33aae2834aeee046eb",
+      "normalized_hash": "6ba3b1d848280054d557ae3a080cba608a7a4161795dec33aae2834aeee046eb",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 2341
+    },
+    {
+      "source_path": "docs/roadmap/implementation-status.zh-CN.md",
+      "raw_hash": "da49033ca3bfcc1111b17909bd1484279c9844226476a9dc1d6e803128405385",
+      "normalized_hash": "da49033ca3bfcc1111b17909bd1484279c9844226476a9dc1d6e803128405385",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 7355
+    },
+    {
+      "source_path": "docs/roadmap/llm-engineering-execution-plan.zh-CN.md",
+      "raw_hash": "f89b47eb57f8294a411938a1aeb84d05f266afadbba8a1c5be35bc5203311be4",
+      "normalized_hash": "f89b47eb57f8294a411938a1aeb84d05f266afadbba8a1c5be35bc5203311be4",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 55797
+    },
+    {
+      "source_path": "docs/roadmap/next-stage-execution-plan.zh-CN.md",
+      "raw_hash": "2efc5278be94716fa2685e4f043cb4601dfbf5fb6aa2aebbab99fde764cab9a9",
+      "normalized_hash": "2efc5278be94716fa2685e4f043cb4601dfbf5fb6aa2aebbab99fde764cab9a9",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 50015
+    },
+    {
+      "source_path": "docs/roadmap/next-stage-status.zh-CN.md",
+      "raw_hash": "985edab62dc49a55d570c32131bad0266a38632cbdfcf379cd0cfa8e7b6a08d1",
+      "normalized_hash": "985edab62dc49a55d570c32131bad0266a38632cbdfcf379cd0cfa8e7b6a08d1",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 3787
+    },
+    {
+      "source_path": "docs/steerable-runtime.md",
+      "raw_hash": "702ebea7fe87ba95f2c48089d6ce43013372cce3f90e807abcfa0d514bb1eb3b",
+      "normalized_hash": "702ebea7fe87ba95f2c48089d6ce43013372cce3f90e807abcfa0d514bb1eb3b",
+      "language": "markdown",
+      "source_kind": "design_document",
+      "size_bytes": 17664
+    },
+    {
+      "source_path": "tests/__init__.py",
+      "raw_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 0
+    },
+    {
+      "source_path": "tests/conftest.py",
+      "raw_hash": "cef3b14d75b1979cd74d344c6ceefd58fc031d9747d07dcf7338d4ad90e0f051",
+      "normalized_hash": "ce30a52764a2257486c120652fa6cab55d1454307f3682e2f09598d89d96ef6c",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 2674
+    },
+    {
+      "source_path": "tests/fixtures/knowledge_repo/corecoder/journal.py",
+      "raw_hash": "7b8a482986572627fb18273399be98e1b4132ed20178baeb8af558eb0a0c87f8",
+      "normalized_hash": "7b8a482986572627fb18273399be98e1b4132ed20178baeb8af558eb0a0c87f8",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 526
+    },
+    {
+      "source_path": "tests/fixtures/knowledge_repo/corecoder/verification.py",
+      "raw_hash": "60369c5bde4c5afa68cba02a3e4d36a21326d4b6aa3f37e6150578fe6308c88d",
+      "normalized_hash": "60369c5bde4c5afa68cba02a3e4d36a21326d4b6aa3f37e6150578fe6308c88d",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 353
+    },
+    {
+      "source_path": "tests/fixtures/knowledge_repo/docs/design.md",
+      "raw_hash": "c88f15cf97487b8e220ca349c2e6c482698a39b0e0b9bb16a71becd9f9be317c",
+      "normalized_hash": "c88f15cf97487b8e220ca349c2e6c482698a39b0e0b9bb16a71becd9f9be317c",
+      "language": "markdown",
+      "source_kind": "test",
+      "size_bytes": 391
+    },
+    {
+      "source_path": "tests/integrations/__init__.py",
+      "raw_hash": "435b6b28832ed73a60c9e8dc455c3e8078e76134cfb4c4d4c52bfc4ac5a06721",
+      "normalized_hash": "435b6b28832ed73a60c9e8dc455c3e8078e76134cfb4c4d4c52bfc4ac5a06721",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 62
+    },
+    {
+      "source_path": "tests/integrations/test_model_gateway.py",
+      "raw_hash": "d44ddba80a8524a412909a499ab8772be285acf30aed5534e8cfb71c49f1076a",
+      "normalized_hash": "d44ddba80a8524a412909a499ab8772be285acf30aed5534e8cfb71c49f1076a",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 9502
+    },
+    {
+      "source_path": "tests/integrations/test_prompt_chain.py",
+      "raw_hash": "2ad35582956556e2c7a9bbd87adacdd17ec6834e0eb3fba1e6cccbcf09514085",
+      "normalized_hash": "2ad35582956556e2c7a9bbd87adacdd17ec6834e0eb3fba1e6cccbcf09514085",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 5214
+    },
+    {
+      "source_path": "tests/knowledge/__init__.py",
+      "raw_hash": "dcc1d7fd700eb9ded7d9200b1ce25c6101cab45f4f05460bd3a4bc1c7c1292dd",
+      "normalized_hash": "dcc1d7fd700eb9ded7d9200b1ce25c6101cab45f4f05460bd3a4bc1c7c1292dd",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 60
+    },
+    {
+      "source_path": "tests/knowledge/conftest.py",
+      "raw_hash": "74232c3ec248ed957afcc842171b8208f8cdac02fafe85b4e5b74d3d95adfa92",
+      "normalized_hash": "74232c3ec248ed957afcc842171b8208f8cdac02fafe85b4e5b74d3d95adfa92",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 810
+    },
+    {
+      "source_path": "tests/knowledge/test_answering.py",
+      "raw_hash": "5ed6044666641d3c199d466f124863950356e175d5c66408289a61eb0b55ffd3",
+      "normalized_hash": "5ed6044666641d3c199d466f124863950356e175d5c66408289a61eb0b55ffd3",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 6451
+    },
+    {
+      "source_path": "tests/knowledge/test_cli.py",
+      "raw_hash": "e6825554ed398de98ce8260e7bf421e52445b0872da58931472e30bf2e750d41",
+      "normalized_hash": "e6825554ed398de98ce8260e7bf421e52445b0872da58931472e30bf2e750d41",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 2978
+    },
+    {
+      "source_path": "tests/knowledge/test_dataset.py",
+      "raw_hash": "bb2ed3923511a489ad277ab4f5c8a35f97564978f4ae17475ee8c1c15db3c79f",
+      "normalized_hash": "bb2ed3923511a489ad277ab4f5c8a35f97564978f4ae17475ee8c1c15db3c79f",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 436
+    },
+    {
+      "source_path": "tests/knowledge/test_foundation.py",
+      "raw_hash": "64ba545f81f5cf4fe2b0b8d006afecc0cfe3ca01795aa1d6b2b4637b37dc8d96",
+      "normalized_hash": "64ba545f81f5cf4fe2b0b8d006afecc0cfe3ca01795aa1d6b2b4637b37dc8d96",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 14153
+    },
+    {
+      "source_path": "tests/knowledge/test_indexing.py",
+      "raw_hash": "ae9a168909693b9b9c198672c0dfa8ce5fb048fc5fe062021775d44025396fa6",
+      "normalized_hash": "ae9a168909693b9b9c198672c0dfa8ce5fb048fc5fe062021775d44025396fa6",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 11540
+    },
+    {
+      "source_path": "tests/test_bash_streaming.py",
+      "raw_hash": "1ea49b1fbe58fc3efb6145a221c421ab7896b1f5aa6888d4bb0ecd75b34d5b36",
+      "normalized_hash": "1ea49b1fbe58fc3efb6145a221c421ab7896b1f5aa6888d4bb0ecd75b34d5b36",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 8047
+    },
+    {
+      "source_path": "tests/test_budget.py",
+      "raw_hash": "3e828d9a2f7e94e8a7121436aa93c470f16589401b83f26d2fd15b26cb5ab2d0",
+      "normalized_hash": "3e828d9a2f7e94e8a7121436aa93c470f16589401b83f26d2fd15b26cb5ab2d0",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 10087
+    },
+    {
+      "source_path": "tests/test_checkpoints.py",
+      "raw_hash": "09f7129c0115438a4ea6167588edbcdcb67f52ba42614c1de457eeb1a31ac1dc",
+      "normalized_hash": "2caff8eab10548b8dd97fa551af04aab8e2001b80ef801b03f23fa441aeb23e8",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 3392
+    },
+    {
+      "source_path": "tests/test_core.py",
+      "raw_hash": "03d566aa05df26fa047aa47fbeacb8b7672e75917198ba1699fd94217fa0fd13",
+      "normalized_hash": "be45cc75861eaa12d815bf9c820641639f1fd828c131967d83c4dc586a47e0b7",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 31385
+    },
+    {
+      "source_path": "tests/test_demo.py",
+      "raw_hash": "3a3c4cc99427e1bd1a4d2ce5754ae62f9f313cb4ac7e9e8d7cc70dd8c63b7548",
+      "normalized_hash": "525c41060a38908a33c5c6e5b28ba23f954abae419afd26534dca9517ef518c4",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 1885
+    },
+    {
+      "source_path": "tests/test_evals.py",
+      "raw_hash": "9b9b91fe5bfbdb6e11f5e97ba484cf7fb507db27f77be9078d379fb670289f0e",
+      "normalized_hash": "9b9b91fe5bfbdb6e11f5e97ba484cf7fb507db27f77be9078d379fb670289f0e",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 6176
+    },
+    {
+      "source_path": "tests/test_events.py",
+      "raw_hash": "9cdf7d02f75227a6aa75443b40cf3206ad684196d704a69196bc1d436507114b",
+      "normalized_hash": "9cdf7d02f75227a6aa75443b40cf3206ad684196d704a69196bc1d436507114b",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 10011
+    },
+    {
+      "source_path": "tests/test_hooks.py",
+      "raw_hash": "def17547f07055d5d8e9fd56cd84ccfea0bdaa6de9efd389375ef2c819ddb2a7",
+      "normalized_hash": "a2465f1b497dd63f58fd5ffa6c85564bf57996cbebd2a081b9fb44f2c2f94f52",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 5792
+    },
+    {
+      "source_path": "tests/test_interactive_runtime.py",
+      "raw_hash": "f8250c44b196a16fdb4f577baeff7380aab0e754497aee97da1b554ab58cd57c",
+      "normalized_hash": "f8250c44b196a16fdb4f577baeff7380aab0e754497aee97da1b554ab58cd57c",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 9998
+    },
+    {
+      "source_path": "tests/test_litellm.py",
+      "raw_hash": "37a67b9deeb05201510f45bf44159ceb95a75374ef4882c040a05997f38e0246",
+      "normalized_hash": "fd9d6d98517aac72776450eac18f52c3eb611a9c3393a2f86f74c54d7c03ef2a",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 8765
+    },
+    {
+      "source_path": "tests/test_live_smoke.py",
+      "raw_hash": "4fcdbbd1a47407f286582168490ba468a15170626a4cdf271d1767e4d677ff6c",
+      "normalized_hash": "68db3f2f93079dea7e6ca2cb5450290c1230364a93269335fd2833f4c5b998d3",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 1777
+    },
+    {
+      "source_path": "tests/test_mcp.py",
+      "raw_hash": "de13701954223eb7d9b9930f3acdff7a161815031ec7f6adbddff28ec227201f",
+      "normalized_hash": "94688014cd31b1d307fe0940fc6cb5238eaf994006c8b6242b4bae0cc1740505",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 11013
+    },
+    {
+      "source_path": "tests/test_no_progress.py",
+      "raw_hash": "57d818af8f6033850c314561fa1eac7d2442ea0cd950ba50334942f677ff6d78",
+      "normalized_hash": "57d818af8f6033850c314561fa1eac7d2442ea0cd950ba50334942f677ff6d78",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 5610
+    },
+    {
+      "source_path": "tests/test_pause_cancel.py",
+      "raw_hash": "71f39877b0c6142ece1ce5dd6e23cf00f9fadccb6f8ae11ad3b00ce176eb6c2d",
+      "normalized_hash": "71f39877b0c6142ece1ce5dd6e23cf00f9fadccb6f8ae11ad3b00ce176eb6c2d",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 11375
+    },
+    {
+      "source_path": "tests/test_permissions.py",
+      "raw_hash": "7f3157a3d2f64fe45f99b33bb0df6221f398241ace7146977bb01ab33b46eef1",
+      "normalized_hash": "8a785f42e6dc7f1a47b95247f9cf5d601700ffb5960b020803ceaccc4391f3b2",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 7651
+    },
+    {
+      "source_path": "tests/test_plan_mode.py",
+      "raw_hash": "4c401570efca770fad6e6844734494d3d0206bc583340b814000b065818c1455",
+      "normalized_hash": "97c22c09da50b5d6ff64b0757e88f0635710049c23c7fd4326f476cf1035a0af",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 3395
+    },
+    {
+      "source_path": "tests/test_project_docs.py",
+      "raw_hash": "dbd516adeace3a7fe77d54d9d5c5f2ba042183062fa88eac099e6720e3385637",
+      "normalized_hash": "dbd516adeace3a7fe77d54d9d5c5f2ba042183062fa88eac099e6720e3385637",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 1326
+    },
+    {
+      "source_path": "tests/test_reliablecoder_demo.py",
+      "raw_hash": "c8c165cc750bf094240317e04d55aecf854c0b91e0c113a5678a0d9d2587f8e4",
+      "normalized_hash": "c8c165cc750bf094240317e04d55aecf854c0b91e0c113a5678a0d9d2587f8e4",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 685
+    },
+    {
+      "source_path": "tests/test_repl.py",
+      "raw_hash": "e0532a54d4ad48d002a706590125093fe188c8ae94a13c80a4429b10930226eb",
+      "normalized_hash": "b3d154053160f34352786e33a2cc6f22ac2e684c2963df9cf9c6e1c9c4b21963",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 4424
+    },
+    {
+      "source_path": "tests/test_run_store.py",
+      "raw_hash": "371be045a61ff8aaa3d6cda2016cfaa2e2188752ba5f3c1393e01226be10bec2",
+      "normalized_hash": "371be045a61ff8aaa3d6cda2016cfaa2e2188752ba5f3c1393e01226be10bec2",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 14848
+    },
+    {
+      "source_path": "tests/test_runtime.py",
+      "raw_hash": "2066afbdccb2f360c16e8df6c02c3a49086bb9489bb3ad19f7dec8db10878818",
+      "normalized_hash": "2066afbdccb2f360c16e8df6c02c3a49086bb9489bb3ad19f7dec8db10878818",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 7811
+    },
+    {
+      "source_path": "tests/test_safety_matrix.py",
+      "raw_hash": "39d58d90a2c503d2dc7ddcc7ae010f126a8ebfade2cc0d13211d35d5bce3d88a",
+      "normalized_hash": "ae14df1e4b43569339d04fd042e94296c7ca7c438e0398ef52c605bbded4af63",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 7713
+    },
+    {
+      "source_path": "tests/test_scheduler.py",
+      "raw_hash": "7fd3b6a4cf6ace058db1dc78a14b185e8569ccc840038139ffd9b61019a6fe40",
+      "normalized_hash": "7fd3b6a4cf6ace058db1dc78a14b185e8569ccc840038139ffd9b61019a6fe40",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 8942
+    },
+    {
+      "source_path": "tests/test_session.py",
+      "raw_hash": "feffd5ea9832496ad124f0be3396b4f0125d95556ef2bb344c7bbdf4d4192f4f",
+      "normalized_hash": "b01ab8e1c3c8e0094073841b5a62f829c499ceae1bf77167e424399cea98e65e",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 3423
+    },
+    {
+      "source_path": "tests/test_shell.py",
+      "raw_hash": "d33774a118b9edb0f6c6413330360b76d83567d985bf712bef274bd68b2c15d1",
+      "normalized_hash": "c9106e7f46e41090aefbd9993d4718d63865f0d2c2819f3baa250868d9d84563",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 2426
+    },
+    {
+      "source_path": "tests/test_slash_commands.py",
+      "raw_hash": "c2af39ebcd62e4f347f52a7ae2ad06bc410cb9226f6b5a271118703c5fa142a8",
+      "normalized_hash": "d825bcff85852e7bce0c14d70653e487b9ef667afc30cfae0d763249229b3bfc",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 4101
+    },
+    {
+      "source_path": "tests/test_state.py",
+      "raw_hash": "17794f12cca1e36adde03a29c106269a3ea376960047be2658c4dc067893974a",
+      "normalized_hash": "17794f12cca1e36adde03a29c106269a3ea376960047be2658c4dc067893974a",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 8475
+    },
+    {
+      "source_path": "tests/test_steering.py",
+      "raw_hash": "58c861f148e8902139cb23d1470ec0868b6788582657cd57fc4534b9f1c6f7b6",
+      "normalized_hash": "58c861f148e8902139cb23d1470ec0868b6788582657cd57fc4534b9f1c6f7b6",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 11888
+    },
+    {
+      "source_path": "tests/test_steering_e2e.py",
+      "raw_hash": "f5637e2fada4f76124c51e6919ee7228cdf2285670d9f225c847be38072218d5",
+      "normalized_hash": "f5637e2fada4f76124c51e6919ee7228cdf2285670d9f225c847be38072218d5",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 7632
+    },
+    {
+      "source_path": "tests/test_tool_cache.py",
+      "raw_hash": "b5d6038fae8cf285c75ad965d43f64988c1c0949a944146edc4fee7e3605db63",
+      "normalized_hash": "b5d6038fae8cf285c75ad965d43f64988c1c0949a944146edc4fee7e3605db63",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 14554
+    },
+    {
+      "source_path": "tests/test_tool_protocol.py",
+      "raw_hash": "a187cf48513a1a924d65c532b1796ceeacb642795d90fcdf984711bd04a13501",
+      "normalized_hash": "a187cf48513a1a924d65c532b1796ceeacb642795d90fcdf984711bd04a13501",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 11027
+    },
+    {
+      "source_path": "tests/test_tools.py",
+      "raw_hash": "12372398edcfeae33add6b71e646e66e216001871df412fc74bf53a102a5736b",
+      "normalized_hash": "3c18e8d743ba0cef990aef4a1680f37ee4f133966c55caf80fcaf38c997a0bd1",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 16578
+    },
+    {
+      "source_path": "tests/test_trace.py",
+      "raw_hash": "7f34c32d8b8fe2ca99e84d71e47b4629e065d888427f3e4409ba1927f2f15ad6",
+      "normalized_hash": "7f34c32d8b8fe2ca99e84d71e47b4629e065d888427f3e4409ba1927f2f15ad6",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 10264
+    },
+    {
+      "source_path": "tests/test_verification.py",
+      "raw_hash": "e929babe745cc977858e07cc12504143c9663771b5e2005141532c6dc5a6a69a",
+      "normalized_hash": "e929babe745cc977858e07cc12504143c9663771b5e2005141532c6dc5a6a69a",
+      "language": "python",
+      "source_kind": "test",
+      "size_bytes": 8706
+    }
+  ],
+  "embedding_space": {
+    "provider": "fixture",
+    "model_revision": "hashed-identifier-bigram-v1",
+    "dimensions": 64,
+    "preprocessing_version": "normalized-utf8-v1"
+  },
+  "index": {
+    "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+    "files": 136,
+    "chunks": 2243,
+    "changed_files": 136,
+    "deleted_files": 0,
+    "reused_files": 0,
+    "embedded_texts": 2211,
+    "embedding_requests": 70,
+    "skipped": {},
+    "duration_ms": 10671.999999962281,
+    "mode": "fixture"
+  },
+  "budget": {
+    "requests": 117,
+    "tokens": 1255854,
+    "pending_requests": 0,
+    "unknown_usage_requests": 117,
+    "cost_usd": null,
+    "cost_unavailable": true
+  },
+  "human_answer_support_rate": null,
+  "results": {
+    "lexical": {
+      "answerable_questions": 11,
+      "hit_at_5": 0.45454545454545453,
+      "hit_count": 5,
+      "recall_at_5_macro": 0.36363636363636365,
+      "mrr_at_10": 0.20681818181818182,
+      "citation_valid": 130,
+      "citation_total": 130,
+      "fixture_no_answer_correct": 2,
+      "no_answer_total": 2,
+      "boundary_passed": 3,
+      "boundary_total": 3,
+      "elapsed_ms": 18108.99999999674,
+      "cases": [
+        {
+          "id": "locate-07",
+          "category": "exact",
+          "gold_hit_count": 1,
+          "gold_count": 1,
+          "first_relevant_rank": 2,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "locate-08",
+          "category": "exact",
+          "gold_hit_count": 1,
+          "gold_count": 1,
+          "first_relevant_rank": 1,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "locate-09",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "locate-10",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "flow-07",
+          "category": "cross_module",
+          "gold_hit_count": 1,
+          "gold_count": 2,
+          "first_relevant_rank": 5,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "flow-08",
+          "category": "cross_module",
+          "gold_hit_count": 1,
+          "gold_count": 2,
+          "first_relevant_rank": 4,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "flow-09",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "flow-10",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": 8,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "design-06",
+          "category": "design",
+          "gold_hit_count": 1,
+          "gold_count": 1,
+          "first_relevant_rank": 5,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "design-07",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "design-08",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "lexical"
+        },
+        {
+          "id": "absent-05",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "absent-06",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-04",
+          "category": "adversarial",
+          "scenario": "cross_project",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-05",
+          "category": "adversarial",
+          "scenario": "malicious_document",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-06",
+          "category": "adversarial",
+          "scenario": "mixed_snapshot",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        }
+      ]
+    },
+    "vector": {
+      "answerable_questions": 11,
+      "hit_at_5": 0.0,
+      "hit_count": 0,
+      "recall_at_5_macro": 0.0,
+      "mrr_at_10": 0.0,
+      "citation_valid": 130,
+      "citation_total": 130,
+      "fixture_no_answer_correct": 2,
+      "no_answer_total": 2,
+      "boundary_passed": 3,
+      "boundary_total": 3,
+      "elapsed_ms": 21358.99999999674,
+      "cases": [
+        {
+          "id": "locate-07",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "locate-08",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "locate-09",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "locate-10",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "flow-07",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "flow-08",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "flow-09",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "flow-10",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "design-06",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "design-07",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "design-08",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "vector"
+        },
+        {
+          "id": "absent-05",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "absent-06",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-04",
+          "category": "adversarial",
+          "scenario": "cross_project",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-05",
+          "category": "adversarial",
+          "scenario": "malicious_document",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-06",
+          "category": "adversarial",
+          "scenario": "mixed_snapshot",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        }
+      ]
+    },
+    "hybrid": {
+      "answerable_questions": 11,
+      "hit_at_5": 0.18181818181818182,
+      "hit_count": 2,
+      "recall_at_5_macro": 0.18181818181818182,
+      "mrr_at_10": 0.10036075036075037,
+      "citation_valid": 130,
+      "citation_total": 130,
+      "fixture_no_answer_correct": 2,
+      "no_answer_total": 2,
+      "boundary_passed": 3,
+      "boundary_total": 3,
+      "elapsed_ms": 20000.0,
+      "cases": [
+        {
+          "id": "locate-07",
+          "category": "exact",
+          "gold_hit_count": 1,
+          "gold_count": 1,
+          "first_relevant_rank": 4,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "locate-08",
+          "category": "exact",
+          "gold_hit_count": 1,
+          "gold_count": 1,
+          "first_relevant_rank": 2,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "locate-09",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "locate-10",
+          "category": "exact",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "flow-07",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": 9,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "flow-08",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": 7,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "flow-09",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "flow-10",
+          "category": "cross_module",
+          "gold_hit_count": 0,
+          "gold_count": 2,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "design-06",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": 10,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "design-07",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "design-08",
+          "category": "design",
+          "gold_hit_count": 0,
+          "gold_count": 1,
+          "first_relevant_rank": null,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec",
+          "mode": "hybrid"
+        },
+        {
+          "id": "absent-05",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "absent-06",
+          "category": "no_answer",
+          "status": "insufficient",
+          "fixture": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-04",
+          "category": "adversarial",
+          "scenario": "cross_project",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-05",
+          "category": "adversarial",
+          "scenario": "malicious_document",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        },
+        {
+          "id": "boundary-06",
+          "category": "adversarial",
+          "scenario": "mixed_snapshot",
+          "passed": true,
+          "snapshot_id": "8fdeb388a714e47bef4e701c39d93a8e1e47dffab487e7538879821dc9aab3ec"
+        }
+      ]
+    }
+  }
+}

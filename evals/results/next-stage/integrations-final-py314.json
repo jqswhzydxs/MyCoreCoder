@@ -1,0 +1,17 @@
+{
+  "timestamp_utc": "2026-11-17T03:14:56.843070+00:00",
+  "command": [
+    ".tmp/mcp-py314/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/integrations",
+    "tests/knowledge/test_foundation.py",
+    "tests/knowledge/test_cli.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 53.83859010000015,
+  "output": "...............................................s........................ [ 96%]\n...                                                                      [100%]\n74 passed, 1 skipped in 43.61s\n"
+}

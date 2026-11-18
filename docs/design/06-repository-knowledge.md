@@ -1,0 +1,33 @@
+# Versioned repository knowledge
+
+The optional `knowledge` integration adds a `KnowledgeService` shared by the local CLI and later workflow/MCP adapters. It never executes coding tools or grants permissions. Local commands route before Chat configuration; `status`, lexical `index`/`search`, and index previews do not create a Chat client. `index --mode lexical` builds a usable local keyword index without an Embedding provider, API key, Chroma or model requests.
+
+## Identity and provenance
+
+`ProjectScope` binds a local owner identifier, project ID, canonical root, allowed source directories and data directory. The owner identifier hashes local machine/account identity and is not server authentication. The project ID hashes the canonical root. SQLite persists the root binding and refuses the same identity at another root.
+
+`SourceDocument` records a relative POSIX path, stable UTF-8 text, raw-byte SHA-256, normalized-text SHA-256, language and source kind. CRLF is normalized without changing line numbers. Reparse points, ignored/generated/private files, invalid encodings, binary data, unstable reads and oversize files are excluded with reason counters. Windows `stat` and `fstat` ctime are compared within their respective APIs because their semantics differ; identity, size and mtime agree across all observations.
+
+`Chunk` contains exact contiguous complete source lines. AST partitions preserve decorators and qualified class/method/nested-function names. Markdown sections respect fenced code. LangChain `Document` and `RecursiveCharacterTextSplitter` produce character splits which are expanded to full lines. A single oversized source line is retained intact; the embedding gateway may reject it under its separately documented text limit. A syntax error marks text fallback explicitly. IDs hash project, path, raw file hash, one-based closed line span and splitter version.
+
+## Storage and publication
+
+The metadata database uses WAL, foreign keys, a schema guard, transactional writer leases and immutable historical inventories. The manifest identifies schema, lexical preprocessing version, embedding space, splitter version, file hashes and ordered chunk IDs. `building → ready → published` does not change an active pointer until the required stores have complete matching inventories. A lexical-only manifest records `embedding_space: null`: it publishes complete chunks and FTS without generating, caching or writing vectors. Existing vector manifests remain readable with unchanged identities. Switching modes creates separate snapshots and preserves cached vectors for a later semantic rebuild. Cleanup skips vector deletion for lexical-only snapshots.
+
+Embedding space identifies provider, model revision, dimension and normalization version. A custom compatible endpoint contributes a URL hash to provider identity, so different endpoints cannot reuse each other's cached vectors under the same model alias. The adapter passes an explicit URL to the SDK and does not inherit Chat's `OPENAI_BASE_URL`. Cache entries are bound to owner/project/space/text hash. Each bounded batch and query uses the workflow BudgetLedger; retries occupy new requests and unknown usage remains unknown. Unchanged text can reuse vectors, including across renamed paths, while citations receive new IDs. The fixture provider is a deterministic hash projection and is not a semantic quality model.
+
+Chroma receives explicit vectors; its collection embedding function is disabled. LangChain Chroma searches by the supplied vector with owner/project/snapshot filters. The adapter pools owned local clients and releases their resources when its last owner closes. FTS5 indexes safe identifier/camelCase/snake_case tokens and Chinese bigrams. Queries use quoted token-only MATCH expressions and separately bound SQL scope parameters.
+
+Readers pin one published snapshot before retrieval. Cleanup retains active snapshots, current read leases and the configured historical allowance. Retired snapshots are marked unavailable before external vector deletion; interrupted cleanup is replayable. Chroma and SQLite do not form a distributed transaction. Unpublished or gc-pending data is never a query source.
+
+## Retrieval and answer boundaries
+
+Keyword and vector ranks are fused using `Σ 1/(60 + rank)` with one-based ranks. Requested/effective mode, degradation and excluded stale sources remain explicit. Hybrid queries against lexical-only snapshots fall back explicitly without calling an Embedding provider; vector-only queries fail until a vector index is built. Lexical answers refresh stale sources using local indexing. The LangChain `BaseRetriever` produces Documents consumed by the repository answer adapter. Evidence IDs map to trusted source metadata, and context trimming uses complete lines with separate visible citation spans.
+
+The answer adapter checks file hashes/spans before generation and again before output, shares Chat and Embedding budgets, permits at most one typed query rewrite and one source refresh, and discards drafts whose sources remain unstable. `answered` is independent of coding `VERIFIED`. Schema membership and current citations do not prove semantic correctness; live quality and human support judgments require separate evidence.
+
+## Configuration
+
+New commands support `CLI → environment → corecoder.toml → defaults`. Parameters appear after the route/subcommand. The `[knowledge]` table configures source directories, data root, character splitter and retrieval/context limits. `[embedding]` has its own provider/model/revision/dimension/URL/key-environment-name/rate. Its `batch_size` (1..32), `max_text_bytes` and `max_batch_bytes` also configure the gateway; corresponding `CORECODER_EMBEDDING_*` variables and `--embedding-*` flags can override them. This permits compatible endpoints with smaller per-request row limits. Overlong complete source lines fail explicitly rather than being truncated. Embedding endpoints reporting input usage as `total_tokens` alone are supported. `[chat]` can select the answering backend and trusted rates. Credentials are read lazily from environment variables for actual calls and never written to project configuration or reports. No model can select a different scope.
+
+Both index and search use `[knowledge] retrieval_mode` when `--mode` is omitted. Set it to `"lexical"` for local operation, or pass `--mode lexical` explicitly. Local indexing still uses the authorized loader and exact-line splitter dependencies; it creates no vector database and reports zero embedding/model requests. `fixture` remains a separate test provider, not a substitute for local keyword indexing or real semantic embeddings.

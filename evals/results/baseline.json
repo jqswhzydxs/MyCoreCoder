@@ -778,7 +778,7 @@
       },
       "id": "max_rounds",
       "injected_faults": [],
-      "latency_ms": 30.0,
+      "latency_ms": 25.0,
       "model_attempts": 2,
       "passed": true,
       "permission_bypasses": 0,
@@ -811,7 +811,7 @@
           "result": "1\tstill here"
         }
       ],
-      "tool_executions": 2,
+      "tool_executions": 1,
       "tool_selection_correct": true,
       "variant": "baseline",
       "verification": {
@@ -2589,7 +2589,7 @@
       },
       "id": "no_progress_repeated_read",
       "injected_faults": [],
-      "latency_ms": 30.0,
+      "latency_ms": 25.0,
       "model_attempts": 2,
       "passed": true,
       "permission_bypasses": 0,
@@ -2622,7 +2622,7 @@
           "result": "1\tsame"
         }
       ],
-      "tool_executions": 2,
+      "tool_executions": 1,
       "tool_selection_correct": true,
       "variant": "baseline",
       "verification": {
@@ -2784,7 +2784,7 @@
       "platform": "Windows-11-10.0.26100-SP0",
       "python": "3.14.8"
     },
-    "git_commit": "bd64cfe7ad2789fa0ab1b3a689ad160567b5cdb0",
+    "git_commit": "50e5e7df168d708b45ed0eb43d7fffaa9edff5d0",
     "harness_version": "2.0",
     "model": {
       "name": "scripted-eval-v2",
@@ -2798,7 +2798,7 @@
     },
     "observation_count": 40,
     "prompt": {
-      "sha256": "af04ba34ec35113a58a21c428789bd55daad2623cdb9bd2494c3fc0478ecbee8",
+      "sha256": "2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37",
       "source": "corecoder/prompt.py",
       "version": "corecoder-0.8.0"
     },
@@ -2816,7 +2816,7 @@
   "metrics": {
     "argument_valid_rate": 0.916667,
     "average_completion_tokens": 4.5,
-    "average_latency_ms": 149.075,
+    "average_latency_ms": 148.825,
     "average_prompt_tokens": 23.4,
     "average_rounds": 1.95,
     "average_tool_calls": 1.2,
@@ -2897,7 +2897,7 @@
           "verified_completion_rate": 0.0
         },
         "none": {
-          "average_latency_ms": 28.315789,
+          "average_latency_ms": 27.789474,
           "average_rounds": 2.052632,
           "crash_resume_rate": 0.0,
           "duplicate_side_effect_rate": 0.333333,
@@ -2990,13 +2990,13 @@
           "verified_completion_rate": 0.0
         },
         "max_rounds": {
-          "average_latency_ms": 30.0,
+          "average_latency_ms": 25.0,
           "average_rounds": 2.0,
           "crash_resume_rate": 0.0,
           "duplicate_side_effect_rate": 0.0,
           "false_completion_rate": 0.0,
           "observations": 1,
-          "p95_latency_ms": 30.0,
+          "p95_latency_ms": 25.0,
           "p95_rounds": 2.0,
           "permission_bypass_rate": 0.0,
           "task_success_rate": 1.0,
@@ -3016,7 +3016,7 @@
           "verified_completion_rate": 0.0
         },
         "no_progress": {
-          "average_latency_ms": 26.666667,
+          "average_latency_ms": 25.0,
           "average_rounds": 2.0,
           "crash_resume_rate": 0.0,
           "duplicate_side_effect_rate": 0.0,
@@ -3135,7 +3135,7 @@
           "verified_completion_rate": 0.0
         },
         "no_progress_loop": {
-          "average_latency_ms": 27.5,
+          "average_latency_ms": 25.0,
           "average_rounds": 2.0,
           "crash_resume_rate": 0.0,
           "duplicate_side_effect_rate": 0.0,

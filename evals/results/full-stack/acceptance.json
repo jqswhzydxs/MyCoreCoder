@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-11-18T03:56:10.498240+00:00",
+  "python": "3.12.16",
+  "platform": "Windows",
+  "status": "passed",
+  "live_api_requested": false,
+  "stages": {
+    "full_stack": {
+      "status": "passed",
+      "detail": {
+        "mode": "offline_http_fixture",
+        "status": "passed",
+        "live_model_requests": 0,
+        "sdk_http_fixture_requests": 8,
+        "checks": {
+          "unchanged_index_zero_embedding_requests": true,
+          "extracted_memory_requires_approval": true,
+          "cross_session_memory_recalled": true,
+          "unknown_citation_rejected_and_repaired": true,
+          "memory_reaches_planner_and_answer_api": true,
+          "superseded_memory_excluded_from_api": true,
+          "deleted_memory_excluded_and_not_resurrected": true,
+          "edited_source_has_current_citations": true,
+          "terminal_resume_zero_additional_chat_requests": true,
+          "graph_and_two_mcp_clients_share_sources": true,
+          "mcp_bridge_closed": true
+        },
+        "turns": [
+          {
+            "turn": "initial",
+            "stages": [
+              "prepare",
+              "retrieve",
+              "recall",
+              "plan",
+              "answer",
+              "finalize"
+            ],
+            "answer_status": "answered",
+            "source_count": 1,
+            "budget": {
+              "requests": 4,
+              "tokens": 458,
+              "pending_requests": 0,
+              "unknown_usage_requests": 1,
+              "cost_usd": null,
+              "cost_unavailable": true
+            }
+          },
+          {
+            "turn": "updated",
+            "stages": [
+              "prepare",
+              "retrieve",
+              "recall",
+              "plan",
+              "answer",
+              "finalize"
+            ],
+            "answer_status": "answered",
+            "source_count": 1,
+            "budget": {
+              "requests": 3,
+              "tokens": 308,
+              "pending_requests": 0,
+              "unknown_usage_requests": 1,
+              "cost_usd": null,
+              "cost_unavailable": true
+            }
+          },
+          {
+            "turn": "deleted-and-refreshed",
+            "stages": [
+              "prepare",
+              "retrieve",
+              "recall",
+              "plan",
+              "answer",
+              "finalize"
+            ],
+            "answer_status": "answered",
+            "source_count": 1,
+            "budget": {
+              "requests": 3,
+              "tokens": 308,
+              "pending_requests": 0,
+              "unknown_usage_requests": 1,
+              "cost_usd": null,
+              "cost_unavailable": true
+            }
+          }
+        ],
+        "prompts": {
+          "memory_extract.v2": "445129d9390a2b3bc891b0a88a00f297bc923cf555108def539649731b66eac6",
+          "task_plan.v2": "bcc7d67d4dd579e0e021924fa15e9ab73d5265eb861e862e3c308009e543d811",
+          "repo_answer.v2": "8eeef61c61c6b3a6009442179eae33d748dc45dfb521893a3f2cad86d1d318d8"
+        },
+        "limits": "SDK transport and vector/model responses are fixtures; no live semantic quality or language-adherence claim."
+      },
+      "elapsed_seconds": 12.093
+    },
+    "prompt_contracts": {
+      "status": "passed",
+      "detail": {
+        "versions": {
+          "v1": {
+            "passed": 14,
+            "total": 14
+          },
+          "v2": {
+            "passed": 14,
+            "total": 14
+          }
+        },
+        "prompt_hashes": {
+          "repo_answer.v1": "484d3f10468750829a8f7d9aaaf84741c1d39b1c70cee71f500fb5e798241579",
+          "repo_answer.v2": "8eeef61c61c6b3a6009442179eae33d748dc45dfb521893a3f2cad86d1d318d8",
+          "task_plan.v1": "5430332c7c8b5d13c9e6c317998011e82eda86a7cfe27baf0e42a5f71d483286",
+          "task_plan.v2": "bcc7d67d4dd579e0e021924fa15e9ab73d5265eb861e862e3c308009e543d811",
+          "memory_extract.v1": "5f2d98b67af4285bc01ea1741d16a8e7008c6561d8447a90b60ba559b99f039d",
+          "memory_extract.v2": "445129d9390a2b3bc891b0a88a00f297bc923cf555108def539649731b66eac6"
+        },
+        "mode": "deterministic_offline_contracts"
+      },
+      "elapsed_seconds": 0.172
+    },
+    "agent_mcp_sources": {
+      "status": "passed",
+      "detail": {
+        "mode": "offline_fixture",
+        "snapshot_id": "7c2080c703f3e5c4188793d9d4f000d78c2308d0172da3605235262c7e2ce0af",
+        "protocol_version": "2026-07-28",
+        "matching_chunk_ids": [
+          "66ee683c0a26cc88d9a53e2840c4a9de0e73d0d2e35b06c0a400ec4806fc9645"
+        ],
+        "graph_sources": [
+          {
+            "chunk_id": "66ee683c0a26cc88d9a53e2840c4a9de0e73d0d2e35b06c0a400ec4806fc9645",
+            "citation": "[corecoder/journal.py:L1-L2 @ 7c2080c703f3e5c4188793d9d4f000d78c2308d0172da3605235262c7e2ce0af]",
+            "end_line": 2,
+            "id": "e_3fb059813925b2401e1afb82",
+            "raw_hash": "abbd2b54a475a1997294dbb8ec707b7b8982ebe90358e415a42d0f4324527c57",
+            "snapshot_id": "7c2080c703f3e5c4188793d9d4f000d78c2308d0172da3605235262c7e2ce0af",
+            "source_kind": "source_code",
+            "source_path": "corecoder/journal.py",
+            "start_line": 1,
+            "symbol": "RunStore"
+          }
+        ],
+        "sdk_bridge_closed": true,
+        "server_model_requests": 0
+      },
+      "elapsed_seconds": 7.406
+    },
+    "coding_crash_resume": {
+      "status": "passed",
+      "detail": {
+        "mode": "offline_fixture",
+        "workflow_id": "a646b0bd2b907c0002a136d50ed24cf497df812dd86e745ece7b052d5978d64c",
+        "child_run_id": "4063a62acdd85863b1e883232cbe9cb06faaaeae08f37a7b06f7412aba812b39",
+        "code_run_status": "verified",
+        "physical_writes": 1,
+        "terminal_resume_requests_added": 0,
+        "budget": {
+          "requests": 3,
+          "tokens": 11468,
+          "pending_requests": 0,
+          "unknown_usage_requests": 3,
+          "cost_usd": null,
+          "cost_unavailable": true
+        }
+      },
+      "elapsed_seconds": 0.454
+    }
+  },
+  "dependencies": {
+    "openai": "3.51.0",
+    "langchain-core": "1.8.0",
+    "langgraph": "1.2.20",
+    "chromadb": "1.5.9",
+    "mcp": "2.3.0"
+  },
+  "source_manifest": {
+    "corecoder/__init__.py": "879aba5211ad0872d7aa872d58d571ddb30874871dbb5d4414778ffc3aec8dc7",
+    "corecoder/__main__.py": "a35ec83f1245c788b60879927505285b32bb82c2a940a4aa77fc41352546c713",
+    "corecoder/agent.py": "d076a67065b5bf407298d1f0a1e38060caf64f61ab905c7f39772f4c8c1f887d",
+    "corecoder/budget.py": "04809c59ec5d1efe4be59d1bbc2ef55b204f365358f0c888e3815be0309c6c9b",
+    "corecoder/checkpoints.py": "78248a2cf4a593b458cdc579cb63fa5263854f5fa45559ea0d2da65c9beb76b6",
+    "corecoder/cli.py": "777a1dace000db3da1e655bdbd871fcbe04009170894fc836e458fc590ebcaae",
+    "corecoder/config.py": "18de19b4d9ed90999ee06a8544ca5d806b33b4ec939fc03e299159f30a108398",
+    "corecoder/context.py": "0cd7bc620d343733848a1681dd1f3ef9a7ceaf16a3530d8fa6e13d20186cd29c",
+    "corecoder/demo.py": "52649630ed2e90e64dee2601918d9bf0918a2c02ef5e354ce0a35f0857b65075",
+    "corecoder/events.py": "52a633feba540e7a32e54c3400d143d2098f4bb8426a2f1ccae0877be28ed4c6",
+    "corecoder/hooks.py": "b670ad4737bc1f56bade854ef2ba0fc771d82ca373a36f7de6521c60f8a36b8e",
+    "corecoder/integrations/__init__.py": "ee2f09a9cbe9b092dcaf386933266db6e6675b1bf5d3765c5d02d472fc0281b6",
+    "corecoder/integrations/agent_llm_bridge.py": "8d904d409c5321cce3104d7facb1504d04438ade2af6aea6db7e01cd31e894b1",
+    "corecoder/integrations/langchain_bridge.py": "8d4db7975ccf7aa11400ac24c966e299727eb470084fe6922ffcf35d3dfec715",
+    "corecoder/integrations/mcp_sdk_bridge.py": "c0910cae27f3572b6c6d601b2bb45312ac8b7e5c38cdb7f05b88039c06f912fc",
+    "corecoder/integrations/model_gateway.py": "7cf1ca48dff35e7cd1d924999dd01f7bf34050198e1d375a45439560a224ad39",
+    "corecoder/knowledge/__init__.py": "d2f73eaa4750549e979009e90ab250055dab25d5bbc6ef4655d6f7d7c512ecec",
+    "corecoder/knowledge/answering.py": "a8eaf9d171434cc7b9a11a4a615e58c1b3256efc2537ea5ecd9d7d34ebffffac",
+    "corecoder/knowledge/citations.py": "9b7c11918d1a07a9b6b41b679334e01343fca286d4af24d65fb3e1973d53867b",
+    "corecoder/knowledge/cli.py": "f5c7a72e81074723021d6fee053305031d0491933b34d9bbd8b41664b9579f39",
+    "corecoder/knowledge/embedding_gateway.py": "809824753c9a3a3289228dcbd8cb9ed3f96798584772d59af7f4cb85ce064110",
+    "corecoder/knowledge/embeddings.py": "73df02ee9c813828bcf2b51ba143b0f9cedc76e9f1ed02fcc721df5290c6cb0a",
+    "corecoder/knowledge/indexer.py": "581336e3d8af8ecf8e410a66afd67ff30960433aa4e915ed90bcbed8cb91b2e4",
+    "corecoder/knowledge/lexical_store.py": "0c876f4b9fba0dc89ae8b3b9ad2c0ad1964196a868931be4e0347278aae0f572",
+    "corecoder/knowledge/loaders.py": "08dd1ead0ce32a7b611e8ef5a006ede5c90f7b6da6989687592d979c8b79fb1c",
+    "corecoder/knowledge/manifest_store.py": "3f8aca2ccc8a6491382c1c25d2cf9fa5e650a2e781692d8fcf770d34525f64e2",
+    "corecoder/knowledge/models.py": "37ad2b2e243c3d687569b704a827eea31e3453ae83cb2f192ce94af30247be01",
+    "corecoder/knowledge/retriever.py": "14944b033e2d029af09fc2d7a8e8d3081bd4743254e30204421b489f01d28800",
+    "corecoder/knowledge/scope.py": "adf55e5ed2679552fd734a34f0933c2c4cd3f5404486844c0a239b3d09786337",
+    "corecoder/knowledge/service.py": "36c939a784b108dd87c22c529dbe6bdce7ea6b1e54d03664ae8f1d7e7435c6dc",
+    "corecoder/knowledge/settings.py": "517e5a92134b80e4feee9e2a52220b55fe0e870fd5f2a18ff8f5d2ccab2f78b1",
+    "corecoder/knowledge/splitters.py": "2a5608e30890ba16358454a2497d36efce4e09214eb3ec481f20cdeff17280fa",
+    "corecoder/knowledge/vector_store.py": "e0bd0a36f6d40bcd89e2e27bf0268560f5a04954b2bd8f9c5c8e44e0d40ebb4d",
+    "corecoder/llm.py": "84b6b004419320cc08f65357b43d224f93f9ba6b8fcc1ec1c350376223a91310",
+    "corecoder/mcp.py": "c09e5dc2259d3ddc5b7f16cde82bbef688471e5aa374901903722d1f7fa66d78",
+    "corecoder/mcp_servers/__init__.py": "57429710af935a808bfe682f5740ded90dca4f213ca5fe1a9ba76a8e8721e3cf",
+    "corecoder/mcp_servers/knowledge.py": "1d629cf346489f7a05a0a03c3580e77d87b2247f067fab8508ee7f5ee224f65b",
+    "corecoder/memory/__init__.py": "27a942a02aa544986a26ae8f227a170783144e319a3e762e5f1343bb18f50e8f",
+    "corecoder/memory/cli.py": "00d10c0975548d620042380a812090683ffcdb6d50ba54232b6747de4231daac",
+    "corecoder/memory/models.py": "eb8c4d0d9579b79233c546ddc9f15b89effdf810cc45244997ffe8ea6c873d34",
+    "corecoder/memory/policy.py": "874f391f004e799e2cfbb5b9683af7ae76f3aaf5560e553e6e22624bd25d6c6b",
+    "corecoder/memory/service.py": "9ebe3e0f4c54ce85e7127c7c37ce894c4a65a37f64173215bdcdb90888408af1",
+    "corecoder/memory/store.py": "cdcd56e66aad402fe4349d0c3b7da140d214603d4b78529cff2407d92b7fda10",
+    "corecoder/metrics.py": "94ecd3980329035b84be1946c3769fcb599dde5184a08d29fdcf96bd65b4afe2",
+    "corecoder/permissions.py": "ca260754ce1bc2789975b620709994c5d5d4c521f0c4703d537b1ac0876f9873",
+    "corecoder/prompt.py": "2c371b7e0779b5697c9d2ba6ae4fc542448fcf7c0122fd836a37e978fd32de37",
+    "corecoder/prompts/__init__.py": "2030a0654c944bfa8f6bb7fd1a09cf494d3e9baf343499a1867d62f0423c63e7",
+    "corecoder/prompts/registry.py": "c1c4525772a8a15d8af78aa39ee11c247276641b58d505cf7aec678e366a43e2",
+    "corecoder/prompts/schemas.py": "f855ca539847f0b6ddc36994305a4ca7afa5926d861a3b56ff084694cbab7b58",
+    "corecoder/run_store.py": "ca29972cc9efeee62e3ae5e951da933690748dc542eccad9bfc2657eb6a21ebd",
+    "corecoder/runtime.py": "b2647ad8f03513791cf0efce0c34cbb05a3e0aa32ecf7d3209785433e2d6551a",
+    "corecoder/scheduler.py": "ee7a9dd655e9170d2d19e7cb98823df3b50a582f38774d0b04005312bd0a6c09",
+    "corecoder/session.py": "980ffd8e185eb474e2ec6964c0c00eeb09807a5f19b4b6219fd6bd90c0e03ef1",
+    "corecoder/shell.py": "88f67d7d1200595ad30f1e7d1b89d12579d121690edc18be0d19d90cbcb8797a",
+    "corecoder/state.py": "9200be356a9eb1bf77579f4df0781c1576456fea6b46318f3d52850976bd2c8c",
+    "corecoder/tool_cache.py": "e44cd52de8a5ad479ff5ff7a177eecec30c41b8a67eeac0259e191cc3765459a",
+    "corecoder/tools/__init__.py": "5d334dfd426f197572331a23f39820b463757e0544f1847301dae716666be8f3",
+    "corecoder/tools/agent.py": "efd3a2b43a152458e50d9da59113822448a241257f60b4ad3dbe7505919abd92",
+    "corecoder/tools/base.py": "851991f583391be54c7c1704055dbdc9a195004e234a16b55c780b6cc0c7b3d0",
+    "corecoder/tools/bash.py": "d74b5692ac2e8c3c08ef11f1ebfe876638d8574541f0b2c1a86ca0016c43b95b",
+    "corecoder/tools/edit.py": "8bf43ee34c9d40db30bdba5795ca584f65e3c39b0d7de474046a0039ecd03c06",
+    "corecoder/tools/glob_tool.py": "1bbd81a50314613082c1b3b87a99c5e77bb4e755779766889fb864cebba9c872",
+    "corecoder/tools/grep.py": "91baba40313f97c15e68f7c2dfec8268b9065bfa193b0a69bfa183d0b94231aa",
+    "corecoder/tools/protocol.py": "298f13d4b8d92f00b19f9a49f9721d0af07bcd9fb46b22651e8d0639ade90190",
+    "corecoder/tools/read.py": "511b2a1b3396a6d55a7076c8c01dc3d353642372e075c17aca72acedc486af81",
+    "corecoder/tools/todo.py": "97f4c1ed00aaad7b4ff1ae73423b81f0ad3e9f995feb9ae8868fbf01fe983798",
+    "corecoder/tools/write.py": "41758e42214e437859b2cede8455921dcdc1e303e8af7a2feeffe9d87cfffca2",
+    "corecoder/trace.py": "456205860008cb02cc5a58b12a0b54ff3a94cea5253df132fdb51cc7889dbdf2",
+    "corecoder/trace_replay.py": "005b76cce9f3dc72de054494f1e9e3f61080fe2bb81c040f0a77cf4332239057",
+    "corecoder/verification.py": "abb62de322461a91b7fe3242a9b0ccedc317e19d07635d837b8efad52e35fb0f",
+    "corecoder/workflows/__init__.py": "c242e057a907c4e4181bc037d4292234520ebf1e9eb20da7470c674da40786a3",
+    "corecoder/workflows/budget_ledger.py": "a7c429022a178507a4f1f043a5193d887948bf6af53a123f31fff2a7873a28a7",
+    "corecoder/workflows/checkpointing.py": "832ee155e2cc891449d518829e3b3144779efa68b279dab957659b7599b6fa00",
+    "corecoder/workflows/claims.py": "250118b6855ed9efe4f320efbad720407ef3797dc8176e5755c9b318eb68554b",
+    "corecoder/workflows/cli.py": "e45fd5a3ebb0ed287fb3bde89e1b97707b45fee0c169c4f98ab4882160e087af",
+    "corecoder/workflows/durable_budget.py": "a4f41734d4484d354cd3fde0cf55692cd92002037ead5d0562c0c078fe7803ed",
+    "corecoder/workflows/fixtures.py": "6e538357a7929dda61e8a31e9eaa303d6d9319214b2a009f21b81d8640e4cae3",
+    "corecoder/workflows/graph.py": "46d1f52ec4d5894be3747e9caea3715bada7d30d4f721bb63170eae2176fd433",
+    "corecoder/workflows/nodes.py": "c892252735effa5bff46c1e5e82f2966673f14e05e8a9b2ecefde62e788ab29e",
+    "corecoder/workflows/operation_store.py": "84f3c6b50eebc43b0cd6fa9ad3fed69763627aa5151cb52b3298a968f6b68f04",
+    "corecoder/workflows/payload_store.py": "6fce596d7b3763de729afc50507c828dad6cf9bc66c6be5fd315fe8e7f2fc030",
+    "corecoder/workflows/runtime_bridge.py": "a7b256cd6a94e08410b88a2e69a95205be45b42396471307772cb4ce237fc138",
+    "corecoder/workflows/state.py": "c88ecf07ed36a266c6a129466748f6d8181e43799428e7a942ce5ebdb81aefa0",
+    "corecoder/prompts/memory_extract.v1.txt": "5f2d98b67af4285bc01ea1741d16a8e7008c6561d8447a90b60ba559b99f039d",
+    "corecoder/prompts/memory_extract.v2.txt": "445129d9390a2b3bc891b0a88a00f297bc923cf555108def539649731b66eac6",
+    "corecoder/prompts/query_rewrite.v1.txt": "8ac909c6ebc6c018ede829070bdb130b75a91ddf502aab82ded9d7909070dfbc",
+    "corecoder/prompts/query_rewrite.v2.txt": "92a86461951521a9ea2c3d46f9a255d3588bdece806bc4009170781224463c57",
+    "corecoder/prompts/repo_answer.v1.txt": "484d3f10468750829a8f7d9aaaf84741c1d39b1c70cee71f500fb5e798241579",
+    "corecoder/prompts/repo_answer.v2.txt": "8eeef61c61c6b3a6009442179eae33d748dc45dfb521893a3f2cad86d1d318d8",
+    "corecoder/prompts/task_plan.v1.txt": "5430332c7c8b5d13c9e6c317998011e82eda86a7cfe27baf0e42a5f71d483286",
+    "corecoder/prompts/task_plan.v2.txt": "bcc7d67d4dd579e0e021924fa15e9ab73d5265eb861e862e3c308009e543d811",
+    "evals/full_stack_runner.py": "63e55e28e5ca21f52fbc3b026da72aadee844754b4d29b77a2bface52d3f8d15",
+    "examples/full_stack_demo.py": "1526a8557d40dd237ea8f0a1297d498698d2a43d208b3e320d303edbf3c98ead",
+    "examples/graph_resume_demo.py": "cfeb66c556ff0b8f410075848459d513c19c16ab46b2d6e66a2e10886138785b",
+    "examples/knowledge_mcp_demo.py": "2d28cd5287f215f287b0aa526ba941e9090687f66524d79d2befe745ee255706",
+    "evals/prompt_runner.py": "902f168779ec1a7af631da8531302efca7d092bb2f5ee0613d71a382f9a626d4",
+    "pyproject.toml": "43efcd92541abadd1584ddeaf4e80e6809fa1859468b19ef88f66127ee5b1fd8"
+  },
+  "limits": "Offline acceptance uses scripted models/vectors; live API probe is separate. Human quality review is pending."
+}

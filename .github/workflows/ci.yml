@@ -52,6 +52,38 @@ jobs:
           python -m build
           python -m twine check dist/*
 
+  knowledge-prompts:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.14"]
+    env:
+      CORECODER_REQUIRE_KNOWLEDGE_TESTS: "1"
+      LANGSMITH_TRACING: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install repository knowledge dependencies
+        run: python -m pip install -e ".[dev,knowledge]"
+      - name: Run required integration tests
+        run: python -m pytest tests/integrations tests/knowledge tests/memory -q
+      - name: Run local storage demonstrations
+        run: |
+          python -m examples.knowledge_index_demo
+          python -m examples.repo_qa_demo
+          python -m examples.memory_demo
+      - name: Check deterministic memory lifecycle
+        run: python -m evals.memory_runner
+      - name: Compare offline Prompt contracts
+        run: python -m evals.prompt_runner --compare v1 v2 --offline
+      - name: Check dependency resolution
+        run: python -m pip check
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -66,6 +98,61 @@ jobs:
 
       - name: Ruff check
         run: ruff check corecoder tests examples evals
+
+  graph-workflows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.14"]
+    env:
+      CORECODER_REQUIRE_KNOWLEDGE_TESTS: "1"
+      CORECODER_REQUIRE_GRAPH_TESTS: "1"
+      LANGSMITH_TRACING: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install graph and repository dependencies
+        run: python -m pip install -e ".[dev,knowledge,graph]"
+      - name: Run required workflow and runtime tests
+        run: python -m pytest tests --ignore=tests/test_live_smoke.py -q
+      - name: Run actual graph recovery demonstration
+        run: python -m examples.graph_resume_demo
+      - name: Compare matched direct and graph recovery
+        run: python -m evals.recovery_comparison
+      - name: Check dependency resolution
+        run: python -m pip check
+
+  knowledge-mcp:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.14"]
+    env:
+      CORECODER_REQUIRE_KNOWLEDGE_TESTS: "1"
+      CORECODER_REQUIRE_GRAPH_TESTS: "1"
+      CORECODER_REQUIRE_MCP_TESTS: "1"
+      LANGSMITH_TRACING: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install official SDK and repository extensions
+        run: python -m pip install -e ".[dev,knowledge,graph,mcp]"
+      - name: Test actual stdio and resource cleanup
+        run: python -m pytest tests/integrations/test_knowledge_mcp.py -q
+      - name: Compare graph, Agent and independent SDK sources
+        run: python -m examples.knowledge_mcp_demo
+      - name: Check dependency resolution
+        run: python -m pip check
 
   eval-gate:
     runs-on: ubuntu-latest

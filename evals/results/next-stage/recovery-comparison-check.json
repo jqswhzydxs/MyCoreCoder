@@ -1,0 +1,11 @@
+{
+  "timestamp_utc": "2026-11-17T01:52:33.704060+00:00",
+  "command": [
+    ".tmp/mcp-py312/Scripts/python.exe",
+    "-m",
+    "evals.recovery_comparison"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 6.51600000000326,
+  "output": "{\n  \"mode\": \"offline_fixture\",\n  \"runs\": 6,\n  \"duplicate_effects\": 0,\n  \"verified\": 6,\n  \"limitations\": \"Three in-process injected crash boundaries; not OS kill/power loss, arbitrary tools or live-model performance. Both variants use durable budget integration. Graph adds plan/commit stages.\"\n}\n"
+}

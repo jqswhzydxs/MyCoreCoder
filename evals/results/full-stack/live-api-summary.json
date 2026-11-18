@@ -1,0 +1,36 @@
+{
+  "timestamp_utc": "2026-11-18T03:54:21.700990+00:00",
+  "python": "3.12.16",
+  "scope": "Synthetic-input API connectivity and schema only",
+  "result": {
+    "status": "incomplete",
+    "detail": {
+      "mode": "live_api_connectivity",
+      "status": "incomplete",
+      "checks": {
+        "chat": {
+          "status": "passed",
+          "model": "deepseek-flash",
+          "prompt_id": "repo_answer.v2",
+          "schema_valid": true
+        },
+        "embedding": {
+          "status": "not_configured",
+          "model": "text-embedding-v4",
+          "error_category": "missing_independent_embedding_configuration"
+        }
+      },
+      "request_limit": 4,
+      "budget": {
+        "requests": 1,
+        "tokens": 610,
+        "pending_requests": 0,
+        "unknown_usage_requests": 0,
+        "cost_usd": null,
+        "cost_unavailable": true
+      },
+      "limits": "Tiny synthetic-input connectivity/schema probe; not full-corpus Recall or human-reviewed answer quality."
+    },
+    "elapsed_seconds": 2.047
+  }
+}

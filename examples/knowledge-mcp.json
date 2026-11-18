@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "knowledge": {
+      "client": "sdk",
+      "command": "python",
+      "args": ["-m", "corecoder", "mcp", "serve-knowledge", "--root", "/absolute/path/to/project", "--mode", "lexical"],
+      "protocolMode": "auto",
+      "startupTimeout": 30,
+      "callTimeout": 30,
+      "trustedReadOnlyTools": ["knowledge_search", "knowledge_get_chunk"]
+    }
+  }
+}

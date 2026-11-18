@@ -17,6 +17,10 @@ from pathlib import Path
 from openai import APIConnectionError, APIError, APITimeoutError, BadRequestError, OpenAI, RateLimitError
 
 
+class LLMProtocolError(ValueError):
+    """A response cannot safely be treated as a complete model proposal."""
+
+
 @dataclass
 class ToolCall:
     id: str
@@ -31,6 +35,8 @@ class LLMResponse:
     tool_calls: list[ToolCall] = field(default_factory=list)
     prompt_tokens: int = 0
     completion_tokens: int = 0
+    usage_available: bool = False
+    request_id: str | None = None
 
     @property
     def message(self) -> dict:
@@ -143,6 +149,71 @@ class LLM:
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
 
+    def chat_once(
+        self,
+        messages: list[dict],
+        *,
+        tools: list[dict] | None = None,
+        timeout_seconds: float = 30.0,
+        max_tokens: int = 1024,
+    ) -> LLMResponse:
+        """One buffered request for ModelGateway, with SDK retries disabled.
+
+        Partial streams never reach a caller. Parameter adaptation and retries
+        are deliberately absent; the gateway owns the total attempt budget.
+        The original ``chat`` contract remains available to the coding runtime.
+        """
+        params = {
+            **self.extra,
+            "model": self.model,
+            "messages": messages,
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+        dialect = getattr(self, "_gateway_dialect", {})
+        token_key = "max_completion_tokens" if dialect.get("completion_tokens") or "max_completion_tokens" in params else "max_tokens"
+        params.pop("max_tokens", None)
+        params[token_key] = max_tokens
+        if dialect.get("no_temperature"):
+            params.pop("temperature", None)
+        if dialect.get("no_stream_options"):
+            params.pop("stream_options", None)
+        if tools:
+            params["tools"] = tools
+        request_deadline = time.monotonic() + timeout_seconds
+        stream = self._create_once(params, timeout_seconds)
+        try:
+            response = self._drain(stream, None, None, strict_tools=True, deadline=request_deadline)
+            headers = getattr(getattr(stream, "response", None), "headers", {})
+            response.request_id = headers.get("x-request-id")
+            return response
+        finally:
+            close = getattr(stream, "close", None)
+            if callable(close):
+                close()
+
+    def _create_once(self, params: dict, timeout_seconds: float):
+        client = self.client.with_options(max_retries=0, timeout=timeout_seconds)
+        return client.chat.completions.create(**params)
+
+    def adapt_gateway_request(self, exc: Exception) -> bool:
+        """Apply one recognized dialect change; the gateway counts the retry."""
+        if getattr(exc, "status_code", None) != 400:
+            return False
+        dialect = dict(getattr(self, "_gateway_dialect", {}))
+        message = str(exc).lower()
+        changes = [
+            ("'max_tokens'", "completion_tokens", True),
+            ("'temperature'", "no_temperature", "temperature" in self.extra),
+            ("'stream_options'", "no_stream_options", True),
+        ]
+        for quoted, setting, applicable in changes:
+            if quoted in message and applicable and not dialect.get(setting):
+                dialect[setting] = True
+                self._gateway_dialect = dialect
+                return True
+        return False
+
     @property
     def estimated_cost(self) -> float | None:
         """Rough cost estimate in USD. Returns None if the model has no known price."""
@@ -231,16 +302,23 @@ class LLM:
         on_token,
         on_reasoning,
         on_stream_activity=None,
+        *,
+        strict_tools: bool = False,
+        deadline: float | None = None,
     ) -> LLMResponse:
         """Consume one stream into an LLMResponse."""
         content_parts: list[str] = []
         tc_map: dict[int, dict] = {}  # index -> {id, name, arguments_str}
         prompt_tok = 0
         completion_tok = 0
+        usage_available = False
+        completed = False
         reasoning_activity_reported = False
         tool_activity_reported: set[int] = set()
 
         for chunk in stream:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise TimeoutError("model request deadline exhausted")
             # usage info comes in the final chunk; getattr-style reads stay safe
             # across OpenAI SDK objects and litellm's provider-varying shapes
             usage = getattr(chunk, "usage", None)
@@ -249,9 +327,18 @@ class LLM:
                 # running totals below don't blow up on int + None
                 prompt_tok = getattr(usage, "prompt_tokens", 0) or 0
                 completion_tok = getattr(usage, "completion_tokens", 0) or 0
+                usage_available = all(
+                    isinstance(getattr(usage, name, None), int)
+                    and not isinstance(getattr(usage, name, None), bool)
+                    and getattr(usage, name) >= 0
+                    for name in ("prompt_tokens", "completion_tokens")
+                )
 
             if not getattr(chunk, "choices", None):
                 continue
+            finish_reason = getattr(chunk.choices[0], "finish_reason", None)
+            if finish_reason in {"stop", "tool_calls"}:
+                completed = True
             delta = chunk.choices[0].delta
 
             # thinking models stream their chain-of-thought separately; show
@@ -298,6 +385,9 @@ class LLM:
                         if tc_delta.function.arguments:
                             tc_map[idx]["args"] += tc_delta.function.arguments
 
+        if strict_tools and not completed:
+            raise LLMProtocolError("stream ended without a complete response")
+
         # parse accumulated tool calls
         parsed: list[ToolCall] = []
         for idx in sorted(tc_map):
@@ -305,7 +395,11 @@ class LLM:
             try:
                 args = json.loads(raw["args"])
             except (json.JSONDecodeError, KeyError):
+                if strict_tools:
+                    raise LLMProtocolError("incomplete tool arguments") from None
                 args = {}
+            if strict_tools and (not isinstance(args, dict) or not raw["id"] or not raw["name"]):
+                raise LLMProtocolError("incomplete tool call")
             parsed.append(ToolCall(id=raw["id"], name=raw["name"], arguments=args))
 
         self.total_prompt_tokens += prompt_tok
@@ -316,6 +410,7 @@ class LLM:
             tool_calls=parsed,
             prompt_tokens=prompt_tok,
             completion_tokens=completion_tok,
+            usage_available=usage_available,
         )
 
     def _call_with_retry(self, params: dict, max_retries: int = 3):
@@ -364,6 +459,16 @@ class LiteLLM(LLM):
         self.extra = kwargs
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
+
+    def _create_once(self, params: dict, timeout_seconds: float):
+        import litellm
+
+        options = {**params, "num_retries": 0, "max_retries": 0, "timeout": timeout_seconds, "drop_params": True}
+        if self.api_key:
+            options["api_key"] = self.api_key
+        if self.base_url:
+            options["api_base"] = self.base_url
+        return litellm.completion(**options)
 
     def _call_with_retry(self, params: dict, max_retries: int = 3):
         """Retry on transient errors with exponential backoff via litellm."""
