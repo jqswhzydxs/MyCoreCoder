@@ -168,6 +168,10 @@ jobs:
           python -m pip install -U pip
           python -m pip install -e ".[dev]"
 
+      # Check the committed evidence before regeneration replaces its commit SHA.
+      - name: Validate checked-in README benchmark evidence
+        run: python -m evals.readme_benchmark --check
+
       - name: Generate matched baseline and candidate
         run: |
           python -m evals.runner --suite all --variant baseline
@@ -175,9 +179,6 @@ jobs:
 
       - name: Enforce safety and reliability gates
         run: python -m evals.compare baseline candidate
-
-      - name: Validate README benchmark evidence
-        run: python -m evals.readme_benchmark --check
 
       - name: Upload eval evidence
         if: always()
